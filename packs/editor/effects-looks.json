@@ -1,0 +1,530 @@
+{
+  "id": "effects-looks",
+  "title": "Colour looks",
+  "version": 1,
+  "type": "effect",
+  "license": "Original to this project",
+  "items": [
+    {
+      "id": "teal-orange",
+      "name": "Teal and orange",
+      "tags": [
+        "cinematic",
+        "blockbuster",
+        "split-tone"
+      ],
+      "description": "Teal shadows and warm orange highlights, the blockbuster look",
+      "data": {
+        "patch": {
+          "temperature": 16,
+          "tint": -4,
+          "shadowHue": 190,
+          "shadowTone": 40,
+          "highlightHue": 28,
+          "highlightTone": 36,
+          "contrast": 112,
+          "saturation": 110
+        }
+      }
+    },
+    {
+      "id": "golden-hour",
+      "name": "Golden hour",
+      "tags": [
+        "warm",
+        "sunset",
+        "glow"
+      ],
+      "description": "Low warm sun, soft glow and a little vignette",
+      "data": {
+        "patch": {
+          "temperature": 42,
+          "highlights": 10,
+          "shadows": 12,
+          "saturation": 112,
+          "vignette": 25,
+          "bloom": 18,
+          "halation": 10
+        }
+      }
+    },
+    {
+      "id": "blue-hour",
+      "name": "Blue hour",
+      "tags": [
+        "cool",
+        "dusk",
+        "mood"
+      ],
+      "description": "Cool, quiet light just after sunset",
+      "data": {
+        "patch": {
+          "temperature": -34,
+          "tint": -5,
+          "shadowHue": 225,
+          "shadowTone": 45,
+          "saturation": 95,
+          "contrast": 108,
+          "vignette": 20
+        }
+      }
+    },
+    {
+      "id": "bleach-bypass",
+      "name": "Bleach bypass",
+      "tags": [
+        "gritty",
+        "war",
+        "desaturated"
+      ],
+      "description": "Washed colour, hard contrast and grain",
+      "data": {
+        "patch": {
+          "saturation": 55,
+          "contrast": 135,
+          "fade": 8,
+          "grain": 25
+        }
+      }
+    },
+    {
+      "id": "faded-film",
+      "name": "Faded film",
+      "tags": [
+        "film",
+        "retro",
+        "matte"
+      ],
+      "description": "Lifted blacks, softer colour, a little grain",
+      "data": {
+        "patch": {
+          "fade": 40,
+          "saturation": 80,
+          "contrast": 92,
+          "temperature": 10,
+          "grain": 30,
+          "vignette": 15
+        }
+      }
+    },
+    {
+      "id": "warm-stock",
+      "name": "Warm film stock",
+      "tags": [
+        "film",
+        "warm",
+        "nostalgic"
+      ],
+      "description": "Warm colour with a gentle halo round the lights",
+      "data": {
+        "patch": {
+          "temperature": 22,
+          "saturation": 115,
+          "contrast": 108,
+          "highlightHue": 40,
+          "highlightTone": 20,
+          "grain": 18,
+          "halation": 15
+        }
+      }
+    },
+    {
+      "id": "green-stock",
+      "name": "Green film stock",
+      "tags": [
+        "film",
+        "green",
+        "natural"
+      ],
+      "description": "Cool greens and crisp shadows",
+      "data": {
+        "patch": {
+          "tint": -14,
+          "temperature": -6,
+          "saturation": 105,
+          "shadowHue": 150,
+          "shadowTone": 25,
+          "contrast": 106,
+          "grain": 15
+        }
+      }
+    },
+    {
+      "id": "vintage-70s",
+      "name": "Vintage 70s",
+      "tags": [
+        "retro",
+        "warm",
+        "grain"
+      ],
+      "description": "Warm, faded and grainy like an old print",
+      "data": {
+        "patch": {
+          "temperature": 28,
+          "fade": 30,
+          "saturation": 85,
+          "shadowHue": 20,
+          "shadowTone": 25,
+          "vignette": 35,
+          "grain": 35
+        }
+      }
+    },
+    {
+      "id": "noir",
+      "name": "Noir",
+      "tags": [
+        "black-and-white",
+        "drama",
+        "classic"
+      ],
+      "description": "Black and white with hard contrast and dark corners",
+      "data": {
+        "patch": {
+          "saturation": 0,
+          "contrast": 150,
+          "brightness": 95,
+          "vignette": 45,
+          "grain": 30
+        }
+      }
+    },
+    {
+      "id": "soft-pastel",
+      "name": "Soft pastel",
+      "tags": [
+        "light",
+        "dreamy",
+        "gentle"
+      ],
+      "description": "Light, airy and gently glowing",
+      "data": {
+        "patch": {
+          "saturation": 82,
+          "brightness": 112,
+          "contrast": 88,
+          "fade": 18,
+          "temperature": 6,
+          "bloom": 18
+        }
+      }
+    },
+    {
+      "id": "neon-night",
+      "name": "Neon night",
+      "tags": [
+        "night",
+        "city",
+        "cyberpunk"
+      ],
+      "description": "Purple shadows, pink lights and a neon glow",
+      "data": {
+        "patch": {
+          "saturation": 150,
+          "contrast": 120,
+          "shadowHue": 270,
+          "shadowTone": 50,
+          "highlightHue": 330,
+          "highlightTone": 45,
+          "bloom": 45,
+          "vignette": 30
+        }
+      }
+    },
+    {
+      "id": "moody-green",
+      "name": "Moody green",
+      "tags": [
+        "dark",
+        "mood",
+        "thriller"
+      ],
+      "description": "Dark, green-tinted and tense",
+      "data": {
+        "patch": {
+          "tint": -22,
+          "saturation": 80,
+          "contrast": 118,
+          "shadowHue": 160,
+          "shadowTone": 40,
+          "brightness": 94,
+          "vignette": 30
+        }
+      }
+    },
+    {
+      "id": "cross-process",
+      "name": "Cross process",
+      "tags": [
+        "retro",
+        "vivid",
+        "lab"
+      ],
+      "description": "Strong colour shifts, cyan shadows and yellow lights",
+      "data": {
+        "patch": {
+          "contrast": 125,
+          "saturation": 130,
+          "shadowHue": 200,
+          "shadowTone": 45,
+          "highlightHue": 60,
+          "highlightTone": 50,
+          "tint": 8
+        }
+      }
+    },
+    {
+      "id": "dreamy-glow",
+      "name": "Dreamy glow",
+      "tags": [
+        "soft",
+        "romantic",
+        "glow"
+      ],
+      "description": "A soft bloom over everything",
+      "data": {
+        "patch": {
+          "bloom": 60,
+          "halation": 20,
+          "brightness": 108,
+          "contrast": 92,
+          "saturation": 108,
+          "blur": 1,
+          "fade": 10
+        }
+      }
+    },
+    {
+      "id": "matte-black",
+      "name": "Matte black",
+      "tags": [
+        "matte",
+        "modern",
+        "fashion"
+      ],
+      "description": "Milky blacks and calm colour",
+      "data": {
+        "patch": {
+          "fade": 55,
+          "contrast": 115,
+          "saturation": 88,
+          "shadows": 10
+        }
+      }
+    },
+    {
+      "id": "vivid-pop",
+      "name": "Vivid pop",
+      "tags": [
+        "colourful",
+        "social",
+        "bright"
+      ],
+      "description": "Rich, punchy colour",
+      "data": {
+        "patch": {
+          "saturation": 150,
+          "vibrance": 40,
+          "contrast": 118
+        }
+      }
+    },
+    {
+      "id": "drama-desat",
+      "name": "Drama",
+      "tags": [
+        "desaturated",
+        "serious",
+        "cold"
+      ],
+      "description": "Muted colour, strong contrast, a cool cast",
+      "data": {
+        "patch": {
+          "saturation": 60,
+          "contrast": 130,
+          "vignette": 35,
+          "temperature": -8
+        }
+      }
+    },
+    {
+      "id": "sepia",
+      "name": "Sepia",
+      "tags": [
+        "old",
+        "photo",
+        "brown"
+      ],
+      "description": "Warm brown tone like an old photograph",
+      "data": {
+        "patch": {
+          "saturation": 25,
+          "temperature": 60,
+          "tint": 10,
+          "fade": 12,
+          "vignette": 25,
+          "grain": 15
+        }
+      }
+    },
+    {
+      "id": "sunset-blaze",
+      "name": "Sunset blaze",
+      "tags": [
+        "warm",
+        "orange",
+        "dramatic"
+      ],
+      "description": "Hot orange light and deep contrast",
+      "data": {
+        "patch": {
+          "temperature": 55,
+          "saturation": 135,
+          "contrast": 115,
+          "highlightHue": 20,
+          "highlightTone": 40,
+          "vignette": 25,
+          "bloom": 25
+        }
+      }
+    },
+    {
+      "id": "moonlight",
+      "name": "Moonlight",
+      "tags": [
+        "night",
+        "cool",
+        "quiet"
+      ],
+      "description": "Cold blue night with soft darks",
+      "data": {
+        "patch": {
+          "temperature": -45,
+          "brightness": 85,
+          "saturation": 70,
+          "shadowHue": 235,
+          "shadowTone": 40,
+          "contrast": 108,
+          "vignette": 35
+        }
+      }
+    },
+    {
+      "id": "summer-bright",
+      "name": "Summer bright",
+      "tags": [
+        "bright",
+        "happy",
+        "outdoor"
+      ],
+      "description": "Warm, bright and lively",
+      "data": {
+        "patch": {
+          "brightness": 108,
+          "saturation": 118,
+          "temperature": 14,
+          "vibrance": 25,
+          "highlights": 15
+        }
+      }
+    },
+    {
+      "id": "retro-cool-fade",
+      "name": "Retro cool fade",
+      "tags": [
+        "retro",
+        "cool",
+        "indie"
+      ],
+      "description": "Cool, faded and a bit grainy",
+      "data": {
+        "patch": {
+          "fade": 35,
+          "temperature": -12,
+          "saturation": 78,
+          "grain": 25
+        }
+      }
+    },
+    {
+      "id": "high-key",
+      "name": "High key",
+      "tags": [
+        "bright",
+        "clean",
+        "beauty"
+      ],
+      "description": "Bright, low contrast and clean",
+      "data": {
+        "patch": {
+          "brightness": 115,
+          "contrast": 90,
+          "shadows": 40,
+          "saturation": 90,
+          "bloom": 20
+        }
+      }
+    },
+    {
+      "id": "low-key",
+      "name": "Low key",
+      "tags": [
+        "dark",
+        "moody",
+        "dramatic"
+      ],
+      "description": "Dark, contrasty and shadowy",
+      "data": {
+        "patch": {
+          "brightness": 88,
+          "contrast": 125,
+          "shadows": -25,
+          "vignette": 40,
+          "saturation": 95
+        }
+      }
+    },
+    {
+      "id": "cyberpunk",
+      "name": "Cyberpunk",
+      "tags": [
+        "neon",
+        "sci-fi",
+        "city"
+      ],
+      "description": "Cyan shadows and magenta lights",
+      "data": {
+        "patch": {
+          "saturation": 135,
+          "contrast": 122,
+          "shadowHue": 185,
+          "shadowTone": 55,
+          "highlightHue": 315,
+          "highlightTone": 50,
+          "bloom": 35,
+          "chroma": 12
+        }
+      }
+    },
+    {
+      "id": "warm-portrait",
+      "name": "Warm portrait",
+      "tags": [
+        "skin",
+        "people",
+        "soft"
+      ],
+      "description": "Flattering warm skin and soft glow",
+      "data": {
+        "patch": {
+          "temperature": 12,
+          "vibrance": -8,
+          "highlights": -10,
+          "shadows": 15,
+          "bloom": 12,
+          "contrast": 96
+        }
+      }
+    }
+  ]
+}
