@@ -1,0 +1,299 @@
+{
+  "id": "effects-lens",
+  "title": "Film and lens",
+  "version": 1,
+  "type": "effect",
+  "license": "Original to this project",
+  "items": [
+    {
+      "id": "grain-light",
+      "name": "Film grain light",
+      "tags": [
+        "grain",
+        "film",
+        "texture"
+      ],
+      "description": "A fine, light grain",
+      "data": {
+        "patch": {
+          "grain": 25
+        }
+      }
+    },
+    {
+      "id": "grain-heavy",
+      "name": "Film grain heavy",
+      "tags": [
+        "grain",
+        "film",
+        "gritty"
+      ],
+      "description": "Thick, visible grain",
+      "data": {
+        "patch": {
+          "grain": 60,
+          "contrast": 105
+        }
+      }
+    },
+    {
+      "id": "vignette-soft",
+      "name": "Vignette soft",
+      "tags": [
+        "vignette",
+        "focus"
+      ],
+      "description": "Gently darker corners",
+      "data": {
+        "patch": {
+          "vignette": 30
+        }
+      }
+    },
+    {
+      "id": "vignette-strong",
+      "name": "Vignette strong",
+      "tags": [
+        "vignette",
+        "focus",
+        "dramatic"
+      ],
+      "description": "Strongly darker corners",
+      "data": {
+        "patch": {
+          "vignette": 65
+        }
+      }
+    },
+    {
+      "id": "bloom-soft",
+      "name": "Bloom soft",
+      "tags": [
+        "glow",
+        "bloom",
+        "soft"
+      ],
+      "description": "A soft glow from bright parts",
+      "data": {
+        "patch": {
+          "bloom": 30
+        }
+      }
+    },
+    {
+      "id": "bloom-strong",
+      "name": "Bloom strong",
+      "tags": [
+        "glow",
+        "bloom",
+        "dreamy"
+      ],
+      "description": "A strong glow from bright parts",
+      "data": {
+        "patch": {
+          "bloom": 70
+        }
+      }
+    },
+    {
+      "id": "halation-film",
+      "name": "Halation",
+      "tags": [
+        "glow",
+        "film",
+        "red"
+      ],
+      "description": "The red halo of film round bright lights",
+      "data": {
+        "patch": {
+          "halation": 55,
+          "bloom": 15
+        }
+      }
+    },
+    {
+      "id": "chromatic",
+      "name": "Colour fringes",
+      "tags": [
+        "lens",
+        "chromatic",
+        "edge"
+      ],
+      "description": "Red and blue split at the edges like a cheap lens",
+      "data": {
+        "patch": {
+          "chroma": 45
+        }
+      }
+    },
+    {
+      "id": "sharpen-crisp",
+      "name": "Sharpen",
+      "tags": [
+        "sharp",
+        "detail"
+      ],
+      "description": "Crisper edges",
+      "data": {
+        "patch": {
+          "sharpen": 50
+        }
+      }
+    },
+    {
+      "id": "vhs",
+      "name": "VHS",
+      "tags": [
+        "retro",
+        "tape",
+        "analog"
+      ],
+      "description": "Soft, fringed, scan-lined video tape",
+      "data": {
+        "patch": {
+          "chroma": 30,
+          "scanlines": 40,
+          "grain": 30,
+          "fade": 20,
+          "blur": 1,
+          "saturation": 90
+        }
+      }
+    },
+    {
+      "id": "glitch-light",
+      "name": "Glitch light",
+      "tags": [
+        "glitch",
+        "digital"
+      ],
+      "description": "Now and then a band jumps sideways",
+      "data": {
+        "patch": {
+          "glitch": 40,
+          "chroma": 15
+        }
+      }
+    },
+    {
+      "id": "glitch-heavy",
+      "name": "Glitch heavy",
+      "tags": [
+        "glitch",
+        "digital",
+        "energy"
+      ],
+      "description": "Constant jumping bands and colour split",
+      "data": {
+        "patch": {
+          "glitch": 85,
+          "chroma": 35,
+          "scanlines": 20
+        }
+      }
+    },
+    {
+      "id": "crt",
+      "name": "Old screen",
+      "tags": [
+        "retro",
+        "tv",
+        "scanlines"
+      ],
+      "description": "Scan lines, glow and dark corners like a tube TV",
+      "data": {
+        "patch": {
+          "scanlines": 60,
+          "vignette": 40,
+          "bloom": 25,
+          "saturation": 110,
+          "chroma": 10
+        }
+      }
+    },
+    {
+      "id": "leak-warm",
+      "name": "Light leak warm",
+      "tags": [
+        "light-leak",
+        "film",
+        "warm"
+      ],
+      "description": "Warm orange light drifting in from the edges",
+      "data": {
+        "patch": {
+          "leak": 70,
+          "leakHue": 25
+        }
+      }
+    },
+    {
+      "id": "leak-cool",
+      "name": "Light leak cool",
+      "tags": [
+        "light-leak",
+        "film",
+        "cool"
+      ],
+      "description": "Cool blue light drifting in from the edges",
+      "data": {
+        "patch": {
+          "leak": 70,
+          "leakHue": 200
+        }
+      }
+    },
+    {
+      "id": "leak-rose",
+      "name": "Light leak rose",
+      "tags": [
+        "light-leak",
+        "film",
+        "pink"
+      ],
+      "description": "Pink light drifting in from the edges",
+      "data": {
+        "patch": {
+          "leak": 65,
+          "leakHue": 330
+        }
+      }
+    },
+    {
+      "id": "leak-gold",
+      "name": "Light leak gold",
+      "tags": [
+        "light-leak",
+        "film",
+        "gold"
+      ],
+      "description": "Golden light drifting in from the edges",
+      "data": {
+        "patch": {
+          "leak": 70,
+          "leakHue": 50
+        }
+      }
+    },
+    {
+      "id": "film-look",
+      "name": "Film look",
+      "tags": [
+        "film",
+        "cinematic",
+        "combo"
+      ],
+      "description": "Grain, halation, faded blacks and a light vignette together",
+      "data": {
+        "patch": {
+          "grain": 28,
+          "halation": 30,
+          "fade": 18,
+          "vignette": 22,
+          "contrast": 106,
+          "saturation": 104
+        }
+      }
+    }
+  ]
+}

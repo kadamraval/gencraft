@@ -1,0 +1,63 @@
+{
+  "format": 1,
+  "channel": "editor",
+  "updated": "2026-10-24T17:32:45.126Z",
+  "packs": [
+    {
+      "id": "caption-styles-basic",
+      "version": 1,
+      "type": "caption-style",
+      "url": "caption-styles-basic.json",
+      "sha256": "4949078f35e46e2fbfaaf166d69dc400379b6fefb19be59a433f04220fa5692a"
+    },
+    {
+      "id": "caption-styles-premium",
+      "version": 1,
+      "type": "caption-style",
+      "url": "caption-styles-premium.json",
+      "sha256": "3bf3b0977864488faecdde62e7e33f53b6fc2d4cb8eb57c5dde611ff13dd355c"
+    },
+    {
+      "id": "effects-basic",
+      "version": 1,
+      "type": "effect",
+      "url": "effects-basic.json",
+      "sha256": "292d5b7105a815fc3134bd588d7f471aba26032309b382292825bc3baeb3b119"
+    },
+    {
+      "id": "effects-lens",
+      "version": 1,
+      "type": "effect",
+      "url": "effects-lens.json",
+      "sha256": "625d944640331b18df3074c707b21b826a6541ac5351044bf05f2505dc97c562"
+    },
+    {
+      "id": "effects-looks",
+      "version": 1,
+      "type": "effect",
+      "url": "effects-looks.json",
+      "sha256": "dbdc8b7b32c06f738ed62fccb1588be5bc34e62f34758c421e167842d118d193"
+    },
+    {
+      "id": "text-layers",
+      "version": 1,
+      "type": "text-style",
+      "url": "text-layers.json",
+      "sha256": "462ecea5c798ac9cc281f1682a62f0dbde96b3ab80672572534c5f7c7da2b1d3"
+    },
+    {
+      "id": "transitions-basic",
+      "version": 1,
+      "type": "transition",
+      "url": "transitions-basic.json",
+      "sha256": "10522e78e7327018caaa093202254c6cfe192aa11867707de6b217df65a132eb"
+    },
+    {
+      "id": "transitions-premium",
+      "version": 2,
+      "type": "transition",
+      "url": "transitions-premium.json",
+      "sha256": "114a422a9494b3ffb98298d255f028691491d564ad55a8624da1e13714941bb6"
+    }
+  ]
+}
