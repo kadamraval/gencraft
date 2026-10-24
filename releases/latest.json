@@ -1,0 +1,23 @@
+{
+  "version": "0.1.0-beta.5",
+  "notes": "## v0.1.0-beta.5 (2026-11-10)\n\nBeta. Features may change and some things are rough: please report problems at https://github.com/kadamraval/gencraft/issues.\n\n### New\n- One capability rule across the studio: Edit and Video Edit apps, a full-screen picture editor, and top-makers ranking.\n- One model database read by the whole app, one model selector everywhere, and AI tools across every provider.\n- Pricing page with centered Lifetime plan, six-box PIN, unified onboarding shell, and licence settings placed above updates.\n\n### Fixed\n- Updated `rustls` to `0.23.46` for Dependabot security alerts.\n- Fixed `gifenc` ESM import compatibility in Node test runners.",
+  "pub_date": "2026-11-09T21:25:12.838Z",
+  "platforms": {
+    "linux-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUMU5UbUpBS2VKdVE3WGNYRVVlQjVabnJQRk1KK1RpOFhQd1FYM1dYOWJDQi9VUy9tZXZZY3o5UkhCL21DNkNCa0luYXR6YVpSTEF0dU5IMTVrc2dNZklxSnlaKzcxTVFvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk0MjU4OTQ0CWZpbGU6R2VuY3JhZnRfMC4xLjAtYmV0YS41X2FtZDY0LkFwcEltYWdlCXZlcnNpb246MC4xLjAtYmV0YS41CjFhaGY0dVc4NGduRlV0QnJHbWdUdkw2bkkycEM4LzNURjcxWC9UT3pmYThHeW16cUtuSHVsdWEwa2ZVTjV2MTNXUTErRWRGM3BIWXhJYlowdnJUNUFBPT0K",
+      "url": "https://github.com/kadamraval/gencraft/releases/download/v0.1.0-beta.5/Gencraft_0.1.0-beta.5_amd64.AppImage"
+    },
+    "darwin-aarch64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUMU5UbUpBS2VKdVZzNjBiQWEwOWl3dkVRaEUwS3I3UFRLa1M3NDA2K2p2SjJSVEVFemRubW1DcDFEaWorL09BYThIYmpVZFBwbS9iN3hPRWdYRG5zb2taTU5odEY2cFFFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk0MjU4NDUyCWZpbGU6R2VuY3JhZnQuYXBwLnRhci5negl2ZXJzaW9uOjAuMS4wLWJldGEuNQpSMDYrcjVKQTdPajNzaGxVRFhWY0p0RjE1Qkhja2hnN013S0hQbUxsTXd1RGxTTHJvZWRwaWROZG1NUDhhZUlpeHRtZk1FWk4wcXo1VTdmQnloNkpCQT09Cg==",
+      "url": "https://github.com/kadamraval/gencraft/releases/download/v0.1.0-beta.5/Gencraft.app.tar.gz"
+    },
+    "darwin-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUMU5UbUpBS2VKdVZzNjBiQWEwOWl3dkVRaEUwS3I3UFRLa1M3NDA2K2p2SjJSVEVFemRubW1DcDFEaWorL09BYThIYmpVZFBwbS9iN3hPRWdYRG5zb2taTU5odEY2cFFFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk0MjU4NDUyCWZpbGU6R2VuY3JhZnQuYXBwLnRhci5negl2ZXJzaW9uOjAuMS4wLWJldGEuNQpSMDYrcjVKQTdPajNzaGxVRFhWY0p0RjE1Qkhja2hnN013S0hQbUxsTXd1RGxTTHJvZWRwaWROZG1NUDhhZUlpeHRtZk1FWk4wcXo1VTdmQnloNkpCQT09Cg==",
+      "url": "https://github.com/kadamraval/gencraft/releases/download/v0.1.0-beta.5/Gencraft.app.tar.gz"
+    },
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUMU5UbUpBS2VKdVdsWWpRalZxS3ZLcFovN0QvRlp6eThMOWVEVnpZSFBIbDc4clpEcy9JRGh6cExXbFVraDNISFY1YVJiNmhsUjhiR0J1bjVvNlh2Q1BLQlArQnIxM2dvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzk0MjU5MDgyCWZpbGU6R2VuY3JhZnRfMC4xLjAtYmV0YS41X3g2NC1zZXR1cC5leGUJdmVyc2lvbjowLjEuMC1iZXRhLjUKL0RNV2MzMVlTNEcrVGNXaVAzcjBWOHRmWk9XdTI3U3NQbjEzN2VOeTI2MTAvTEIwanhhU0Q4U3N5UnQ1RFY4ZU9ONW4yYUVLWUxTejV2dkpUbi9ERHc9PQo=",
+      "url": "https://github.com/kadamraval/gencraft/releases/download/v0.1.0-beta.5/Gencraft_0.1.0-beta.5_x64-setup.exe"
+    }
+  }
+}

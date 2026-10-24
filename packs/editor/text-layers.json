@@ -1,0 +1,853 @@
+{
+  "id": "text-layers",
+  "title": "Text layers",
+  "version": 1,
+  "type": "text-style",
+  "license": "Original designs; fonts are from Google Fonts (open licences)",
+  "items": [
+    {
+      "id": "big-impact",
+      "name": "Big impact",
+      "tags": [
+        "title",
+        "bold",
+        "social"
+      ],
+      "description": "Huge condensed capitals with a thick black edge",
+      "data": {
+        "text": "BIG IDEA",
+        "duration": 3,
+        "rich": {
+          "family": "Anton",
+          "weight": 400,
+          "size": 128,
+          "color": "#ffffff",
+          "stroke": {
+            "width": 5,
+            "color": "#000000"
+          },
+          "case": "upper",
+          "spacing": 2,
+          "animIn": {
+            "kind": "bounce",
+            "duration": 0.5
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.3
+          }
+        }
+      }
+    },
+    {
+      "id": "montserrat-bold",
+      "name": "Clean headline",
+      "tags": [
+        "title",
+        "modern",
+        "clean"
+      ],
+      "description": "A bold, modern headline that slides up",
+      "data": {
+        "text": "Your headline",
+        "duration": 3,
+        "rich": {
+          "family": "Montserrat",
+          "weight": 800,
+          "size": 84,
+          "color": "#ffffff",
+          "shadow": {
+            "blur": 14,
+            "x": 0,
+            "y": 6,
+            "color": "#000000"
+          },
+          "animIn": {
+            "kind": "slide-up",
+            "duration": 0.6
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.4
+          }
+        }
+      }
+    },
+    {
+      "id": "bebas-letters",
+      "name": "Bebas letters",
+      "tags": [
+        "title",
+        "film",
+        "opening"
+      ],
+      "description": "Tall capitals that come in letter by letter",
+      "data": {
+        "text": "COMING SOON",
+        "duration": 4,
+        "rich": {
+          "family": "Bebas Neue",
+          "weight": 400,
+          "size": 120,
+          "color": "#ffffff",
+          "spacing": 8,
+          "case": "upper",
+          "animIn": {
+            "kind": "letters",
+            "duration": 1.0
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.5
+          }
+        }
+      }
+    },
+    {
+      "id": "cinzel-gold",
+      "name": "Golden cinema",
+      "tags": [
+        "title",
+        "film",
+        "luxury"
+      ],
+      "description": "Gold gradient capitals, wide spaced, fading in",
+      "data": {
+        "text": "A FILM BY",
+        "duration": 4,
+        "rich": {
+          "family": "Cinzel",
+          "weight": 600,
+          "size": 72,
+          "color": "#f5d77a",
+          "gradient": {
+            "color": "#b8860b",
+            "angle": 90
+          },
+          "spacing": 14,
+          "case": "upper",
+          "shadow": {
+            "blur": 10,
+            "x": 0,
+            "y": 4,
+            "color": "#000000"
+          },
+          "animIn": {
+            "kind": "fade",
+            "duration": 1.0
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.8
+          }
+        }
+      }
+    },
+    {
+      "id": "playfair-italic",
+      "name": "Elegant italic",
+      "tags": [
+        "title",
+        "elegant",
+        "editorial"
+      ],
+      "description": "A refined italic serif",
+      "data": {
+        "text": "Make it beautiful",
+        "duration": 4,
+        "rich": {
+          "family": "Playfair Display",
+          "weight": 700,
+          "italic": true,
+          "size": 76,
+          "color": "#ffffff",
+          "shadow": {
+            "blur": 12,
+            "x": 0,
+            "y": 4,
+            "color": "#000000"
+          },
+          "animIn": {
+            "kind": "fade",
+            "duration": 0.8
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.6
+          }
+        }
+      }
+    },
+    {
+      "id": "pacifico-glow",
+      "name": "Glowing script",
+      "tags": [
+        "script",
+        "soft",
+        "romantic"
+      ],
+      "description": "Soft pink script with a glow, zooming in",
+      "data": {
+        "text": "Love story",
+        "duration": 4,
+        "rich": {
+          "family": "Pacifico",
+          "weight": 400,
+          "size": 88,
+          "color": "#ffd1e8",
+          "glow": {
+            "blur": 30,
+            "color": "#ff4fa3"
+          },
+          "animIn": {
+            "kind": "zoom",
+            "duration": 0.7
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.5
+          }
+        }
+      }
+    },
+    {
+      "id": "lobster-pop",
+      "name": "Social pop",
+      "tags": [
+        "social",
+        "fun",
+        "script"
+      ],
+      "description": "A white script with a red edge, popping in",
+      "data": {
+        "text": "Subscribe!",
+        "duration": 3,
+        "rich": {
+          "family": "Lobster",
+          "weight": 400,
+          "size": 86,
+          "color": "#ffffff",
+          "stroke": {
+            "width": 4,
+            "color": "#e11d48"
+          },
+          "shadow": {
+            "blur": 10,
+            "x": 0,
+            "y": 5,
+            "color": "#000000"
+          },
+          "animIn": {
+            "kind": "pop",
+            "duration": 0.5
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.3
+          }
+        }
+      }
+    },
+    {
+      "id": "oswald-lower-third",
+      "name": "Lower third",
+      "tags": [
+        "name",
+        "interview",
+        "label"
+      ],
+      "description": "A name plate at the lower left that slides in",
+      "data": {
+        "text": "NAME · ROLE",
+        "duration": 4,
+        "rich": {
+          "family": "Oswald",
+          "weight": 600,
+          "size": 38,
+          "color": "#ffffff",
+          "spacing": 4,
+          "case": "upper",
+          "align": "left",
+          "x": 26,
+          "y": 82,
+          "width": 40,
+          "bg": {
+            "color": "#1d4ed8",
+            "opacity": 95,
+            "padX": 28,
+            "padY": 14,
+            "radius": 6
+          },
+          "animIn": {
+            "kind": "slide-right",
+            "duration": 0.5
+          },
+          "animOut": {
+            "kind": "slide-left",
+            "duration": 0.4
+          }
+        }
+      }
+    },
+    {
+      "id": "poppins-subtitle",
+      "name": "Clean subtitle",
+      "tags": [
+        "subtitle",
+        "clean",
+        "info"
+      ],
+      "description": "A readable subtitle on a soft dark plate",
+      "data": {
+        "text": "Your words here",
+        "duration": 3,
+        "rich": {
+          "family": "Poppins",
+          "weight": 600,
+          "size": 40,
+          "color": "#ffffff",
+          "y": 86,
+          "width": 76,
+          "bg": {
+            "color": "#000000",
+            "opacity": 70,
+            "padX": 22,
+            "padY": 10,
+            "radius": 14
+          },
+          "animIn": {
+            "kind": "fade",
+            "duration": 0.3
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.3
+          }
+        }
+      }
+    },
+    {
+      "id": "orbitron-tech",
+      "name": "Tech readout",
+      "tags": [
+        "tech",
+        "sci-fi",
+        "glow"
+      ],
+      "description": "Cyan capitals typed out with a glow",
+      "data": {
+        "text": "SYSTEM ONLINE",
+        "duration": 4,
+        "rich": {
+          "family": "Orbitron",
+          "weight": 800,
+          "size": 72,
+          "color": "#22d3ee",
+          "spacing": 8,
+          "case": "upper",
+          "glow": {
+            "blur": 26,
+            "color": "#22d3ee"
+          },
+          "animIn": {
+            "kind": "typewriter",
+            "duration": 1.2
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.4
+          }
+        }
+      }
+    },
+    {
+      "id": "press-start-retro",
+      "name": "Arcade",
+      "tags": [
+        "retro",
+        "game",
+        "pixel"
+      ],
+      "description": "Yellow pixel letters with a brown edge, wiped in",
+      "data": {
+        "text": "GAME START",
+        "duration": 4,
+        "rich": {
+          "family": "Press Start 2P",
+          "weight": 400,
+          "size": 44,
+          "color": "#facc15",
+          "stroke": {
+            "width": 3,
+            "color": "#7c2d12"
+          },
+          "shadow": {
+            "blur": 0,
+            "x": 4,
+            "y": 4,
+            "color": "#000000"
+          },
+          "animIn": {
+            "kind": "wipe",
+            "duration": 0.8
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.3
+          }
+        }
+      }
+    },
+    {
+      "id": "marker-note",
+      "name": "Marker note",
+      "tags": [
+        "handwritten",
+        "fun",
+        "note"
+      ],
+      "description": "A tilted marker scribble that bounces in",
+      "data": {
+        "text": "Don't miss this",
+        "duration": 3,
+        "rich": {
+          "family": "Permanent Marker",
+          "weight": 400,
+          "size": 72,
+          "color": "#ffffff",
+          "rotation": -5,
+          "shadow": {
+            "blur": 8,
+            "x": 3,
+            "y": 4,
+            "color": "#000000"
+          },
+          "animIn": {
+            "kind": "bounce",
+            "duration": 0.5
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.3
+          }
+        }
+      }
+    },
+    {
+      "id": "bangers-comic",
+      "name": "Comic burst",
+      "tags": [
+        "comic",
+        "fun",
+        "action"
+      ],
+      "description": "Yellow comic capitals with a black edge, tilted",
+      "data": {
+        "text": "BOOM!",
+        "duration": 3,
+        "rich": {
+          "family": "Bangers",
+          "weight": 400,
+          "size": 120,
+          "color": "#fde047",
+          "stroke": {
+            "width": 6,
+            "color": "#111111"
+          },
+          "rotation": -4,
+          "case": "upper",
+          "spacing": 3,
+          "animIn": {
+            "kind": "pop",
+            "duration": 0.4
+          },
+          "animOut": {
+            "kind": "zoom",
+            "duration": 0.3
+          }
+        }
+      }
+    },
+    {
+      "id": "raleway-thin",
+      "name": "Thin minimal",
+      "tags": [
+        "minimal",
+        "clean",
+        "elegant"
+      ],
+      "description": "Very thin, widely spaced capitals",
+      "data": {
+        "text": "MINIMAL",
+        "duration": 4,
+        "rich": {
+          "family": "Raleway",
+          "weight": 200,
+          "size": 80,
+          "color": "#ffffff",
+          "spacing": 20,
+          "case": "upper",
+          "animIn": {
+            "kind": "fade",
+            "duration": 1.0
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.8
+          }
+        }
+      }
+    },
+    {
+      "id": "abril-gradient",
+      "name": "Fashion headline",
+      "tags": [
+        "title",
+        "fashion",
+        "editorial"
+      ],
+      "description": "A heavy serif headline with a rose gradient",
+      "data": {
+        "text": "The New Look",
+        "duration": 4,
+        "rich": {
+          "family": "Abril Fatface",
+          "weight": 400,
+          "size": 104,
+          "color": "#ffffff",
+          "gradient": {
+            "color": "#fda4af",
+            "angle": 90
+          },
+          "shadow": {
+            "blur": 14,
+            "x": 0,
+            "y": 6,
+            "color": "#000000"
+          },
+          "animIn": {
+            "kind": "slide-up",
+            "duration": 0.7
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.4
+          }
+        }
+      }
+    },
+    {
+      "id": "archivo-block",
+      "name": "Red block",
+      "tags": [
+        "label",
+        "bold",
+        "news"
+      ],
+      "description": "White capitals on a red block",
+      "data": {
+        "text": "LIVE",
+        "duration": 3,
+        "rich": {
+          "family": "Archivo Black",
+          "weight": 400,
+          "size": 72,
+          "color": "#ffffff",
+          "case": "upper",
+          "spacing": 2,
+          "bg": {
+            "color": "#ef4444",
+            "opacity": 100,
+            "padX": 34,
+            "padY": 8,
+            "radius": 4
+          },
+          "animIn": {
+            "kind": "slide-up",
+            "duration": 0.4
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.3
+          }
+        }
+      }
+    },
+    {
+      "id": "righteous-neon",
+      "name": "Violet neon",
+      "tags": [
+        "neon",
+        "night",
+        "glow"
+      ],
+      "description": "A bright sign with a violet glow",
+      "data": {
+        "text": "OPEN NOW",
+        "duration": 4,
+        "rich": {
+          "family": "Righteous",
+          "weight": 400,
+          "size": 90,
+          "color": "#ffffff",
+          "glow": {
+            "blur": 38,
+            "color": "#a855f7"
+          },
+          "case": "upper",
+          "spacing": 6,
+          "animIn": {
+            "kind": "zoom",
+            "duration": 0.6
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.4
+          }
+        }
+      }
+    },
+    {
+      "id": "caveat-hand",
+      "name": "Handwriting",
+      "tags": [
+        "handwritten",
+        "soft",
+        "personal"
+      ],
+      "description": "A warm handwritten line that blurs in",
+      "data": {
+        "text": "with love",
+        "duration": 4,
+        "rich": {
+          "family": "Caveat",
+          "weight": 700,
+          "size": 90,
+          "color": "#fef3c7",
+          "rotation": -3,
+          "shadow": {
+            "blur": 10,
+            "x": 0,
+            "y": 4,
+            "color": "#000000"
+          },
+          "animIn": {
+            "kind": "blur",
+            "duration": 0.8
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.5
+          }
+        }
+      }
+    },
+    {
+      "id": "dancing-wedding",
+      "name": "Wedding script",
+      "tags": [
+        "wedding",
+        "script",
+        "soft"
+      ],
+      "description": "A flowing white script with a soft glow",
+      "data": {
+        "text": "Happily ever after",
+        "duration": 5,
+        "rich": {
+          "family": "Dancing Script",
+          "weight": 700,
+          "size": 92,
+          "color": "#ffffff",
+          "glow": {
+            "blur": 18,
+            "color": "#ffffff"
+          },
+          "animIn": {
+            "kind": "fade",
+            "duration": 1.2
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 1.0
+          }
+        }
+      }
+    },
+    {
+      "id": "russo-sport",
+      "name": "Sport slam",
+      "tags": [
+        "sport",
+        "bold",
+        "energy"
+      ],
+      "description": "White capitals with a blue edge, sliding in",
+      "data": {
+        "text": "GAME DAY",
+        "duration": 3,
+        "rich": {
+          "family": "Russo One",
+          "weight": 400,
+          "size": 100,
+          "color": "#ffffff",
+          "stroke": {
+            "width": 4,
+            "color": "#0ea5e9"
+          },
+          "case": "upper",
+          "shadow": {
+            "blur": 12,
+            "x": 0,
+            "y": 6,
+            "color": "#000000"
+          },
+          "animIn": {
+            "kind": "slide-left",
+            "duration": 0.5
+          },
+          "animOut": {
+            "kind": "slide-right",
+            "duration": 0.4
+          }
+        }
+      }
+    },
+    {
+      "id": "grotesk-letters",
+      "name": "Modern letters",
+      "tags": [
+        "modern",
+        "title",
+        "tech"
+      ],
+      "description": "Clean bold type that arrives letter by letter",
+      "data": {
+        "text": "Design forward",
+        "duration": 4,
+        "rich": {
+          "family": "Space Grotesk",
+          "weight": 700,
+          "size": 78,
+          "color": "#ffffff",
+          "animIn": {
+            "kind": "letters",
+            "duration": 0.9
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.4
+          }
+        }
+      }
+    },
+    {
+      "id": "fredoka-bubble",
+      "name": "Bubble",
+      "tags": [
+        "fun",
+        "kids",
+        "playful"
+      ],
+      "description": "Round white letters with a pink edge, bouncing",
+      "data": {
+        "text": "Hello!",
+        "duration": 3,
+        "rich": {
+          "family": "Fredoka",
+          "weight": 700,
+          "size": 96,
+          "color": "#ffffff",
+          "stroke": {
+            "width": 6,
+            "color": "#ec4899"
+          },
+          "shadow": {
+            "blur": 0,
+            "x": 0,
+            "y": 6,
+            "color": "#9d174d"
+          },
+          "animIn": {
+            "kind": "bounce",
+            "duration": 0.5
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.3
+          }
+        }
+      }
+    },
+    {
+      "id": "playfair-quote",
+      "name": "Pull quote",
+      "tags": [
+        "quote",
+        "editorial",
+        "calm"
+      ],
+      "description": "A quiet italic quote, narrower",
+      "data": {
+        "text": "A line worth keeping",
+        "duration": 5,
+        "rich": {
+          "family": "Playfair Display",
+          "weight": 400,
+          "italic": true,
+          "size": 58,
+          "color": "#ffffff",
+          "width": 60,
+          "lineHeight": 1.3,
+          "animIn": {
+            "kind": "fade",
+            "duration": 1.0
+          },
+          "animOut": {
+            "kind": "fade",
+            "duration": 0.8
+          }
+        }
+      }
+    },
+    {
+      "id": "news-banner",
+      "name": "News banner",
+      "tags": [
+        "news",
+        "label",
+        "info"
+      ],
+      "description": "A red banner with condensed capitals at the bottom",
+      "data": {
+        "text": "BREAKING NEWS",
+        "duration": 4,
+        "rich": {
+          "family": "Roboto Condensed",
+          "weight": 700,
+          "size": 36,
+          "color": "#ffffff",
+          "spacing": 3,
+          "case": "upper",
+          "y": 90,
+          "width": 60,
+          "bg": {
+            "color": "#b91c1c",
+            "opacity": 100,
+            "padX": 26,
+            "padY": 10,
+            "radius": 0
+          },
+          "animIn": {
+            "kind": "slide-up",
+            "duration": 0.4
+          },
+          "animOut": {
+            "kind": "slide-down",
+            "duration": 0.3
+          }
+        }
+      }
+    }
+  ]
+}
