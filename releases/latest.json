@@ -1,0 +1,23 @@
+{
+  "version": "0.1.0-beta.4",
+  "notes": "## v0.1.0-beta.4 (2026-10-25)\n\nBeta. Features may change and some things are rough: please report problems at https://github.com/kadamraval/gencraft/issues.\n\n### New\n- First run is short: sign up (guest for now, accounts open later), an optional PIN, pricing, and one quick setup screen.\n- Free and Paid: Free is open source with one project; Paid (One Year $39 or Lifetime $99, same features) adds Agents, Connectors, building your own Apps and email support.\n- Agents has its own area: Plan, Batch Create & Edit and Skills. Create and Edit no longer carry skills or batch controls.\n- Connectors (Google Drive, Dropbox, Pinterest) are Paid.\n- Providers show this month's usage next to each provider name.\n\n### Other\n- Projects are now saved on this device; a new install starts with one project.\n- The folders, skills and elements limits are removed.",
+  "pub_date": "2026-10-25T11:35:47.707Z",
+  "platforms": {
+    "linux-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUMU5UbUpBS2VKdVRUMG5FN1pyUW4vZzJEQ2Z4M1VFVCtqcERoOS9LTVpTVEFlRVJBdkdxU3BhbjUyTnZyMXFQY1FpSFFIMDhnVkUzWlBDR3FOVzZsL0gzWXNGWmRPeFEwPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyOTI3NzU1CWZpbGU6R2VuY3JhZnRfMC4xLjAtYmV0YS40X2FtZDY0LkFwcEltYWdlCXZlcnNpb246MC4xLjAtYmV0YS40CnNqZDVWL3ZaT0hZaFp6M0x0bVV5blAyVStvYjZPMjNFMHpyRis3dU1ZV2ZVL2VOU0JwdWE3bS9rMnREWmg5QUpyaWdScmRMYVlWZjZHVktMV2dBaEFnPT0K",
+      "url": "https://github.com/kadamraval/gencraft/releases/download/v0.1.0-beta.4/Gencraft_0.1.0-beta.4_amd64.AppImage"
+    },
+    "darwin-aarch64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUMU5UbUpBS2VKdVdCMlZKYU44OWhRMk5FOFN0eFlaYU14YnJXenNyS1lmbDNyYW55K3FsT3VEY2J2Ynlza09CUGQ0dHYxMmhxTW85a25KSENjQmN3STZwT2Z4eFZ6cGc4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyOTI3MjgyCWZpbGU6R2VuY3JhZnQuYXBwLnRhci5negl2ZXJzaW9uOjAuMS4wLWJldGEuNApMTkJVZExGZEJadUJaRDBkdFhuOXJqR1RLRnhuQXRrb0N4OWVwNkZpeWtOaXFxalNGRXE3QzFzQlIydmsrTGJRdTBFcC83dUdsNmcwNVdjdGJrU3JBUT09Cg==",
+      "url": "https://github.com/kadamraval/gencraft/releases/download/v0.1.0-beta.4/Gencraft.app.tar.gz"
+    },
+    "darwin-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUMU5UbUpBS2VKdVdCMlZKYU44OWhRMk5FOFN0eFlaYU14YnJXenNyS1lmbDNyYW55K3FsT3VEY2J2Ynlza09CUGQ0dHYxMmhxTW85a25KSENjQmN3STZwT2Z4eFZ6cGc4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyOTI3MjgyCWZpbGU6R2VuY3JhZnQuYXBwLnRhci5negl2ZXJzaW9uOjAuMS4wLWJldGEuNApMTkJVZExGZEJadUJaRDBkdFhuOXJqR1RLRnhuQXRrb0N4OWVwNkZpeWtOaXFxalNGRXE3QzFzQlIydmsrTGJRdTBFcC83dUdsNmcwNVdjdGJrU3JBUT09Cg==",
+      "url": "https://github.com/kadamraval/gencraft/releases/download/v0.1.0-beta.4/Gencraft.app.tar.gz"
+    },
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUMU5UbUpBS2VKdVhNMmR0Q1RPdjhvVTAxR211b2RYVjB4SEc5VnlJNE9CWDZNak82eHhXZXZaNy9maGlUWjBvb1JNMk1RMzMwLy9pMEJVMkZNWXB6OUo5bEZZZzlrRHdVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyOTI4MDA3CWZpbGU6R2VuY3JhZnRfMC4xLjAtYmV0YS40X3g2NC1zZXR1cC5leGUJdmVyc2lvbjowLjEuMC1iZXRhLjQKOXhrSEx3K0dvd3MyQnkzVmFFV2RoK0tpcUMvYTVmK1VrekhlcGFEVFRVRlJNQVdZYVd5UkhRUk5GMXdNZmlRT1NiK2tINmhkVmZ2OXY4VlM2WVZTQ3c9PQo=",
+      "url": "https://github.com/kadamraval/gencraft/releases/download/v0.1.0-beta.4/Gencraft_0.1.0-beta.4_x64-setup.exe"
+    }
+  }
+}

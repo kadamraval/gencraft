@@ -1,0 +1,18 @@
+{
+  "id": "caption-styles-basic",
+  "title": "Caption styles",
+  "version": 1,
+  "type": "caption-style",
+  "license": "Original to this project",
+  "items": [
+    { "id": "classic", "name": "Classic", "tags": ["clean", "subtitle"], "description": "White letters with a dark outline at the bottom", "data": { "style": { "size": "m", "position": "bottom", "font": "sans", "color": "white", "look": "outline", "animation": "none" } } },
+    { "id": "bold-yellow", "name": "Bold yellow", "tags": ["social", "bold"], "description": "Big yellow display letters with a shadow", "data": { "style": { "size": "l", "position": "bottom", "font": "display", "color": "yellow", "look": "shadow", "animation": "pop" } } },
+    { "id": "boxed", "name": "Boxed", "tags": ["clean", "readable"], "description": "White letters on a dark box", "data": { "style": { "size": "m", "position": "bottom", "font": "sans", "color": "white", "look": "box", "animation": "fade" } } },
+    { "id": "neon", "name": "Neon", "tags": ["glow", "night"], "description": "Cyan letters with a soft shadow", "data": { "style": { "size": "l", "position": "middle", "font": "display", "color": "cyan", "look": "shadow", "animation": "fade" } } },
+    { "id": "retro-serif", "name": "Retro serif", "tags": ["film", "retro"], "description": "Serif letters, plain, rising in", "data": { "style": { "size": "m", "position": "bottom", "font": "serif", "color": "white", "look": "shadow", "animation": "rise" } } },
+    { "id": "typewriter", "name": "Typewriter", "tags": ["mono", "story"], "description": "Monospace letters typed out one by one", "data": { "style": { "size": "m", "position": "bottom", "font": "mono", "color": "white", "look": "box", "animation": "typewriter" } } },
+    { "id": "title-pop", "name": "Title pop", "tags": ["title", "bold"], "description": "A very large centred title that springs in", "data": { "style": { "size": "xl", "position": "middle", "font": "display", "color": "white", "look": "outline", "animation": "pop" } } },
+    { "id": "top-note", "name": "Top note", "tags": ["label"], "description": "A small label at the top", "data": { "style": { "size": "s", "position": "top", "font": "sans", "color": "white", "look": "box", "animation": "fade" } } },
+    { "id": "alert", "name": "Alert", "tags": ["warning", "bold"], "description": "Red display letters, shadow, popping in", "data": { "style": { "size": "l", "position": "middle", "font": "display", "color": "red", "look": "shadow", "animation": "pop" } } }
+  ]
+}

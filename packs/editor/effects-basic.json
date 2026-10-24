@@ -1,0 +1,21 @@
+{
+  "id": "effects-basic",
+  "title": "Basic looks",
+  "version": 1,
+  "type": "effect",
+  "license": "Original to this project",
+  "items": [
+    { "id": "bw", "name": "Black and white", "tags": ["color", "classic"], "description": "Removes all colour", "data": { "patch": { "saturation": 0 } } },
+    { "id": "vivid", "name": "Vivid", "tags": ["color", "pop"], "description": "Rich colour and a little more contrast", "data": { "patch": { "saturation": 150, "contrast": 115 } } },
+    { "id": "faded", "name": "Faded film", "tags": ["color", "film", "retro"], "description": "Soft, lifted blacks like an old print", "data": { "patch": { "saturation": 70, "contrast": 85, "brightness": 108 } } },
+    { "id": "punch", "name": "High contrast", "tags": ["color", "dramatic"], "description": "Strong blacks and bright highlights", "data": { "patch": { "contrast": 150 } } },
+    { "id": "dim", "name": "Dim", "tags": ["color", "mood"], "description": "Darker, quieter picture", "data": { "patch": { "brightness": 70 } } },
+    { "id": "dream", "name": "Dream", "tags": ["blur", "soft", "mood"], "description": "A soft, glowing haze", "data": { "patch": { "blur": 4, "brightness": 110, "saturation": 120 } } },
+    { "id": "soft", "name": "Soft focus", "tags": ["blur", "soft"], "description": "A light blur", "data": { "patch": { "blur": 2 } } },
+    { "id": "mirror", "name": "Mirror", "tags": ["transform"], "description": "Flips the picture left to right", "data": { "patch": { "flipH": true } } },
+    { "id": "zoom", "name": "Zoom in 20%", "tags": ["transform", "motion"], "description": "Closer on the subject", "data": { "patch": { "scale": 120 } } },
+    { "id": "pip", "name": "Picture in picture", "tags": ["transform", "layout"], "description": "A small window in the corner", "data": { "patch": { "scale": 35, "x": 30, "y": 30 } } },
+    { "id": "slow", "name": "Slow motion", "tags": ["speed"], "description": "Half speed", "data": { "patch": { "speed": 50 } } },
+    { "id": "fast", "name": "Fast forward", "tags": ["speed"], "description": "Double speed", "data": { "patch": { "speed": 200 } } }
+  ]
+}

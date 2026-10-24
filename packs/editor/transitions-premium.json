@@ -1,0 +1,614 @@
+{
+  "id": "transitions-premium",
+  "title": "Premium transitions",
+  "version": 2,
+  "type": "transition",
+  "license": "Original shaders written for this project",
+  "items": [
+    {
+      "id": "dissolve",
+      "name": "Dissolve",
+      "tags": [
+        "fade",
+        "classic",
+        "smooth"
+      ],
+      "description": "One picture melts into the next",
+      "data": {
+        "kind": "shader",
+        "duration": 1.0,
+        "glsl": "vec4 transition(vec2 uv) {\n  return mix(getFromColor(uv), getToColor(uv), smoothstep(0.0, 1.0, progress));\n}\n"
+      }
+    },
+    {
+      "id": "dip-black",
+      "name": "Dip to black",
+      "tags": [
+        "fade",
+        "classic",
+        "drama"
+      ],
+      "description": "Down to black, then up into the next picture",
+      "data": {
+        "kind": "shader",
+        "duration": 1.0,
+        "glsl": "vec4 transition(vec2 uv) {\n  float a = smoothstep(0.0, 0.5, progress);\n  float b = smoothstep(0.5, 1.0, progress);\n  return mix(mix(getFromColor(uv), vec4(0.0, 0.0, 0.0, 1.0), a), getToColor(uv), b);\n}\n"
+      }
+    },
+    {
+      "id": "dip-white",
+      "name": "Flash to white",
+      "tags": [
+        "fade",
+        "flash",
+        "bright"
+      ],
+      "description": "A bright flash covers the change",
+      "data": {
+        "kind": "shader",
+        "duration": 0.8,
+        "glsl": "vec4 transition(vec2 uv) {\n  float a = smoothstep(0.0, 0.5, progress);\n  float b = smoothstep(0.5, 1.0, progress);\n  return mix(mix(getFromColor(uv), vec4(1.0), a), getToColor(uv), b);\n}\n"
+      }
+    },
+    {
+      "id": "wipe-right",
+      "name": "Wipe right",
+      "tags": [
+        "wipe",
+        "directional"
+      ],
+      "description": "The next picture sweeps in from the left",
+      "data": {
+        "kind": "shader",
+        "duration": 0.9,
+        "glsl": "uniform vec2 direction; // = vec2(1.0, 0.0)\nuniform float softness; // = 0.08\nvec4 transition(vec2 uv) {\n  vec2 n = normalize(direction);\n  float h = 0.5 * (abs(n.x) + abs(n.y));\n  float along = (dot(uv - 0.5, n) + h) / (2.0 * h);\n  float edge = progress * (1.0 + softness) - softness;\n  float m = smoothstep(edge, edge + softness, along);\n  return mix(getToColor(uv), getFromColor(uv), m);\n}\n",
+        "params": {
+          "direction": [
+            1,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "id": "wipe-left",
+      "name": "Wipe left",
+      "tags": [
+        "wipe",
+        "directional"
+      ],
+      "description": "The next picture sweeps in from the right",
+      "data": {
+        "kind": "shader",
+        "duration": 0.9,
+        "glsl": "uniform vec2 direction; // = vec2(1.0, 0.0)\nuniform float softness; // = 0.08\nvec4 transition(vec2 uv) {\n  vec2 n = normalize(direction);\n  float h = 0.5 * (abs(n.x) + abs(n.y));\n  float along = (dot(uv - 0.5, n) + h) / (2.0 * h);\n  float edge = progress * (1.0 + softness) - softness;\n  float m = smoothstep(edge, edge + softness, along);\n  return mix(getToColor(uv), getFromColor(uv), m);\n}\n",
+        "params": {
+          "direction": [
+            -1,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "id": "wipe-up",
+      "name": "Wipe up",
+      "tags": [
+        "wipe",
+        "directional"
+      ],
+      "description": "The next picture sweeps up from the bottom",
+      "data": {
+        "kind": "shader",
+        "duration": 0.9,
+        "glsl": "uniform vec2 direction; // = vec2(1.0, 0.0)\nuniform float softness; // = 0.08\nvec4 transition(vec2 uv) {\n  vec2 n = normalize(direction);\n  float h = 0.5 * (abs(n.x) + abs(n.y));\n  float along = (dot(uv - 0.5, n) + h) / (2.0 * h);\n  float edge = progress * (1.0 + softness) - softness;\n  float m = smoothstep(edge, edge + softness, along);\n  return mix(getToColor(uv), getFromColor(uv), m);\n}\n",
+        "params": {
+          "direction": [
+            0,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "id": "wipe-down",
+      "name": "Wipe down",
+      "tags": [
+        "wipe",
+        "directional"
+      ],
+      "description": "The next picture sweeps down from the top",
+      "data": {
+        "kind": "shader",
+        "duration": 0.9,
+        "glsl": "uniform vec2 direction; // = vec2(1.0, 0.0)\nuniform float softness; // = 0.08\nvec4 transition(vec2 uv) {\n  vec2 n = normalize(direction);\n  float h = 0.5 * (abs(n.x) + abs(n.y));\n  float along = (dot(uv - 0.5, n) + h) / (2.0 * h);\n  float edge = progress * (1.0 + softness) - softness;\n  float m = smoothstep(edge, edge + softness, along);\n  return mix(getToColor(uv), getFromColor(uv), m);\n}\n",
+        "params": {
+          "direction": [
+            0,
+            -1
+          ]
+        }
+      }
+    },
+    {
+      "id": "push-left",
+      "name": "Push left",
+      "tags": [
+        "slide",
+        "push",
+        "directional"
+      ],
+      "description": "Both pictures slide left together",
+      "data": {
+        "kind": "shader",
+        "duration": 0.8,
+        "glsl": "uniform vec2 direction; // = vec2(-1.0, 0.0)\nvec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 uf = uv - direction * p;\n  vec2 ut = uv - direction * (p - 1.0);\n  bool inFrom = uf.x >= 0.0 && uf.x <= 1.0 && uf.y >= 0.0 && uf.y <= 1.0;\n  return inFrom ? getFromColor(uf) : getToColor(ut);\n}\n",
+        "params": {
+          "direction": [
+            -1,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "id": "push-right",
+      "name": "Push right",
+      "tags": [
+        "slide",
+        "push",
+        "directional"
+      ],
+      "description": "Both pictures slide right together",
+      "data": {
+        "kind": "shader",
+        "duration": 0.8,
+        "glsl": "uniform vec2 direction; // = vec2(-1.0, 0.0)\nvec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 uf = uv - direction * p;\n  vec2 ut = uv - direction * (p - 1.0);\n  bool inFrom = uf.x >= 0.0 && uf.x <= 1.0 && uf.y >= 0.0 && uf.y <= 1.0;\n  return inFrom ? getFromColor(uf) : getToColor(ut);\n}\n",
+        "params": {
+          "direction": [
+            1,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "id": "push-up",
+      "name": "Push up",
+      "tags": [
+        "slide",
+        "push",
+        "directional"
+      ],
+      "description": "Both pictures slide up together",
+      "data": {
+        "kind": "shader",
+        "duration": 0.8,
+        "glsl": "uniform vec2 direction; // = vec2(-1.0, 0.0)\nvec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 uf = uv - direction * p;\n  vec2 ut = uv - direction * (p - 1.0);\n  bool inFrom = uf.x >= 0.0 && uf.x <= 1.0 && uf.y >= 0.0 && uf.y <= 1.0;\n  return inFrom ? getFromColor(uf) : getToColor(ut);\n}\n",
+        "params": {
+          "direction": [
+            0,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "id": "push-down",
+      "name": "Push down",
+      "tags": [
+        "slide",
+        "push",
+        "directional"
+      ],
+      "description": "Both pictures slide down together",
+      "data": {
+        "kind": "shader",
+        "duration": 0.8,
+        "glsl": "uniform vec2 direction; // = vec2(-1.0, 0.0)\nvec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 uf = uv - direction * p;\n  vec2 ut = uv - direction * (p - 1.0);\n  bool inFrom = uf.x >= 0.0 && uf.x <= 1.0 && uf.y >= 0.0 && uf.y <= 1.0;\n  return inFrom ? getFromColor(uf) : getToColor(ut);\n}\n",
+        "params": {
+          "direction": [
+            0,
+            -1
+          ]
+        }
+      }
+    },
+    {
+      "id": "zoom-through",
+      "name": "Zoom through",
+      "tags": [
+        "zoom",
+        "dynamic"
+      ],
+      "description": "Fly into the first picture and out of the next",
+      "data": {
+        "kind": "shader",
+        "duration": 1.0,
+        "glsl": "vec4 transition(vec2 uv) {\n  vec2 c = vec2(0.5);\n  float p = smoothstep(0.0, 1.0, progress);\n  float zf = 1.0 + p * 1.2;\n  float zt = 2.2 - p * 1.2;\n  vec4 a = getFromColor(c + (uv - c) / zf);\n  vec4 b = getToColor(c + (uv - c) / zt);\n  return mix(a, b, smoothstep(0.35, 0.65, p));\n}\n"
+      }
+    },
+    {
+      "id": "zoom-blur",
+      "name": "Zoom blur",
+      "tags": [
+        "zoom",
+        "blur",
+        "dynamic",
+        "energy"
+      ],
+      "description": "A fast radial blur carries the cut",
+      "data": {
+        "kind": "shader",
+        "duration": 0.9,
+        "glsl": "vec4 transition(vec2 uv) {\n  vec2 c = vec2(0.5);\n  float strength = sin(progress * 3.14159265) * 0.18;\n  vec4 a = vec4(0.0);\n  vec4 b = vec4(0.0);\n  for (int i = 0; i < 12; i++) {\n    float t = float(i) / 11.0;\n    vec2 s = c + (uv - c) * (1.0 - strength * t);\n    a += getFromColor(s);\n    b += getToColor(s);\n  }\n  return mix(a / 12.0, b / 12.0, smoothstep(0.35, 0.65, progress));\n}\n"
+      }
+    },
+    {
+      "id": "circle-open",
+      "name": "Circle open",
+      "tags": [
+        "shape",
+        "reveal"
+      ],
+      "description": "The next picture opens from the middle in a circle",
+      "data": {
+        "kind": "shader",
+        "duration": 0.9,
+        "glsl": "vec4 transition(vec2 uv) {\n  vec2 p = (uv - 0.5) * vec2(ratio, 1.0);\n  float reach = length(vec2(ratio, 1.0) * 0.5);\n  float r = progress * reach * 1.05;\n  float m = smoothstep(r, r - 0.03, length(p));\n  return mix(getFromColor(uv), getToColor(uv), m);\n}\n"
+      }
+    },
+    {
+      "id": "clock-wipe",
+      "name": "Clock wipe",
+      "tags": [
+        "shape",
+        "reveal",
+        "classic"
+      ],
+      "description": "A sweeping hand reveals the next picture",
+      "data": {
+        "kind": "shader",
+        "duration": 1.0,
+        "glsl": "vec4 transition(vec2 uv) {\n  vec2 d = uv - 0.5;\n  float angle = atan(d.x, -d.y);\n  float a = (angle + 3.14159265) / 6.2831853;\n  float m = step(a, progress);\n  return mix(getFromColor(uv), getToColor(uv), m);\n}\n"
+      }
+    },
+    {
+      "id": "blinds",
+      "name": "Blinds",
+      "tags": [
+        "slats",
+        "classic"
+      ],
+      "description": "Slats turn over to show the next picture",
+      "data": {
+        "kind": "shader",
+        "duration": 0.9,
+        "glsl": "uniform float slats; // = 10.0\nvec4 transition(vec2 uv) {\n  float m = step(fract(uv.x * slats), progress);\n  return mix(getFromColor(uv), getToColor(uv), m);\n}\n"
+      }
+    },
+    {
+      "id": "pixelize",
+      "name": "Pixelize",
+      "tags": [
+        "digital",
+        "retro"
+      ],
+      "description": "Both pictures break into blocks and back",
+      "data": {
+        "kind": "shader",
+        "duration": 0.9,
+        "glsl": "uniform float blocks; // = 48.0\nvec4 transition(vec2 uv) {\n  float amount = sin(progress * 3.14159265);\n  float size = mix(1.0, blocks, amount);\n  vec2 grid = vec2(size * ratio, size);\n  vec2 q = amount > 0.01 ? (floor(uv * grid) + 0.5) / grid : uv;\n  return mix(getFromColor(q), getToColor(q), smoothstep(0.4, 0.6, progress));\n}\n"
+      }
+    },
+    {
+      "id": "glitch",
+      "name": "Glitch",
+      "tags": [
+        "digital",
+        "glitch",
+        "energy"
+      ],
+      "description": "Colour splits and torn blocks jump to the next picture",
+      "data": {
+        "kind": "shader",
+        "duration": 0.7,
+        "glsl": "float rnd(vec2 s) {\n  return fract(sin(dot(s, vec2(12.9898, 78.233))) * 43758.5453);\n}\nvec4 transition(vec2 uv) {\n  float amount = sin(progress * 3.14159265);\n  float row = floor(uv.y * 24.0);\n  float shake = (rnd(vec2(row, floor(progress * 14.0))) - 0.5) * 0.22 * amount;\n  vec2 u = uv + vec2(shake, 0.0);\n  float split = 0.012 * amount;\n  vec4 a = vec4(getFromColor(u + vec2(split, 0.0)).r, getFromColor(u).g, getFromColor(u - vec2(split, 0.0)).b, 1.0);\n  vec4 b = vec4(getToColor(u + vec2(split, 0.0)).r, getToColor(u).g, getToColor(u - vec2(split, 0.0)).b, 1.0);\n  float cut = progress + (rnd(vec2(row, 3.0)) - 0.5) * 0.3 * amount;\n  return mix(a, b, step(0.5, cut));\n}\n"
+      }
+    },
+    {
+      "id": "whip-pan",
+      "name": "Whip pan",
+      "tags": [
+        "motion",
+        "blur",
+        "dynamic",
+        "energy"
+      ],
+      "description": "A fast sideways whip hides the cut",
+      "data": {
+        "kind": "shader",
+        "duration": 0.7,
+        "glsl": "vec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  float blur = sin(progress * 3.14159265) * 0.12;\n  vec4 a = vec4(0.0);\n  vec4 b = vec4(0.0);\n  for (int i = 0; i < 12; i++) {\n    float t = float(i) / 11.0 - 0.5;\n    vec2 sa = vec2(uv.x - p + t * blur, uv.y);\n    vec2 sb = vec2(uv.x - p + 1.0 + t * blur, uv.y);\n    a += getFromColor(fract(sa));\n    b += getToColor(fract(sb));\n  }\n  a /= 12.0;\n  b /= 12.0;\n  return (uv.x - p >= 0.0) ? a : b;\n}\n"
+      }
+    },
+    {
+      "id": "spin-zoom",
+      "name": "Spin zoom",
+      "tags": [
+        "spin",
+        "dynamic"
+      ],
+      "description": "The picture turns and zooms into the next",
+      "data": {
+        "kind": "shader",
+        "duration": 1.0,
+        "glsl": "vec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 c = vec2(0.5);\n  vec2 d = (uv - c) * vec2(ratio, 1.0);\n  float turn = p * 1.2;\n  float cs = cos(turn);\n  float sn = sin(turn);\n  vec2 r = vec2(cs * d.x - sn * d.y, sn * d.x + cs * d.y);\n  float z = 1.0 + p * 0.8;\n  vec2 sa = c + (r / z) / vec2(ratio, 1.0);\n  float zb = 1.8 - p * 0.8;\n  vec2 rb = vec2(cs * d.x + sn * d.y, -sn * d.x + cs * d.y);\n  vec2 sb = c + (rb / zb) / vec2(ratio, 1.0);\n  return mix(getFromColor(sa), getToColor(sb), smoothstep(0.4, 0.6, p));\n}\n"
+      }
+    },
+    {
+      "id": "luma-fade",
+      "name": "Luma fade",
+      "tags": [
+        "fade",
+        "film",
+        "organic"
+      ],
+      "description": "Bright parts of the first picture hold on longest",
+      "data": {
+        "kind": "shader",
+        "duration": 1.0,
+        "glsl": "vec4 transition(vec2 uv) {\n  float l = dot(getFromColor(uv).rgb, vec3(0.299, 0.587, 0.114));\n  float th = progress * 1.3 - 0.15;\n  float m = smoothstep(th - 0.12, th + 0.12, l);\n  return mix(getToColor(uv), getFromColor(uv), m);\n}\n"
+      }
+    },
+    {
+      "id": "noise-dissolve",
+      "name": "Noise dissolve",
+      "tags": [
+        "dissolve",
+        "grain",
+        "texture"
+      ],
+      "description": "The picture breaks up into grain and the next one shows through",
+      "data": {
+        "kind": "shader",
+        "duration": 1.0,
+        "glsl": "float hash(vec2 p) {\n  p = fract(p * vec2(443.897, 441.423));\n  p += dot(p, p.yx + 19.19);\n  return fract((p.x + p.y) * p.x);\n}\nvec4 transition(vec2 uv) {\n  float n = hash(floor(uv * vec2(ratio, 1.0) * 90.0));\n  float m = smoothstep(n - 0.06, n + 0.06, progress * 1.3 - 0.12);\n  return mix(getFromColor(uv), getToColor(uv), m);\n}\n"
+      }
+    },
+    {
+      "id": "swirl",
+      "name": "Swirl",
+      "tags": [
+        "twist",
+        "dynamic",
+        "playful"
+      ],
+      "description": "The picture twists round the middle into the next",
+      "data": {
+        "kind": "shader",
+        "duration": 1.1,
+        "glsl": "vec4 transition(vec2 uv) {\n  vec2 c = vec2(0.5);\n  vec2 d = (uv - c) * vec2(ratio, 1.0);\n  float dist = length(d);\n  float amount = sin(progress * 3.14159265) * 5.0 * (1.0 - smoothstep(0.0, 0.8, dist));\n  float cs = cos(amount);\n  float sn = sin(amount);\n  vec2 r = vec2(cs * d.x - sn * d.y, sn * d.x + cs * d.y) / vec2(ratio, 1.0) + c;\n  return mix(getFromColor(r), getToColor(r), smoothstep(0.35, 0.65, progress));\n}\n"
+      }
+    },
+    {
+      "id": "ripple",
+      "name": "Ripple",
+      "tags": [
+        "water",
+        "wave",
+        "dreamy"
+      ],
+      "description": "Waves run out from the middle and carry the change",
+      "data": {
+        "kind": "shader",
+        "duration": 1.1,
+        "glsl": "vec4 transition(vec2 uv) {\n  vec2 d = uv - 0.5;\n  float dist = length(d * vec2(ratio, 1.0));\n  vec2 off = normalize(d + vec2(0.00001)) * sin(dist * 42.0 - progress * 22.0) * 0.028 * sin(progress * 3.14159265);\n  return mix(getFromColor(uv + off), getToColor(uv + off), smoothstep(0.3, 0.7, progress));\n}\n"
+      }
+    },
+    {
+      "id": "barn-doors",
+      "name": "Barn doors",
+      "tags": [
+        "shape",
+        "reveal",
+        "classic"
+      ],
+      "description": "The next picture opens out from the middle, sideways",
+      "data": {
+        "kind": "shader",
+        "duration": 0.8,
+        "glsl": "vec4 transition(vec2 uv) {\n  float m = step(abs(uv.x - 0.5) * 2.0, progress);\n  return mix(getFromColor(uv), getToColor(uv), m);\n}\n"
+      }
+    },
+    {
+      "id": "barn-doors-up",
+      "name": "Barn doors up",
+      "tags": [
+        "shape",
+        "reveal",
+        "classic"
+      ],
+      "description": "The next picture opens out from the middle, up and down",
+      "data": {
+        "kind": "shader",
+        "duration": 0.8,
+        "glsl": "vec4 transition(vec2 uv) {\n  float m = step(abs(uv.y - 0.5) * 2.0, progress);\n  return mix(getFromColor(uv), getToColor(uv), m);\n}\n"
+      }
+    },
+    {
+      "id": "wipe-diagonal",
+      "name": "Wipe diagonal",
+      "tags": [
+        "wipe",
+        "directional"
+      ],
+      "description": "The next picture sweeps across the corner",
+      "data": {
+        "kind": "shader",
+        "duration": 0.9,
+        "glsl": "uniform vec2 direction; // = vec2(1.0, 0.0)\nuniform float softness; // = 0.08\nvec4 transition(vec2 uv) {\n  vec2 n = normalize(direction);\n  float h = 0.5 * (abs(n.x) + abs(n.y));\n  float along = (dot(uv - 0.5, n) + h) / (2.0 * h);\n  float edge = progress * (1.0 + softness) - softness;\n  float m = smoothstep(edge, edge + softness, along);\n  return mix(getToColor(uv), getFromColor(uv), m);\n}\n",
+        "params": {
+          "direction": [
+            1,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "id": "wipe-diagonal-back",
+      "name": "Wipe diagonal back",
+      "tags": [
+        "wipe",
+        "directional"
+      ],
+      "description": "The next picture sweeps across the other corner",
+      "data": {
+        "kind": "shader",
+        "duration": 0.9,
+        "glsl": "uniform vec2 direction; // = vec2(1.0, 0.0)\nuniform float softness; // = 0.08\nvec4 transition(vec2 uv) {\n  vec2 n = normalize(direction);\n  float h = 0.5 * (abs(n.x) + abs(n.y));\n  float along = (dot(uv - 0.5, n) + h) / (2.0 * h);\n  float edge = progress * (1.0 + softness) - softness;\n  float m = smoothstep(edge, edge + softness, along);\n  return mix(getToColor(uv), getFromColor(uv), m);\n}\n",
+        "params": {
+          "direction": [
+            -1,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "id": "tv-off",
+      "name": "TV off and on",
+      "tags": [
+        "retro",
+        "squeeze",
+        "digital"
+      ],
+      "description": "The picture squeezes to a line, then the next opens from it",
+      "data": {
+        "kind": "shader",
+        "duration": 0.8,
+        "glsl": "vec4 transition(vec2 uv) {\n  float p = progress;\n  float k = p < 0.5 ? 1.0 - p * 2.0 : (p - 0.5) * 2.0;\n  vec2 u = vec2(uv.x, 0.5 + (uv.y - 0.5) / max(k, 0.0001));\n  bool inside = u.y >= 0.0 && u.y <= 1.0;\n  vec4 c = p < 0.5 ? getFromColor(u) : getToColor(u);\n  return inside ? c : vec4(0.0, 0.0, 0.0, 1.0);\n}\n"
+      }
+    },
+    {
+      "id": "card-flip",
+      "name": "Card flip",
+      "tags": [
+        "flip",
+        "3d",
+        "playful"
+      ],
+      "description": "The picture turns over like a card to show the next",
+      "data": {
+        "kind": "shader",
+        "duration": 1.0,
+        "glsl": "vec4 transition(vec2 uv) {\n  float s = abs(cos(progress * 3.14159265));\n  vec2 u = vec2(0.5 + (uv.x - 0.5) / max(s, 0.0001), uv.y);\n  bool inside = u.x >= 0.0 && u.x <= 1.0;\n  vec4 c = progress < 0.5 ? getFromColor(u) : getToColor(u);\n  return inside ? vec4(c.rgb * mix(0.55, 1.0, s), 1.0) : vec4(0.0, 0.0, 0.0, 1.0);\n}\n"
+      }
+    },
+    {
+      "id": "slide-over-left",
+      "name": "Slide over left",
+      "tags": [
+        "slide",
+        "cover",
+        "directional"
+      ],
+      "description": "The next picture slides in over the first from the right",
+      "data": {
+        "kind": "shader",
+        "duration": 0.8,
+        "glsl": "uniform vec2 direction; // = vec2(-1.0, 0.0)\nvec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 ut = uv - direction * (p - 1.0);\n  bool inTo = ut.x >= 0.0 && ut.x <= 1.0 && ut.y >= 0.0 && ut.y <= 1.0;\n  return inTo ? getToColor(ut) : getFromColor(uv);\n}\n",
+        "params": {
+          "direction": [
+            -1,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "id": "slide-over-right",
+      "name": "Slide over right",
+      "tags": [
+        "slide",
+        "cover",
+        "directional"
+      ],
+      "description": "The next picture slides in over the first from the left",
+      "data": {
+        "kind": "shader",
+        "duration": 0.8,
+        "glsl": "uniform vec2 direction; // = vec2(-1.0, 0.0)\nvec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 ut = uv - direction * (p - 1.0);\n  bool inTo = ut.x >= 0.0 && ut.x <= 1.0 && ut.y >= 0.0 && ut.y <= 1.0;\n  return inTo ? getToColor(ut) : getFromColor(uv);\n}\n",
+        "params": {
+          "direction": [
+            1,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "id": "film-burn",
+      "name": "Film burn",
+      "tags": [
+        "film",
+        "light",
+        "retro",
+        "warm"
+      ],
+      "description": "A warm burn of light covers the change",
+      "data": {
+        "kind": "shader",
+        "duration": 1.0,
+        "glsl": "vec4 transition(vec2 uv) {\n  float flash = sin(progress * 3.14159265);\n  vec3 base = mix(getFromColor(uv).rgb, getToColor(uv).rgb, smoothstep(0.4, 0.6, progress));\n  float band = 0.6 + 0.4 * sin(uv.x * 5.0 + progress * 9.0) * sin(uv.y * 3.0 - progress * 4.0);\n  vec3 burn = vec3(1.0, 0.55, 0.18) * flash * 1.25 * band;\n  return vec4(1.0 - (1.0 - base) * (1.0 - clamp(burn, 0.0, 1.0)), 1.0);\n}\n"
+      }
+    },
+    {
+      "id": "mosaic-reveal",
+      "name": "Mosaic reveal",
+      "tags": [
+        "digital",
+        "tiles",
+        "reveal"
+      ],
+      "description": "Tiles of the next picture appear at random",
+      "data": {
+        "kind": "shader",
+        "duration": 0.9,
+        "glsl": "float hash(vec2 p) {\n  p = fract(p * vec2(443.897, 441.423));\n  p += dot(p, p.yx + 19.19);\n  return fract((p.x + p.y) * p.x);\n}\nvec4 transition(vec2 uv) {\n  vec2 g = floor(uv * vec2(16.0 * ratio, 16.0));\n  float n = hash(g);\n  float m = smoothstep(n - 0.08, n + 0.08, progress * 1.3 - 0.12);\n  return mix(getFromColor(uv), getToColor(uv), m);\n}\n"
+      }
+    },
+    {
+      "id": "stripes",
+      "name": "Stripes",
+      "tags": [
+        "slats",
+        "slide",
+        "playful"
+      ],
+      "description": "Stripes of the picture slide away in turn",
+      "data": {
+        "kind": "shader",
+        "duration": 0.9,
+        "glsl": "vec4 transition(vec2 uv) {\n  float row = floor(uv.y * 8.0);\n  float d = mod(row, 2.0) < 1.0 ? 1.0 : -1.0;\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 uf = uv - vec2(d * p, 0.0);\n  bool inFrom = uf.x >= 0.0 && uf.x <= 1.0;\n  return inFrom ? getFromColor(uf) : getToColor(uv);\n}\n"
+      }
+    },
+    {
+      "id": "dreamy-blur",
+      "name": "Dreamy blur",
+      "tags": [
+        "blur",
+        "soft",
+        "dreamy",
+        "romantic"
+      ],
+      "description": "Both pictures soften and melt into each other",
+      "data": {
+        "kind": "shader",
+        "duration": 1.1,
+        "glsl": "vec4 transition(vec2 uv) {\n  float amount = sin(progress * 3.14159265) * 0.035;\n  vec4 a = vec4(0.0);\n  vec4 b = vec4(0.0);\n  for (int i = 0; i < 14; i++) {\n    float ang = float(i) * 2.39996323;\n    float rr = sqrt((float(i) + 0.5) / 14.0);\n    vec2 o = vec2(cos(ang), sin(ang)) * rr * amount;\n    a += getFromColor(uv + o);\n    b += getToColor(uv + o);\n  }\n  return mix(a / 14.0, b / 14.0, smoothstep(0.3, 0.7, progress));\n}\n"
+      }
+    }
+  ]
+}

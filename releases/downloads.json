@@ -1,0 +1,41 @@
+{
+  "version": "0.1.0-beta.4",
+  "beta": true,
+  "files": [
+    {
+      "name": "Gencraft_0.1.0-beta.4_amd64.AppImage",
+      "url": "https://github.com/kadamraval/gencraft/releases/download/v0.1.0-beta.4/Gencraft_0.1.0-beta.4_amd64.AppImage",
+      "os": "Linux",
+      "size": 93551096,
+      "sha256": "079e5bb17039b7a14fe34f6549e42d1db5e22732b9c0e5b5d507c900a21bf422"
+    },
+    {
+      "name": "Gencraft_0.1.0-beta.4_amd64.deb",
+      "url": "https://github.com/kadamraval/gencraft/releases/download/v0.1.0-beta.4/Gencraft_0.1.0-beta.4_amd64.deb",
+      "os": "Linux",
+      "size": 15761062,
+      "sha256": "a31704391ee3b1d8e4fd1ce83893add644527da02588b53972fc4a05948f3f21"
+    },
+    {
+      "name": "Gencraft.app.tar.gz",
+      "url": "https://github.com/kadamraval/gencraft/releases/download/v0.1.0-beta.4/Gencraft.app.tar.gz",
+      "os": "macOS",
+      "size": 28783677,
+      "sha256": "c19eccd8dfb3e862b13868574843ebe909d411ac0bb4bb1416214cc36040c9a0"
+    },
+    {
+      "name": "Gencraft_0.1.0-beta.4_universal.dmg",
+      "url": "https://github.com/kadamraval/gencraft/releases/download/v0.1.0-beta.4/Gencraft_0.1.0-beta.4_universal.dmg",
+      "os": "macOS",
+      "size": 28494894,
+      "sha256": "0f4006a104d7d17307b40dd8bd4532f7d314610d7c131023b3d9ee47ec6bf5d6"
+    },
+    {
+      "name": "Gencraft_0.1.0-beta.4_x64-setup.exe",
+      "url": "https://github.com/kadamraval/gencraft/releases/download/v0.1.0-beta.4/Gencraft_0.1.0-beta.4_x64-setup.exe",
+      "os": "Windows",
+      "size": 11963483,
+      "sha256": "7f2cf945fbff4f709cae105247c5544bc65c8e342d713ba419b121fd430a4999"
+    }
+  ]
+}

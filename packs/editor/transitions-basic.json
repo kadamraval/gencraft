@@ -1,0 +1,14 @@
+{
+  "id": "transitions-basic",
+  "title": "Basic transitions",
+  "version": 1,
+  "type": "transition",
+  "license": "Original to this project",
+  "items": [
+    { "id": "fade-in", "name": "Fade in", "tags": ["fade"], "description": "The clip comes up from black", "data": { "kind": "fade-in" } },
+    { "id": "fade-out", "name": "Fade out", "tags": ["fade"], "description": "The clip goes down to black", "data": { "kind": "fade-out" } },
+    { "id": "fade-both", "name": "Fade in and out", "tags": ["fade"], "description": "Both ends of the clip", "data": { "kind": "fade-both" } },
+    { "id": "dip", "name": "Dip to black between clips", "tags": ["fade", "cut"], "description": "Out of the selected clip and into the next one", "data": { "kind": "dip" } },
+    { "id": "none", "name": "No transition", "tags": ["cut"], "description": "Cut straight through", "data": { "kind": "none" } }
+  ]
+}

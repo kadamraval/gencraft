@@ -1,0 +1,386 @@
+{
+  "id": "caption-styles-premium",
+  "title": "Premium caption styles",
+  "version": 1,
+  "type": "caption-style",
+  "license": "Original to this project",
+  "items": [
+    {
+      "id": "social-bold",
+      "name": "Social bold",
+      "tags": [
+        "social",
+        "bold",
+        "short-video"
+      ],
+      "description": "Big capitals with a thick black edge, popping in",
+      "data": {
+        "style": {
+          "size": "l",
+          "position": "middle",
+          "font": "display",
+          "color": "white",
+          "look": "stroke",
+          "animation": "pop",
+          "case": "upper"
+        }
+      }
+    },
+    {
+      "id": "hormozi-yellow",
+      "name": "Yellow punch",
+      "tags": [
+        "social",
+        "bold",
+        "short-video"
+      ],
+      "description": "Yellow capitals with a thick edge, bouncing in",
+      "data": {
+        "style": {
+          "size": "l",
+          "position": "middle",
+          "font": "display",
+          "color": "yellow",
+          "look": "stroke",
+          "animation": "bounce",
+          "case": "upper"
+        }
+      }
+    },
+    {
+      "id": "big-bounce",
+      "name": "Big bounce",
+      "tags": [
+        "social",
+        "bold",
+        "energy"
+      ],
+      "description": "Extra large capitals that spring into place",
+      "data": {
+        "style": {
+          "size": "xl",
+          "position": "middle",
+          "font": "display",
+          "color": "white",
+          "look": "stroke",
+          "animation": "bounce",
+          "case": "upper"
+        }
+      }
+    },
+    {
+      "id": "clean-social",
+      "name": "Clean social",
+      "tags": [
+        "social",
+        "clean",
+        "modern"
+      ],
+      "description": "White rounded letters with a soft shadow, zooming in",
+      "data": {
+        "style": {
+          "size": "m",
+          "position": "bottom",
+          "font": "rounded",
+          "color": "white",
+          "look": "shadow",
+          "animation": "zoom"
+        }
+      }
+    },
+    {
+      "id": "neon-cyan",
+      "name": "Neon cyan",
+      "tags": [
+        "neon",
+        "night",
+        "glow"
+      ],
+      "description": "A glowing cyan neon sign",
+      "data": {
+        "style": {
+          "size": "l",
+          "position": "middle",
+          "font": "rounded",
+          "color": "cyan",
+          "look": "neon",
+          "animation": "fade"
+        }
+      }
+    },
+    {
+      "id": "neon-pink",
+      "name": "Neon pink",
+      "tags": [
+        "neon",
+        "night",
+        "party"
+      ],
+      "description": "A glowing pink neon sign",
+      "data": {
+        "style": {
+          "size": "l",
+          "position": "middle",
+          "font": "display",
+          "color": "pink",
+          "look": "neon",
+          "animation": "zoom",
+          "case": "upper",
+          "spacing": "wide"
+        }
+      }
+    },
+    {
+      "id": "cinema-subtitle",
+      "name": "Cinema subtitle",
+      "tags": [
+        "film",
+        "subtitle",
+        "classic"
+      ],
+      "description": "Wide-spaced serif capitals with a soft shadow",
+      "data": {
+        "style": {
+          "size": "m",
+          "position": "bottom",
+          "font": "serif",
+          "color": "white",
+          "look": "shadow",
+          "animation": "fade",
+          "case": "upper",
+          "spacing": "wide"
+        }
+      }
+    },
+    {
+      "id": "documentary",
+      "name": "Documentary",
+      "tags": [
+        "clean",
+        "subtitle",
+        "info"
+      ],
+      "description": "Dark letters on a light plate, small and quiet",
+      "data": {
+        "style": {
+          "size": "s",
+          "position": "bottom",
+          "font": "sans",
+          "color": "white",
+          "look": "boxlight",
+          "animation": "fade"
+        }
+      }
+    },
+    {
+      "id": "retro-wave",
+      "name": "Retro wave",
+      "tags": [
+        "retro",
+        "synthwave",
+        "glow"
+      ],
+      "description": "Slanted pink capitals with a glow, sliding up",
+      "data": {
+        "style": {
+          "size": "l",
+          "position": "middle",
+          "font": "display",
+          "color": "pink",
+          "look": "glow",
+          "animation": "slide",
+          "case": "upper",
+          "spacing": "wide",
+          "italic": true
+        }
+      }
+    },
+    {
+      "id": "terminal",
+      "name": "Terminal",
+      "tags": [
+        "mono",
+        "tech",
+        "code"
+      ],
+      "description": "Green monospace typed onto a dark plate",
+      "data": {
+        "style": {
+          "size": "m",
+          "position": "bottom",
+          "font": "mono",
+          "color": "green",
+          "look": "box",
+          "animation": "typewriter"
+        }
+      }
+    },
+    {
+      "id": "elegant-script",
+      "name": "Elegant script",
+      "tags": [
+        "romantic",
+        "wedding",
+        "soft"
+      ],
+      "description": "Flowing script letters fading in",
+      "data": {
+        "style": {
+          "size": "l",
+          "position": "middle",
+          "font": "script",
+          "color": "white",
+          "look": "shadow",
+          "animation": "fade"
+        }
+      }
+    },
+    {
+      "id": "caution-tape",
+      "name": "Caution tape",
+      "tags": [
+        "warning",
+        "bold",
+        "label"
+      ],
+      "description": "Black capitals on a yellow plate, sliding up",
+      "data": {
+        "style": {
+          "size": "m",
+          "position": "bottom",
+          "font": "condensed",
+          "color": "yellow",
+          "look": "boxcolor",
+          "animation": "slide",
+          "case": "upper",
+          "spacing": "wide"
+        }
+      }
+    },
+    {
+      "id": "ocean-label",
+      "name": "Ocean label",
+      "tags": [
+        "label",
+        "clean",
+        "blue"
+      ],
+      "description": "White letters on a blue plate",
+      "data": {
+        "style": {
+          "size": "m",
+          "position": "bottom",
+          "font": "rounded",
+          "color": "blue",
+          "look": "boxcolor",
+          "animation": "fade"
+        }
+      }
+    },
+    {
+      "id": "lime-pop",
+      "name": "Lime pop",
+      "tags": [
+        "social",
+        "fun",
+        "bright"
+      ],
+      "description": "Bright lime letters with a thick edge, bouncing",
+      "data": {
+        "style": {
+          "size": "l",
+          "position": "middle",
+          "font": "rounded",
+          "color": "lime",
+          "look": "stroke",
+          "animation": "bounce",
+          "case": "upper"
+        }
+      }
+    },
+    {
+      "id": "orange-tag",
+      "name": "Orange tag",
+      "tags": [
+        "label",
+        "top",
+        "info"
+      ],
+      "description": "A small orange tag at the top",
+      "data": {
+        "style": {
+          "size": "s",
+          "position": "top",
+          "font": "sans",
+          "color": "orange",
+          "look": "boxcolor",
+          "animation": "slide",
+          "case": "upper",
+          "spacing": "wide"
+        }
+      }
+    },
+    {
+      "id": "soft-whisper",
+      "name": "Soft whisper",
+      "tags": [
+        "soft",
+        "gentle",
+        "light"
+      ],
+      "description": "Small rounded letters with a gentle glow",
+      "data": {
+        "style": {
+          "size": "m",
+          "position": "bottom",
+          "font": "rounded",
+          "color": "white",
+          "look": "glow",
+          "animation": "fade"
+        }
+      }
+    },
+    {
+      "id": "red-alert",
+      "name": "Red alert",
+      "tags": [
+        "warning",
+        "news",
+        "bold"
+      ],
+      "description": "Red capitals popping in with a thick edge",
+      "data": {
+        "style": {
+          "size": "l",
+          "position": "middle",
+          "font": "display",
+          "color": "red",
+          "look": "stroke",
+          "animation": "pop",
+          "case": "upper"
+        }
+      }
+    },
+    {
+      "id": "tight-mono-note",
+      "name": "Tight note",
+      "tags": [
+        "mono",
+        "minimal",
+        "tech"
+      ],
+      "description": "Tight white monospace on a dark plate",
+      "data": {
+        "style": {
+          "size": "s",
+          "position": "bottom",
+          "font": "mono",
+          "color": "white",
+          "look": "box",
+          "animation": "fade",
+          "spacing": "tight"
+        }
+      }
+    }
+  ]
+}
