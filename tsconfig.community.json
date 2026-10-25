@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "@pro/*": [
+        "src/pro-stub/*"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "src/pro"
+  ]
+}

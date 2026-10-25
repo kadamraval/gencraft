@@ -1,0 +1,46 @@
+name: CI
+# Every pull request and every push to main or dev: types (official and community configurations), tests, the design audit, that the in-app help
+# matches the guide, licences of the dependencies, a secret scan and a large-file check. Nothing here uses a secret, so pull requests from
+# forks run the same checks.
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: LiteLLM file (some tests read it)
+        run: mkdir -p scripts/.cache && curl -fsSL -o scripts/.cache/litellm.json https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json
+      - run: npx tsc --noEmit
+      - run: npm run typecheck:community
+      - run: npm run test:registry
+      - run: npm run audit:design
+      - name: The app builds
+        run: npx vite build
+      - name: In-app help matches the user guide
+        run: npx tsx scripts/build-help.mts && git diff --exit-code src/lib/help/help.generated.json
+      - run: npm run licenses:check
+      - name: No file over 5 MB
+        run: |
+          big=$(git ls-files | while read -r f; do if [ -f "$f" ] && [ "$(stat -c %s "$f")" -gt 5000000 ]; then echo "$f"; fi; done)
+          if [ -n "$big" ]; then echo "Files over 5 MB:"; echo "$big"; exit 1; fi
+      - name: No keys or secret files in any tracked file
+        run: node scripts/check-secrets.mjs --git
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

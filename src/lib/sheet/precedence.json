@@ -1,0 +1,9 @@
+{
+  "price": ["litellm", "fal", "fal-page"],
+  "status": ["fal"],
+  "name": ["fal"],
+  "date": ["fal"],
+  "category": ["fal", "litellm"],
+  "type": ["litellm"],
+  "job": []
+}

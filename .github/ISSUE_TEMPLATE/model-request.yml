@@ -1,0 +1,21 @@
+name: Model or tool request
+description: A model, provider or tool Gencraft should know about
+labels: ["model"]
+body:
+  - type: input
+    id: model
+    attributes:
+      label: Model name
+      description: For example "Kling 4.0" or "Seedream 5".
+    validations:
+      required: true
+  - type: input
+    id: provider
+    attributes:
+      label: Where it runs
+      description: Provider and the model's id there, if you know it (fal, Replicate, OpenRouter, OpenAI, Gemini).
+  - type: textarea
+    id: why
+    attributes:
+      label: What it should be used for
+      description: The job (for example text to video, upscale, voice) and a link to the maker's page.

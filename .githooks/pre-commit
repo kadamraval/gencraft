@@ -1,0 +1,4 @@
+#!/bin/sh
+# Nothing that looks like a key or a secret file may be committed, then the type check and the design audit.
+node scripts/check-secrets.mjs --staged || exit 1
+npx tsc --noEmit && npm run audit:design --silent

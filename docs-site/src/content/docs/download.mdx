@@ -1,0 +1,45 @@
+---
+title: Download Gencraft
+description: "Download Gencraft for Windows, macOS and Linux, check that the file is genuine, and learn how the app updates itself."
+---
+
+import DownloadLinks from '../../components/DownloadLinks.astro';
+import { Aside } from '@astrojs/starlight/components';
+
+<Aside type="caution" title="Beta">
+  Gencraft is in beta. Features may change and some things are rough. Please [report problems](https://github.com/kadamraval/gencraft/issues). The files are listed under each release on [GitHub](https://github.com/kadamraval/gencraft/releases).
+</Aside>
+
+Gencraft is a normal installed app for **Windows 10 and 11, macOS (Apple Silicon and Intel) and Linux**. You do not need to install anything else.
+
+<DownloadLinks />
+
+## First start
+
+| System | What to do |
+|---|---|
+| Windows | Run the installer. If SmartScreen warns about an unknown publisher, choose **More info**, then **Run anyway**. |
+| macOS | Open the disk image and drag Gencraft to Applications. The first time, right-click the app and choose **Open**. |
+| Linux | For the AppImage, make it executable (`chmod +x Gencraft*.AppImage`) and run it. The `.deb` installs with your package manager. |
+
+## Check that your download is genuine
+
+Every release lists a `SHA256SUMS` file. Compare the checksum of your download with the line for that file.
+
+On Windows (PowerShell):
+
+```powershell
+Get-FileHash .\Gencraft_x.y.z_x64-setup.exe -Algorithm SHA256
+```
+
+On macOS and Linux:
+
+```bash
+shasum -a 256 Gencraft_x.y.z_universal.dmg
+```
+
+The two values must be identical. Updates inside the app are signed, and the app refuses an update whose signature does not match the key it carries.
+
+## Updates
+
+After the first install the app updates itself. Choose how often it looks, once, in **Settings, General, Updates**: every day, every week, every month, or only when you click **Check now**.

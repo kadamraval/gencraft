@@ -1,0 +1,37 @@
+---
+title: Gencraft
+description: "Gencraft is a desktop AI studio for images, video, voice and finished stories. Bring your own provider keys, pay the models directly and keep your files on your own device."
+template: splash
+hero:
+  tagline: The AI studio for images, video, voice and finished stories. Your keys, your files, the newest models from every maker.
+  actions:
+    - text: Download
+      link: download/
+      icon: down-caret
+      variant: primary
+    - text: Read the guide
+      link: guide/welcome/
+      icon: right-arrow
+      variant: minimal
+---
+
+import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
+
+<Aside type="caution" title="Beta">
+  Gencraft is in public beta: features may change and some things are rough. Please [report problems](https://github.com/kadamraval/gencraft/issues).
+</Aside>
+
+<CardGrid stagger>
+  <Card title="Bring your own keys" icon="seti:key">
+    Use fal, Replicate, OpenRouter, OpenAI and Gemini with your own keys. No subscription and no credits: the providers bill you directly, and Gencraft shows an estimate before every run.
+  </Card>
+  <Card title="Every top model, one app" icon="rocket">
+    A signed model database, rebuilt every day, records what each model can do, which settings it takes and what it costs on every provider. See [models and prices](models/).
+  </Card>
+  <Card title="Tools for any file" icon="puzzle">
+    Upscale, remove a background, remove an object, restyle, relight, lip-sync, dub, transcribe and more, each with the models that can really do the job.
+  </Card>
+  <Card title="Your files stay yours" icon="laptop">
+    Results are saved to a folder you choose. Keys are never put in a backup. Windows, macOS and Linux, and the app updates itself.
+  </Card>
+</CardGrid>

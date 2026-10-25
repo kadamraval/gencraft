@@ -1,0 +1,60 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+scripts/.cache
+scripts/registry-report.txt
+
+# License signing key: never commit
+.license/
+
+# Keys and secrets used while testing: never commit. Put real keys in .env.local (copy .env.example) or type them into the app.
+.env
+.env.*
+!.env.example
+.dev.vars
+*.pem
+*.key
+*.p12
+*.pfx
+*.jwk.json
+*.keys.json
+secrets/
+.secrets/
+# App backups hold the person's own files and settings (never keys), so they do not belong in the repository
+*.gencraftbackup
+*.t18backup
+
+dist-knowledge
+
+# Local Claude settings (personal)
+.claude/settings.local.json
+
+# Build output
+src-tauri/target
+src-tauri/gen
+.claude/release.flag
+
+# Snapshot made by scripts/publish-public.sh
+.public-snapshot

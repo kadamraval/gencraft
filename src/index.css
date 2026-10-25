@@ -1,0 +1,364 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 98.5%;
+    --foreground: 240 6% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 6% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 6% 11%;
+
+    --primary: 240 6% 11%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 4% 94%;
+    --secondary-foreground: 240 6% 11%;
+
+    --muted: 240 4% 94%;
+    --muted-foreground: 240 4% 48%;
+
+    --accent: 240 4% 92%;
+    --accent-foreground: 240 6% 11%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 4% 88%;
+    --input: 240 4% 88%;
+    --ring: transparent;
+    --select: 215 22% 52%;
+
+    --radius: 0.85rem;
+  }
+
+  .dark {
+    /* Authentic Obsidian Dark Graphite Palette */
+    --background: 240 5% 9.5%;
+    --foreground: 220 7% 90%;
+
+    --card: 240 5% 12.5%;
+    --card-foreground: 220 7% 90%;
+
+    --popover: 240 5% 12.5%;
+    --popover-foreground: 220 7% 90%;
+
+    --primary: 220 7% 92%;
+    --primary-foreground: 240 5% 9.5%;
+
+    --secondary: 240 5% 16%;
+    --secondary-foreground: 220 7% 90%;
+
+    --muted: 240 5% 16%;
+    --muted-foreground: 220 5% 60%;
+
+    --accent: 240 5% 18%;
+    --accent-foreground: 220 7% 90%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 4% 20%;
+    --input: 240 4% 20%;
+    --ring: transparent;
+    --select: 215 24% 62%;
+  }
+
+  * {
+    outline: none !important;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+    /* Text on screen can be selected and copied. Buttons, tiles and drag handles keep select-none on their own. */
+    user-select: text;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Ambient 2D light for top in light/dark mode */
+.ambient-top-light {
+  background: radial-gradient(
+    100% 55% at 50% 0%,
+    rgba(255, 255, 255, 0.04) 0%,
+    transparent 100%
+  );
+}
+
+:root:not(.dark) .ambient-top-light {
+  background: radial-gradient(
+    100% 55% at 50% 0%,
+    rgba(244, 244, 245, 0.85) 0%,
+    transparent 100%
+  );
+}
+
+/* Ambient monochrome bottom-to-center animated gradient */
+.ambient-bottom-center-gradient {
+  background: radial-gradient(
+    ellipse 75% 55% at 50% 100%,
+    rgba(255, 255, 255, 0.07) 0%,
+    transparent 75%
+  );
+}
+
+:root:not(.dark) .ambient-bottom-center-gradient {
+  background: radial-gradient(
+    ellipse 75% 55% at 50% 100%,
+    rgba(228, 228, 231, 0.5) 0%,
+    transparent 75%
+  );
+}
+
+/* Border Glow Keyframe Animation */
+@keyframes borderGlowConic {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-border-glow-spin {
+  animation: borderGlowConic 6s linear infinite;
+}
+
+/* Slide Down from Top Animation */
+@keyframes slideDownFromTop {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-down {
+  animation: slideDownFromTop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom Discreet Scrollbars */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.2);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(161, 161, 170, 0.4);
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+
+/*
+ * Skins for light mode. Dark has one look and none of these rules touch it (every selector says :not(.dark)).
+ * Classic is the base look above, so it needs no rules.
+ */
+
+/* Glass: a pale blue to lilac backdrop, frosted panels, white hairlines */
+:root[data-skin="glass"]:not(.dark) {
+  --background: 215 45% 96%;
+  --foreground: 222 30% 14%;
+  --card: 0 0% 100%;
+  --popover: 0 0% 100%;
+  --secondary: 215 40% 93%;
+  --muted: 215 40% 93%;
+  --accent: 215 40% 91%;
+  --muted-foreground: 220 12% 40%;
+  --border: 215 35% 86%;
+  --input: 215 35% 86%;
+}
+
+:root[data-skin="glass"]:not(.dark) body {
+  background-image: linear-gradient(135deg, hsl(212 70% 93%) 0%, hsl(262 60% 94%) 52%, hsl(188 62% 92%) 100%);
+  background-attachment: fixed;
+}
+
+:root[data-skin="glass"]:not(.dark) .app-root {
+  background-color: transparent;
+}
+
+:root[data-skin="glass"]:not(.dark) .bg-card {
+  background-color: hsl(0 0% 100% / 0.58);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
+  box-shadow: 0 1px 0 hsl(0 0% 100% / 0.8) inset, 0 10px 30px -18px hsl(222 40% 30% / 0.35);
+}
+
+:root[data-skin="glass"]:not(.dark) .bg-popover {
+  background-color: hsl(0 0% 100% / 0.82);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  backdrop-filter: blur(22px) saturate(1.5);
+}
+
+/* Neo: full white, no borders, soft shadows, a light gradient */
+:root[data-skin="neo"]:not(.dark) {
+  --background: 0 0% 100%;
+  --foreground: 230 20% 12%;
+  --card: 0 0% 100%;
+  --popover: 0 0% 100%;
+  --primary: 238 72% 58%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 228 40% 96.5%;
+  --muted: 228 40% 96.5%;
+  --accent: 228 40% 94%;
+  --muted-foreground: 228 10% 45%;
+  --border: 228 30% 95%;
+  --input: 228 22% 87%;
+}
+
+:root[data-skin="neo"]:not(.dark) body {
+  background-image: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(232 70% 98%) 55%, hsl(262 70% 98%) 100%);
+  background-attachment: fixed;
+}
+
+:root[data-skin="neo"]:not(.dark) .app-root {
+  background-color: transparent;
+}
+
+:root[data-skin="neo"]:not(.dark) .bg-card {
+  box-shadow: 0 1px 2px hsl(230 30% 20% / 0.04), 0 14px 32px -20px hsl(232 50% 30% / 0.22);
+}
+
+:root[data-skin="neo"]:not(.dark) .bg-primary {
+  background-image: linear-gradient(135deg, hsl(238 78% 62%), hsl(266 72% 62%));
+}
+
+/* Small pictures of each skin for the Appearance card. They keep their own colors in either mode. */
+.skin-pv--classic {
+  --pv-page: hsl(0 0% 98.5%);
+  --pv-panel: hsl(0 0% 100%);
+  --pv-line: 1px solid hsl(240 4% 88%);
+  --pv-shadow: none;
+  --pv-blur: none;
+  --pv-accent: hsl(240 6% 11%);
+}
+
+.skin-pv--glass {
+  --pv-page: linear-gradient(135deg, hsl(212 70% 90%), hsl(262 60% 92%) 55%, hsl(188 62% 90%));
+  --pv-panel: hsl(0 0% 100% / 0.6);
+  --pv-line: 1px solid hsl(0 0% 100% / 0.85);
+  --pv-shadow: none;
+  --pv-blur: blur(4px);
+  --pv-accent: hsl(222 30% 20%);
+}
+
+.skin-pv--neo {
+  --pv-page: linear-gradient(180deg, hsl(0 0% 100%), hsl(250 80% 96%));
+  --pv-panel: hsl(0 0% 100%);
+  --pv-line: none;
+  --pv-shadow: 0 6px 14px -8px hsl(240 50% 30% / 0.4);
+  --pv-blur: none;
+  --pv-accent: linear-gradient(135deg, hsl(238 78% 62%), hsl(266 72% 62%));
+}
+
+.skin-pv-page {
+  background: var(--pv-page);
+}
+
+.skin-pv-panel {
+  background: var(--pv-panel);
+  border: var(--pv-line);
+  box-shadow: var(--pv-shadow);
+  -webkit-backdrop-filter: var(--pv-blur);
+  backdrop-filter: var(--pv-blur);
+}
+
+.skin-pv-accent {
+  background: var(--pv-accent);
+}
+
+/* Dialogs and their dimmed backdrop in the light skins: clear panels, a light veil, no muddy gray */
+:root[data-skin="glass"]:not(.dark) [role="dialog"] {
+  background-color: hsl(0 0% 100% / 0.9);
+}
+
+:root[data-skin="glass"]:not(.dark) [role="dialog"] .bg-card {
+  background-color: hsl(0 0% 100% / 0.78);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+:root[data-skin="glass"]:not(.dark) .bg-black\/40 {
+  background-color: hsl(222 40% 25% / 0.2);
+}
+
+:root[data-skin="neo"]:not(.dark) .bg-black\/40 {
+  background-color: hsl(232 30% 20% / 0.16);
+}
+
+:root[data-skin="neo"]:not(.dark) .bg-popover,
+:root[data-skin="neo"]:not(.dark) [role="dialog"] {
+  box-shadow: 0 2px 6px hsl(230 30% 20% / 0.06), 0 24px 48px -16px hsl(232 50% 25% / 0.28);
+}
+
+/* The script page: Courier 12 point, ten characters to the inch, as a screenplay is typeset */
+.script-page {
+  font-family: "Courier Prime", "Courier New", Courier, monospace;
+  font-size: 12pt;
+  line-height: 1.25;
+  tab-size: 4;
+}
+
+.script-page textarea {
+  font: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  padding: 0;
+  min-height: 0;
+  border: 0;
+  background: transparent;
+  resize: none;
+  overflow: hidden;
+}
+
+/* AI Elements are written for shadcn, where a bare "border" takes the theme's border colour. Here that holds inside them. */
+@layer base {
+  .ai-scope *,
+  .ai-scope ::before,
+  .ai-scope ::after {
+    border-color: hsl(var(--border));
+  }
+}
+
+/* AI Elements read colours under Tailwind 4's names; the same colours from this project's tokens */
+.ai-scope {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-primary: hsl(var(--primary));
+  --color-secondary: hsl(var(--secondary));
+  --color-accent: hsl(var(--accent));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --radius-md: calc(var(--radius) - 2px);
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}

@@ -1,0 +1,14 @@
+#!/bin/sh
+# 1. main is for releases only: a push that updates main is refused here, on any terminal. The release flow sets GENCRAFT_RELEASE=1 for its own push.
+# 2. What is pushed is scanned for keys and secret files (the same scanner as the pre-commit hook and CI).
+zero="0000000000000000000000000000000000000000"
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ "$remote_ref" = "refs/heads/main" ] && [ "${GENCRAFT_RELEASE:-}" != "1" ]; then
+    echo "Refused: main changes only through /release. Push dev instead." >&2
+    exit 1
+  fi
+  if [ "$local_sha" != "$zero" ]; then
+    node scripts/check-secrets.mjs --range "$remote_sha" "$local_sha" || exit 1
+  fi
+done
+exit 0

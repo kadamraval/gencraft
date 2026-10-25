@@ -1,0 +1,1283 @@
+Title: BytePlus
+URL: https://docs.byteplus.com/en/docs/modelark/seedance-2-5-prompt-guide?redirect=1
+Source element: <body>
+---
+ModelArk
+Document
+Coding Plan
+API reference
+Resources
+AI Suite
+ModelArk
+Video generation
+Dreamina Seedance 2.5 prompt guide
+Copy Page
+This topic introduces prompting techniques and tips for Dreamina Seedance 2.5 (hereafter referred to as Seedance 2.5), helping you generate high-quality videos that match your requirements more efficiently.
+Get the skill
+We strongly recommend using the Seedance 2.5 Skill to optimize your prompts.
+Install it in your local project with NPX:
+Bash
+Copy
+npx --yes skills@latest add \
+  "https://arkdocs-en.tos-ap-southeast-1.volces.com/skills/" \
+  --skill sd25-pe \
+  --yes
+In an AI chat box, enter /sd25-pe + your prompt to start optimizing the prompt.
+Overall introduction
+Seedance 2.5 can generate a single video up to 30 seconds long and accept up to 50 image, audio, and video reference assets in one request. It provides stronger instruction following, professional video editing and extension controls, and native generation in more than 10 languages. These upgrades advance video generation toward production-ready workflows built around long-form storytelling, rich references, precise editing, and multilingual creation.
+Creative quality also improves significantly. More realistic visuals, lighting, performance, and camera movement make results feel closer to live-action footage. Seedance 2.5 gives professional creators and enterprise teams a faster, more controllable, and more scalable video production workflow.
+Typical multimodal video generation capabilities
+Seedance 2.5 supports flexible combinations of multimodal inputs such as text, images, video and audio. The following table only lists some typical capabilities. You can combine these capabilities in other ways based on your actual scenarios.
+Task type
+	
+R2V tasks supported by Seedance 2.5
+	
+Detailed description of capabilities
+Reference
+	
+Subject reference - References the subject's appearance identity and/or voice, such as a person, object, scene, or virtual character.
+	
+Subject image reference
+Subject audio and video reference
+Subject image + audio reference
+Motion reference - References motion and dynamic information from videos.
+	
+Action/expression/camera movement/creativity/effects, and more
+Motion + subject reference
+3D clay-model reference/rendering - Uses coarse-grained or fine-grained 3D clay-model videos as motion references and renders them into the target visual style.
+	
+3D clay-model reference
+3D clay-model reference + subject reference
+3D clay-model reference + subject reference + scene reference
+Style reference - References the visual style of images or videos.
+	
+Style image/video reference
+Style image/video reference + subject reference
+Audio reference - References audio information such as music, dialogue, voice, tone, or timbre.
+	
+Audio (music/melody/dialogue/voice) reference
+Audio + subject reference
+Storyboard reference - References storyboard information such as subjects, composition, actions, plot, and scene progression.
+	
+Storyboard reference
+Storyboard + subject reference
+Keyframe reference - Uses one or more images as keyframes to generate a video.
+	
+Multiple keyframes reference
+First/last keyframes reference
+First and last frames
+	
+First-frame/first-and-last-frame video generation - Generates a video from a single first-frame image or from two images used as the first and last frames.
+	
+Strictly control this through content.role = first_frame/last_frame.
+Editing
+	
+Video instruction editing - Uses text instructions to add, remove, or modify visual elements in a video, with support for timestamps to specify when edits should take effect.
+	
+Add: Add subjects, costumes, camera movements, special effects, and more.
+Modify: Modify the subject, parts of the subject, style, background, color, lighting, material, motion, camera position, and more.
+Remove: Remove subjects, subtitles, watermarks, and more.
+Video editing with reference images - Uses text instructions plus reference images to add, remove, or modify visual elements in a video, with support for timestamps to specify when edits should take effect.
+Audio editing - Adds, removes, or modifies audio in video.
+	
+Add: Add vocals, music, sound effects, and more.
+Modify: Modify vocals, music, sound effects, and more.
+Remove: Remove vocals, music, sound effects, and more.
+Extension
+	
+Video extension - Continues the input video forward or backward and can require seamless visual and audio continuity.
+	
+Extend forward/extend backward
+Extend forward/backward + subject reference
+Others
+	
+One-click video creation - Generates a short video from multiple images and/or videos, with optional text, stickers, transitions, and other elements.
+	
+One-click video creation from source assets
+One-click video creation from source assets + reference video
+Seamless video transition - Takes two input videos and generates the missing in-between segment to create a seamless transition.
+	
+-
+Combined capabilities - Freely combines the capabilities listed above.
+	
+-
+Task instructions
+Seedance 2.5 divides tasks into two categories based on whether the input reference assets lock the properties of the output video. Seedance 2.0 does not make this distinction.
+Locked: The input asset is strictly placed as a segment on the output video timeline. The model output adapts to the input asset, so the output video's aspect ratio, and in some cases its duration, are locked.
+Unlocked: The input asset is used only as a semantic reference, so users can specify the output video's aspect ratio and duration.
+Locked: Editing, first and last frames, and extension
+Editing, first-frame or first-and-last-frame generation, and extension automatically lock certain generation parameters based on the input assets and do not support user customization for those parameters. The specific rules are as follows:
+Task
+	
+Definition
+	
+Instructions for output video locking
+	
+Trigger keywords in prompt
+Editing
+	
+Edits the visuals or audio of the original video, such as replacing the main subject, adding, removing, or modifying objects, or redrawing and restoring part of the frame.
+	
+Locks the output video's aspect ratio, strictly matching the aspect ratio of the video to be edited. The ratio parameter must be set to adaptive.
+Locks the output video's duration, keeping it approximately aligned with the duration of the video to be edited. The duration parameter must be set to -1.
+If multiple input videos are provided, the model determines which video to edit based on the prompt.
+Due to the model's frame processing mechanism, the output duration may differ slightly from the input, by up to about 0.3 seconds. This only compresses some transition frames; the output content remains approximately aligned with the input and stays complete and unchanged.
+If a video generated by Seedance 2.5 is used as the editing input, the output duration will not differ from the input duration.
+It is recommended to set output_format to mov.
+	
+Set content.role to reference_image, reference_video, or reference_audio.
+Include at least one editing trigger in the prompt: edit video, add, insert, remove, delete, modify, replace, change to, or similar wording.
+Add small animals to @video1; replace the character in @video1 with @image1; remove the background music from @video1.
+First frame/first and last frame
+	
+Uses one image as the first frame to generate a video, or two images as the first and last frames.
+	
+Locks the output video's aspect ratio, strictly matching the aspect ratio of the first-frame image. The ratio parameter must be set to adaptive.
+If the last frame has a different aspect ratio from the first frame, it will be stretched. Use first and last frames with the same aspect ratio.
+Duration: user-defined.
+	
+Set content.role to first_frame or last_frame.
+Extension
+	
+Extends the original video forward or backward.
+	
+Locks the output video's aspect ratio, strictly matching the aspect ratio of the video to be extended. The ratio parameter must be set to adaptive.
+If multiple input videos are provided, the model determines which video to extend based on the prompt.
+Duration: user-defined.
+It is recommended to set output_format to mov.
+	
+Set content.role to reference_image, reference_video, or reference_audio.
+Include at least one extension trigger in the prompt: extend forward, extend backward, continue, continue from, extend the story, or similar wording.
+Extend @video1 backward: the character from @image1 falls from the sky...; Continue the first 5 seconds of @video1: the woman from @video2 enters the frame and says...
+Unlocked: Reference tasks, storyboards, and keyframes
+In general, reference-based tasks do not lock the output video’s aspect ratio or duration based on the input assets. The following two task types are especially worth noting, as they are also unlocked:
+R2V capability
+	
+Inference strategy
+	
+Illustration
+	
+	
+Multi-panel storyboard
+	
+Generated visuals do not strictly align with the storyboard: When you input a multi-panel storyboard, meaning multiple storyboard frames combined into one image, the generated video does not strictly align with the storyboard, such as with specific visual details. The storyboard mainly provides a high-level plot reference.
+We recommend using relatively simple line-art storyboards and using the prompt to fill in information not shown in the storyboard, such as actions, camera movement, style, and other basic information.
+	
+	
+	
+Keyframes
+	
+Generated visuals align with keyframes: Input multiple independent storyboard images, which may include first-frame or last-frame storyboard images, as keyframes. The generated video visuals will align relatively strictly with the input images.
+Duration: user-defined.
+	
+	
+	
+Reference asset input recommendations
+Seedance 2.5 supports up to 50 reference assets per request, including images, audio, and videos. These assets may refer to the same subject or to different subjects, such as characters, animals, props, locations, and more. To make full use of the model's capabilities, we recommend the following when preparing reference assets:
+Use case
+	
+Input recommendations
+Total reference asset input limits
+	
+Images: Up to 30 images, with resolution up to 4K.
+Videos: Up to 10 videos, with a combined total duration of no more than 30 seconds.
+Audio: Up to 10 audio clips, with a combined total duration of no more than 30 seconds.
+For subject audio/video references, how many subjects are recommended?
+	
+1-5 subjects generally produce better results. You may try 6-10 subjects, but stability may decrease and multiple attempts may be needed.
+For subject audio/video references, what input duration is recommended?
+	
+5-10 seconds generally works better. Longer inputs may reduce stability, and multiple attempts may be needed.
+For subject image references, how many subjects are recommended?
+	
+1-8 subjects generally produce better results. You may try 9-12 subjects, but stability may decrease and multiple attempts may be needed.
+What is the difference between subject image inputs from different viewpoints?
+	
+For 1-5 subjects, both single-view and multi-view inputs are supported.
+For more than 5 subjects, single-view inputs are generally more stable. If multiple viewpoints are needed, it is recommended to split them into separate images from different views, rather than using one image that contains multiple viewpoints.
+For storyboard references, how many panels are recommended?
+	
+Multi-panel storyboards are currently better suited for 15 panels or fewer.
+Stick-figure or line-art storyboards are recommended. Avoid adding text directly on the storyboard.
+For 3D clay-model references, is coarse-grained or fine-grained modeling recommended?
+	
+Simple, coarse-grained 3D clay-model video generally works better as a reference. Use only simple geometric primitives to represent people, objects, animals, and similar subjects.
+For video editing, what video length is recommended?
+	
+Videos within 20 seconds generally produce better results. Longer videos may reduce stability, and multiple attempts may be needed.
+For video editing with reference images, how many images are recommended?
+	
+1-5 reference images generally produce better results. You may try 6-8 reference images, but stability may decrease and multiple attempts may be needed.
+For video extension, what format is recommended?
+	
+To achieve the best audio-visual continuity, use the mov format for both the input and output videos.
+Prompt writing recommendations
+Treat Seedance 2.5 as a visual content producer, and write structured prompts with a visual storytelling mindset.
+Basic prompting techniques
+Asset Referencing for R2V
+Clearly identify each image, video, or audio asset by its upload order and intended purpose, such as which asset represents the subject, voice, action, scene, and so on.
+One-Sentence Summary
+Subject + Location + Event + Genre/Style + Camera movement...
+Detailed Plot Description
+Shot sequence or timeline: Either format is acceptable. Use timestamps or “Shot N” to divide the video into segments, and describe each segment’s specific visuals, camera movement, actions, dialogue, sound effects, and other details.
+Use positive descriptions whenever possible. Negative constraints are supported for subtitles and audio control, such as “no subtitles” and “no BGM.”
+Additional Notes
+Add any visual details that should remain consistent throughout, such as camera angle, camera movement, environment, scene setting, sound, atmosphere, and other recurring elements.
+Plain
+Copy
+Realistic nature documentary style, natural lighting and shadows. On a warm afternoon, on a grassy slope in the forest, a chubby panda cub rolls down the hill.
+The panda has fluffy, realistic black-and-white fur, a small round body, and clumsy, adorable movements. The scene is a green forest slope. The ground is covered with grass, moss, clover, soil, small stones, dry branches, and a few small yellow flowers. Tall tree trunks and dense woods are softly blurred in the background. The camera is a low-angle medium-wide shot with a slight handheld feel. The framing remains mostly stable, keeping the panda in frame at all times.
+0s-3s: A panda cub lies on a green grassy slope, its body round and chubby. It begins to slowly roll sideways down the slope with clumsy movements, gently bending the grass beneath its body. A light breeze passes through, and sunlight filters through the trees from the upper left, creating dappled light and shadow.
+3s-8s: The panda rolls toward the lower right of the frame and gradually comes to a stop, shifting from lying on its side to lying on its belly. Its round face turns toward the camera, and its front paws press into the grass. The panda lies in the foreground grass, adjusts into a comfortable position, slightly raises and lowers its head, and makes a soft little humming sound.
+Low camera position, slight handheld feel, subtly following the panda as it moves toward the lower right. Natural depth of field: the foreground grass is slightly blurred, the panda remains clear, and the background forest is softly out of focus. Natural environmental audio only, including wind, rustling grass, and the soft plop of the panda rolling. The overall mood is warm, realistic, and natural.
+    
+    
+    
+    
+    
+    
+    
+      
+Reference tasks (multi-asset mapping)
+As the number of reference assets increases, the mapping and reference relationships between assets become especially important. The numbering should correspond to the upload order of the assets, such as Image 1 / Video 1 / Audio 1, and each asset should be explicitly bound in the text prompt. It is not recommended to provide mapping information only inside the image itself. For example, avoid writing "John" on the protagonist's image and then simply saying "John is at school..." in the prompt, as this can easily cause character confusion or duplication.
+For multiple subjects, list the mapping relationships one by one. When there are many characters, use a list to avoid confusion.
+Example 1: "The knight in Image 1"
+Example 2: "Images 1-2 are Character 1 and correspond to Audio 1; Images 3-4 are Character 2 and correspond to Audio 2."
+Example 3: "Image 1 depicts the protagonist John and uses the voice timbre from Audio 1."
+Specify the role of each reference asset clearly, including what it should be used as a reference for. If only part of an asset should be referenced, clearly state which part should be used.
+Example 1: "Refer to the action of casting the spell in Video 1 and the wrap-around camera movement in Video 2."
+Example 2: "Refer to Image 1 for lighting and filters."
+When the reference asset itself is sufficiently accurate, simply state that it should be referenced and avoid repeatedly describing the scene in detail.
+Example: "Strictly refer to the actions and camera movements in Video 1, and keep the sequence consistent with the video." There is no need to describe details such as raising a hand, turning around, or having the camera slowly orbit.
+Editing tasks
+Clarify the scope and content to be modified. Timestamps can be used for partial edits. Whenever possible, describe how the content should change from A to B.
+Example 1: "Only edit the man's dialogue in Video 1: change it to 'Don't come over here,' and adjust the accent to an American English accent..."
+Example 2: "Change the man's action from drinking coffee to mopping the floor from 4-6 seconds in Video 1, and leave the rest of the content unchanged."
+Example 3: "Editing task: Replace the Asian woman on the right in Video 1 with the Latina woman from Image 1."
+First and last frames
+Prioritize setting the image role through parameters as first_frame or last_frame. Note that this method locks the output video's aspect ratio, strictly aligning it with the user-provided first-frame image.
+The role can also be set as reference_image, with the specific images designated in the prompt as the first and last frames. Note that this method does not lock the output video's aspect ratio. The generated video will be similar to the first-frame and last-frame reference images, but may not match them exactly.
+Example 1: "Image 1 is the first frame."
+Example 2: "Image 3 is the first frame, and Image 5 is the last frame."
+Timestamps
+Timestamps can help clarify the progression of the story. Use 1-second intervals as the basic unit:
+If too little plot is specified within a given time range, the model may improvise more freely.
+If too much content is packed into a given time range, the result may contain excessive cuts or omit parts of the plot. Make sure the duration allocation is reasonable.
+It is not recommended to use timestamps to control high-frequency actions, such as "shake your head three times per second."
+Supported time-control methods:
+Clear time intervals. Pay attention to timeline continuity and avoid gaps such as "0-3s... 5-6s...".
+Example 1: "0-3 seconds...3-7 seconds...7-15 seconds"
+Example 2: "[1s-4s]....[4s-8s]....[8s-12s]"
+Time-point control.
+Example 1: "Quick left sideways transition at the 5-second mark."
+Example 2: "At the 2-second mark, a burst of golden lightning descends from the top of the frame..."
+Relative time control.
+Example 1: "John stands there blankly. After 3 seconds, everyone around him shakes their head."
+Example 2: "The frame freezes for 1 second after the main character presses the shutter."
+Negative control
+Supports negative control for subtitles.
+Example 1: "Do not add subtitles."
+Example 2: "No subtitles."
+Supports negative audio control for finer dimensions, including sound effects, background music (BGM), and dialogue.
+Example 1: "No BGM; generate only environmental sounds and action sounds."
+Example 2: "No audio."
+Advanced prompting techniques
+Camera language
+Basic camera and shot terms can be written directly, such as shot size (extreme wide shot/wide shot/medium shot/medium close-up/close-up), camera movement (push in/pull out/pan/track/follow/orbit/dive/pull back/tilt up/handheld shake), and camera angle (low angle/overhead shot/first-person perspective).
+Common camera techniques can also be written directly, such as one-shot/long take, Hitchcock zoom/dolly zoom, aerial perspective, FPV, bullet time, handheld shot, and speed ramp.
+For overly niche or technical terms, convert them into [term + descriptive explanation].
+Example: "Rack focus: the focus shifts smoothly; the trees that were originally clear in the foreground become blurred, while the character in the background gradually becomes clear."
+For transition shots, clearly specify both the trigger point and the transition method. Whenever possible, include both the transition timing and method.
+Example: "At the 5-second mark, the camera quickly transitions leftward using a left wipe combined with a natural dissolve."
+Action and expression descriptions
+Actions: Give priority to general descriptions, such as "doing several sets of high-knee raises and somersaults" or "both sides engaging in close combat." Only write specific details for a few memorable actions, and avoid repeating the same actions.
+Expressions: Use descriptive sentences and reduce the use of idioms.
+3D clay-model reference/rendering
+In the prompt, clearly state which elements of the 3D clay-model video should be referenced.
+Example 1: If the video does not contain lighting changes and you only want to reference camera movement and motion, write: "Refer to the camera movement and motion in [Video 1]..."
+Example 2: If the video includes lighting changes that should also be referenced, write: "Refer to the lighting changes, camera movement, and motion in [Video 1]..."
+If reference images are also provided, clearly specify the mapping between the reference images and the 3D clay-model video.
+Example: "Map the man in gray clothing from [Image 1] to the red model in [Video 1], and replace the green model 2 in [Video 1] with the red-haired girl from [Video 2]."
+Even when a 3D clay-model video is provided, describe the desired generated video content in detail for better results. Make sure the text description is consistent with the 3D clay-model video. For subjects without additional image or video references, describe the subject's appearance and key features in detail.
+Example prompt:
+Refer to [Video 1] for the lighting direction and lighting changes, camera movement, character positions, music, sound effects, and visual rhythm to generate an animated scene.
+Replace the pink model in [Video 1] with Hina Amano from [Image 3], and replace the gray model in [Video 1] with Hodaka Morishima from [Image 2]. Use the rooftop and sky from [Image 1] as the full background scene.
+First, Hina Amano clasps her hands together and closes her eyes in prayer. Sunlight gradually illuminates her face and the distant buildings from the upper left of the frame. As the shot changes, Hodaka Morishima says "あっ?" with slight surprise. He turns toward the right side of the frame, leans back in surprise, and looks at the sunlight shining from the upper right. The light spreads from the lower left of the ground toward the upper right, illuminating the boy's clothing. Then the shot switches to a wide view referencing [Image 1]. The two protagonists stand with their backs to the camera. The boy spreads his arms and says "Ah~" in surprise, while the girl maintains her praying pose.
+Japanese animation style inspired by Makoto Shinkai. The lighting should evoke sunlight breaking through clouds, and the overall atmosphere should feel hopeful and emotional. The character appearances must strictly reference [Image 2] and [Image 3], remain consistent throughout the video, and avoid face changes. Keep the original audio unchanged. High image quality, rich details, stable motion, and smooth visuals.
+Multi-panel storyboards
+Avoid using too many panels: Multi-panel storyboards are currently better suited for 15 panels or fewer. Too many panels in a single input, such as an 18-panel storyboard, can lead to still frames or incorrect sequence order. Storyboards also constrain the model's creative output, so make sure the storyboard is accurate and logically structured.
+Avoid noisy or over-sharpened storyboards: Do not use cluttered, over-sharpened AI-generated storyboards directly, and avoid adding too much text to the storyboard image.
+Examples of unsuitable multi-panel storyboards:
+Not recommended
+Not recommended
+Avoid inconsistencies in the prompt: Make sure the prompt does not contain contradictions or unreasonable camera movement and motion design.
+Storyboard panels are not strictly aligned with the final video: A multi-panel storyboard will not be followed exactly frame by frame, and the generated video retains a degree of autonomy. If strict alignment is required, use the multi-keyframe reference method.
+Use stick-figure or line-art storyboards [recommended]: Use relatively simple line-art storyboards and control generation through the prompt:
+Step 1: Clearly state the mapping relationships of the reference assets.
+Step 2: Write an overall story summary.
+Step 3: Fully describe the plot according to the storyboard, and at minimum fill in information not shown in the storyboard. You may use timestamps to clarify the story logic.
+Line-art storyboard example:
+Plain
+Copy
+Visual Style: Domestic realistic short drama, shot on Arri Alexa Mini LF, 35 mm cinema lens, cinematic realistic lighting, indoor night scene with snow-falling night view outside the window, film grain, authentic skin texture, natural lifelike performance, subtle micro-expressions, real adult facial bone structure and facial features, no excessive beautification or skin smoothing.
+Asset Bindings: Storyboard @Image1, bedroom @Image2, Li Tian @Image3, Li Qian @Image4, book *Happy Times* @Image5.
+Shot 1: [Wide shot, locked-off camera, eye-level, rule-of-thirds composition] Room on a snowy winter night. In front of floor-to-ceiling windows, a man stands sideways with both hands in his pockets, gazing out at falling snow. A young girl stands beside him, watching the man quietly. Calm and restrained atmosphere. Snowflakes keep drifting against the glass window.
+Shot 2: [Medium shot, over-the-shoulder shot] The girl's back serves as foreground. The man turns his head and looks gently toward the girl. The girl bows her head slightly in silence. Snow keeps falling outside the window.
+Shot 3: [Medium close-up, diagonal composition] The man holds the book *Happy Times* and extends it slowly. The young girl raises her hands to receive the book.
+Shot 4: [Close-up on the girl's face, central composition] The girl clutches the book tight against her chest. Her eyes turn red, teardrops roll slowly down her cheeks with a sorrowful look.
+Shot 5: [Close-up on the man's face, oblique composition] The man wears a soft faint smile, gazing quietly at the tearful girl with melancholy in his eyes.
+Shot 6: [Wide shot, locked-off camera] The girl turns and walks slowly out of frame. Only the man remains standing alone by the window, hands in pockets, staring out into the blowing snow. The room feels empty and still.
+Concept storyboard usage: If the storyboard is a concept storyboard or keyframe design, the prompt can be simplified.
+Example: "Construct a complete story plot according to the storyboard sequence, and use the shots in a reasonable and coherent way."
+Keyframe reference
+When the video must strictly follow the storyboard, use keyframe references. Input each storyboard as an independent reference image in order, and state in the first sentence of the prompt: "Use Images X to X in order as keyframes."
+Example: "Use Images 1 to 7 in order as keyframes. In a sea of clouds and mountains, blue-and-pink long-tailed spirit fish soar through the air. The camera slowly moves toward an ancient town built into the mountainside, focusing on the ancient pagoda at the top of the mountain. The scene then enters an elegant Chinese-style hall, where the spirit fish flies in through the window, lands in the round pool at the center of the hall, and swims leisurely. Finally, the perspective cuts to a dark ancient temple, where an old monk with a white beard stands with his back to the camera, quietly gazing at a huge framed painting. Inside the painting are the hall and the spirit fish swimming in the pond. The overall style is a new Chinese Ukiyo-e illustration."
+Differences from Seedance 2.0
+Timestamp support: Seedance 2.0 does not respond to timestamps and only responds to shot numbers, while Seedance 2.5 supports integer-second timestamps.
+Multi-view image support: Seedance 2.0 does not recommend using multi-view images as subject references, while Seedance 2.5 supports them.
+Flexible aspect ratios: Seedance 2.0 only supports six fixed output aspect ratios, while Seedance 2.5 can support any output aspect ratio between [0.4, 2.5] by controlling the input assets.
+Improved V2V quality: Seedance 2.5 supports MOV output, which better preserves color consistency, brightness consistency, and audio-visual consistency in extension and editing tasks.
+FAQ
+This section describes common issues and workarounds for Seedance 2.5 video generation, editing, and translation tasks, helping you quickly diagnose similar issues and improve your prompts.
+Aesthetic style drift between versions
+Typical issue
+Seedance 2.5 and Seedance 2.0 have significantly different aesthetic style preferences. Videos generated from the same reference image and prompt may have visibly different styles, causing style drift when outputs from both models are used in the same workflow.
+Solution
+To retain the Seedance 2.0 style in a Seedance 2.5 task, use a video generated by Seedance 2.0 as the input for a video extension task and select MOV as the output format. This preserves the original style more effectively.
+Input reference image used in this example:
+Seedance 2.0 output
+	
+Seedance 2.5 output
+	
+After extension
+    
+    
+    
+    
+    
+    
+    
+      
+Seedance 2.0 output with the same reference image and prompt
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Seedance 2.5 output with the same input, showing visible style drift
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Seedance 2.5 extension output using the Seedance 2.0 video as input and MOV as the output format
+Output frame comparison (Seedance 2.0 on the left and Seedance 2.5 on the right):
+ 
+Three-frame comparison:
+Overreaction to emotional cues: Glowing eyes
+Typical issue
+The model may overreact to strong emotional cues, causing the pupils to emit blue, red, or other unnatural light.
+Solution
+Set "normal human eyes; no glowing eyes" as the highest-priority negative constraint, and limit environmental lighting to the facial contours.
+Avoid describing emotions as eye-related visual effects. Replace intense emotional language such as "fanatical" or "extremely shocked" with more neutral wording such as "amazed" to reduce the probability of glowing eyes.
+Before optimization
+	
+After optimization
+    
+    
+    
+    
+    
+    
+    
+      
+Intense emotional language causes the pupils to glow
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Constraining the character to normal, non-glowing eyes and using neutral emotional language reduces the likelihood of the issue
+Example prompts
+Close-up of the glowing pupils in the original output:
+Incorrect character-to-reference mapping
+Typical issue
+In multi-subject videos, characters may be mismatched with their reference images, voice timbres, or order of appearance. For example, the first character to appear may be replaced with another referenced character.
+Solution
+Upload reference assets in the order in which the subjects first appear, and update the image and audio numbering in the prompt accordingly to ensure a one-to-one mapping between each character and its reference assets.
+Before optimization
+	
+After optimization
+    
+    
+    
+    
+    
+    
+    
+      
+The first character to appear is replaced with another referenced character
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Reordering reference assets and updating their numbers based on first appearance fixes the mapping
+Example prompts
+Text spelling errors
+Typical issue
+Text in the video may be misspelled. Letters in English words may be substituted, added, or omitted, with common errors such as E being rendered as A or I. Chinese text may also contain incorrect characters, such as "稳健" being rendered as "稳便".
+Solution
+Split the word into individual letters and require them to appear one by one in sequence. This reduces semantic association and character-shape simplification.
+Prepare the text that must be rendered accurately as an image and provide it as a reference asset.
+Case 1: English word spelling errors
+Before optimization
+	
+After optimization
+    
+    
+    
+    
+    
+    
+    
+      
+DIHETAO is misspelled as DIHERTAO
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Splitting the word into individual letters and requiring them to appear in sequence fixes the spelling
+Example prompts
+Case 2: Chinese text errors
+Before optimization
+	
+After optimization
+    
+    
+    
+    
+    
+    
+    
+      
+"稳健抓地" is incorrectly rendered as "稳便抓地"
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Providing the correct text as reference images fixes the error
+Example prompts
+Subtitles generated despite prompt constraints
+Typical issue
+Subtitles may still be generated even when the prompt explicitly instructs the model not to generate them. This issue has been substantially improved in Seedance 2.5 compared with Seedance 2.0, but it may still occur.
+Solution
+tip
+This issue cannot currently be eliminated completely. The following methods can reduce the probability of subtitles being generated.
+Avoid repeating dialogue words after a line or attaching separate tone, facial-expression, or action instructions to specific words. These descriptions can trigger subtitle generation.
+When different lines require different performances, use the format "Character's line (emotion): content." For example: Granny Zhou's line (in disbelief): "像……"; Granny Zhou's line (voice trembling): "太像了。"
+Ensure that the reference video does not contain subtitles. Subtitles in a reference video may override the no-subtitle instruction.
+Case 1: Dialogue repetition triggers subtitles
+Before optimization
+	
+After optimization
+    
+    
+    
+    
+    
+    
+    
+      
+Repeating words after dialogue and adding tone descriptions causes subtitles
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Separating the lines in the "Character's line (emotion): content" format produces a subtitle-free output in this example
+Example prompts
+Case 2: Subtitles inherited from the reference video
+Before optimization
+	
+After optimization
+    
+    
+    
+    
+    
+    
+    
+      
+The reference video contains subtitles, and the output also includes them
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Replacing it with a subtitle-free reference video produces a subtitle-free output in this example
+Reference video comparison
+Reference video with subtitles
+	
+Reference video without subtitles
+    
+    
+    
+    
+    
+    
+    
+      
+Original reference video used in Case 2, with subtitles
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Reference video after subtitle removal
+Example prompt
+HTTP 400 error with non-standard JPG images
+Typical issue
+Some JPG images fail during upload or processing with an image decoding error, such as invalid image: heic: decode failed.
+Root cause
+These files are neither truncated nor corrupted. They use a non-standard, asymmetric chroma-subsampling scheme, such as Y 2x2, Cb 1x1, and Cr 2x1, which falls outside the supported standard JPEG sampling formats: 4:2:0, 4:2:2, and 4:4:4.
+Solution
+Use FFmpeg to convert the image to a standard pixel format, and then upload it again:
+Bash
+Copy
+ffmpeg -i test-jpg.jpg -pix_fmt yuvj420p fixed.jpg
+Alternatively, convert the image to another format, such as PNG.
+Video duration mismatch after editing
+Typical issue
+The edited output is approximately 0.33 seconds shorter than the input video.
+Solution
+Switch to Reference mode and specify the target duration. Because this is not strict editing, the generated content may differ from the input, but the duration can be controlled precisely.
+If the task must remain in Edit mode, adjust the input video's frame count to 8n+1, where n is a positive integer. The output duration will then match the input.
+Method 1: Switch to Reference mode
+Input video
+	
+Before optimization (Edit mode)
+	
+After optimization (Reference mode)
+    
+    
+    
+    
+    
+    
+    
+      
+Task input
+	
+    
+    
+    
+    
+    
+    
+    
+      
+The edited output is approximately 0.33 seconds shorter than the input
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Reference mode produces the expected duration of 7 seconds and 1 frame
+Method 2: Adjust the input frame count to 8n+1
+Adjusted input video
+	
+Edited output
+    
+    
+    
+    
+    
+    
+    
+      
+The input is adjusted to 161 frames, equivalent to 6 seconds and 17 frames
+	
+    
+    
+    
+    
+    
+    
+    
+      
+The edited output is also 6 seconds and 17 frames, exactly matching the input
+Example timecodes in video editing software:
+ 
+Enlarged timecode details:
+ 
+Example prompt
+Unstable results on complex tasks
+Typical issue
+Results may be unstable when a single task combines multiple reference and editing requirements.
+Solution
+Break the complex task into several simpler tasks and complete it through multiple Reference or Edit passes.
+Before optimization
+	
+After optimization
+    
+    
+    
+    
+    
+    
+    
+      
+One task combines all requirements and produces a visible red trajectory line
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Splitting the workflow into a Reference task and an Edit task produces the intended result
+Task breakdown
+Split the original complex task into two simpler tasks:
+Step 1, Reference task: Use the image containing a marked trajectory to generate an animation of a hat flying along that trajectory. No audio is required. Use this output as a reference asset in Step 2.
+Step 2, Edit task: Edit the original input video to add a hat flying onto the man's head. Match the hat's appearance and flight trajectory to the animation generated in Step 1, and keep everything else unchanged.
+Step 1 input
+	
+Step 1 output
+	
+Step 2 input
+	
+Step 2 output
+Image with the marked trajectory
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Hat animation generated by the Reference task
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Original video to edit, with the Step 1 output provided as a reference asset
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Edited output with the hat placed on the man's head
+Example prompts
+Aspect-ratio editing instability
+Typical issue
+When the aspect ratio is changed, the model may generate additional imagery to fill the expanded canvas, causing inconsistencies in the original visuals or temporal sequence.
+Solution
+Use Reference mode and add a detailed plot description. Emphasize frame-by-frame and shot-by-shot temporal correspondence, as well as content completeness.
+Input video
+	
+Before optimization (Edit mode)
+	
+After optimization (Reference mode)
+    
+    
+    
+    
+    
+    
+    
+      
+Original 16:9 input video
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Editing to 9:16 fills the expanded canvas with inconsistent imagery and timing
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Reference mode with a detailed visual timeline preserves the content and sequence
+Example prompts
+Fingerprint-like textures
+Typical issue
+When a high-resolution AI-generated image is used as a reference input, fingerprint- or shoeprint-like patterns may appear in areas with dense textures, such as grass and foliage.
+Solution
+tip
+The model will continue to be optimized for this issue. The following workaround can currently reduce its probability.
+Resize the input image so that it does not exceed the output video resolution. This issue occurs less often at 1080p than at 720p.
+Input images used in this example, from left to right: the original high-resolution reference image, a close-up of the fingerprint-like texture, and the resized reference image:
+ 
+ 
+Before optimization
+	
+After optimization
+    
+    
+    
+    
+    
+    
+    
+      
+A high-resolution reference image causes fingerprint-like textures
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Resizing the input image so it does not exceed the output resolution reduces the likelihood of the issue
+Background music generated despite "no BGM"
+Typical issue
+Even when the prompt explicitly prohibits background music, the model may still render some sound effects as background music.
+Solution
+Option 1: Strengthen prompt constraints
+Explicitly state that the audio should retain character voices only and that no music track of any kind may be generated. Enumerate related terms, including music, background music, BGM, score, instrumental, melody, synth effects, and ambient pad, to prevent the model from bypassing the constraint with alternative wording.
+Repeat the audio constraint at both the beginning and the end of the prompt.
+Option 2: Remove non-vocal audio in post-production
+Isolate the vocals and remove all non-vocal audio after generation. This method also removes sound effects.
+Before optimization
+	
+After optimization (Option 1: Prompt constraints)
+	
+After optimization (Option 2: Post-production)
+    
+    
+    
+    
+    
+    
+    
+      
+Sound effects are rendered as background music despite the no-BGM instruction
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Music-related terms are enumerated and the constraint is repeated, retaining only the specified dialogue and faint natural ambience
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Vocals are isolated and non-vocal audio, including sound effects, is removed in post-production
+Example prompts
+Mixed languages after audio translation
+Typical issue
+After translating a multi-character video into Chinese, some source-language speech may remain, voice timbres may be mapped to the wrong characters, or the Chinese lip movements may be inaccurate.
+Solution
+Explicitly require all character dialogue, including intelligible background speech, whispers, exclamations, and interjections, to be translated into Chinese without omission.
+Provide complete Chinese dialogue and a timeline for each character.
+Require word-level lip synchronization and define the acceptance criteria: no intelligible source-language speech remains, no subtitles appear, and lip movements precisely match the dialogue. Except for the spoken language and corresponding lip movements, all other visual and audio content must remain unchanged.
+Input video
+	
+Before optimization
+	
+After optimization
+    
+    
+    
+    
+    
+    
+    
+      
+Multi-character video in the source language
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Source-language speech remains and voices are mapped to the wrong characters
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Complete dialogue and timelines for each character produce the intended translation
+Example prompts
+Ripple-like audio artifacts
+Typical issue
+Unexpected audio artifacts may appear, such as bubbling, echoes, or faint whistling.
+Solution
+tip
+The model will continue to be optimized for this issue. The following workaround can currently reduce its probability.
+Remove instructions related to water, waves, or echoes from the prompt to reduce the probability of these artifacts.
+Before optimization
+	
+After optimization
+    
+    
+    
+    
+    
+    
+    
+      
+The generated audio contains ripple-like artifacts
+	
+    
+    
+    
+    
+    
+    
+    
+      
+Removing references to water, waves, and echoes reduces the artifacts
+Prompt examples
+Reference-to-video generation
+The usage of subject, motion, audio, and style references is consistent with Seedance 2.0. For details, see Appendix: Prompt examples. The following sections introduce the reference capabilities added in Seedance 2.5.
+3D clay-model video reference and rendering
+Coarse-grained 3D clay-model video
+Supports rendering from 3D clay-model videos that contain dynamic or temporal information such as motion, camera movement, movement paths, and lighting changes. It also supports adding reference images for subjects, scenes, props, and other elements to control the rendering result.
+The current version performs better with simple modeling. It is recommended to use only simple geometric primitives to represent people, objects, animals, and similar subjects.
+3D clay-model type: Includes cuts, camera movement, and lighting
+Input: text
+Prompt: Use the 3D clay-model reference video <video1> as the only reference for the entire video's camera movement, shot rhythm, shot-size changes, subject motion trajectory, and camera blocking. Strictly preserve the shot order, camera position changes, movement patterns, and pacing of the 3D clay-model video. Do not change the shot structure, add new shots, or alter the subject's motion logic.
+Using the keyframe reference images for each stage, generate a 30-second high-quality 3D animated short film. The overall style should be dreamy, fairytale-like, warm, and full of childlike fantasy. The character's appearance should remain consistent with the keyframes for each stage. Do not change the character design. The character's facial expressions and emotions should change naturally with the scene.
+0-3s (first-frame reference: <2pic>): The shot starts from an overhead wide view and slowly pushes in toward a little girl on the floor. The girl sits on the carpet in her room, playing with a toy airplane. She stands up, turns left, and forcefully swings her right hand to launch the airplane. The toy airplane flies in an arc from left to right into the foreground. The sound gradually transitions from the sound of throwing a paper airplane into the engine sound of a real animated airplane, accompanied by gentle, soothing, cheerful background music.
+3-5s (reference: <3pic>): The airplane flies from left to right through hanging star decorations in the room. The girl rides the airplane into a fantasy sky. A flock of birds flies across the foreground, creating a natural transition. The camera continues side-following and rotating.
+5-8s (reference: <4pic>): The camera continues side-following and orbiting around the little girl. Throughout this segment, the girl keeps piloting the small airplane through a sea of sunset clouds. Around her, a flock of strange birds and giant mythic birds fly alongside her. The white dragon from the reference image swims forward through the air, a winged horse spreads its wings and flies, and a flying whale calls out. Floating islands appear in the background.
+8-10s (reference: <5pic>): The camera orbits to the back of the airplane. The airplane slowly dives toward the sea surface. The girl falls into the water, creating many bubbles in the frame. She swims toward the deep sea, now wearing a bubble-shaped oxygen helmet.
+10-19s (references: <6pic>, <7pic>): The girl continues swimming deeper into the ocean. Suddenly, a manta ray swims into frame and carries the girl forward. The camera continues following the manta ray and the girl as they travel through a dazzling underwater world. The girl looks amazed by the beautiful underwater scenery. The camera keeps pushing forward, revealing a huge space-time rift ahead. The area around the rift looks like broken mirrors, while inside the rift is a brilliant cosmic galaxy. The girl feels a little frightened, but is eventually pulled into the space-time rift and arrives in a fantasy universe.
+19-23s (reference: <8pic>): The girl bursts out of the space-time rift into the fantasy universe, and her outfit changes into the spacesuit shown in the keyframe. Wearing the spacesuit, she jumps from one planet to another. She reaches out, leaps forward, and catches a glowing star. The frame freezes.
+23-24s (reference: <9pic>): In the foreground, the girl and the planets begin to flip forward, gradually transforming and disappearing. In the background, the overhead view of the bedroom from the opening scene (reference: <1pic>) slowly fades in.
+24-28s (reference: <9pic>): The overhead camera continues pushing in. The girl lies asleep on the carpet, still holding the star-catching pose with her hand. A toy airplane and a space-themed picture book lie beside her. Her Asian father enters the frame from the lower left and gently covers her with a blanket. The lighting slowly shifts from warm dusk light to cool moonlight at night.
+28-30s (reference: <10pic>): The camera continues pushing in toward the picture book. The father enters the frame and gently closes the picture book on the floor with his right hand. The final frame freezes on the picture book.
+Overall requirements: All visuals should reference the corresponding keyframes. The 3D clay-model video should only be used as a reference for camera movement, camera motion, shot rhythm, camera blocking, and character animation. Do not reference its visual content. The long-take transitions should feel natural and smooth. Actions should remain continuous, and character proportions and movement should remain consistent. Generate a 30-second video in a 16:9 widescreen format.
+Input: video and images
+    
+    
+    
+    
+    
+    
+    
+      
+Video 1
+Image 2
+Image 3
+Image 4
+Image 5
+Input: video and images (continued)
+Image 6
+Image 7
+Image 8
+Image 9
+Image 10
+Output
+    
+    
+    
+    
+    
+    
+    
+      
+Synchronized comparison video:
+    
+    
+    
+    
+    
+    
+    
+      
+Fine-grained 3D clay-model video
+Designed for scenarios with complete modeling, with a focus on re-rendering. It helps achieve richer and higher-quality rendering results by “coloring” the 3D clay model.
+Try to provide a complete and clear fine-grained 3D clay-model video, without distracting elements such as trajectory lines, coordinate lines, camera cones, or similar visual interference.
+Input: text
+Render Video 1. No BGM; generate only environmental sounds and action sounds.
+Rendering requirements: The background is a nighttime cyberpunk city in deep blue and purple tones, filled with dense skyscrapers. Huge holographic billboards and neon lights glow between the buildings. Several flying vehicles move through the sky, flashing faint lights and producing subtle mechanical sounds. The character is a small raccoon dressed in a black stealth suit, appearing mostly as a silhouette. Its footsteps are cautious and quiet. The character moves across the rooftop of one of the skyscrapers.
+Input: video
+    
+    
+    
+    
+    
+    
+    
+      
+Output
+    
+    
+    
+    
+    
+    
+    
+      
+High-difficulty 3D clay-model video previsualization
+    
+    
+    
+    
+    
+    
+    
+      
+Multi-panel storyboard reference
+Input: text
+Image 1: Nine-panel storyboard reference, used for the overall shot structure, shot sizes, and camera-movement rhythm.
+Image 2: Live-action reference of a rocket launch site on a dusk grassland, used as the benchmark for environmental composition, warm golden sunset light, cool twilight blue tones, and realistic color live-action texture.
+Image 3: Subject 1 (guardian robot) character appearance reference.
+Image 4: Subject 2 (elderly grandmother) character appearance reference.
+[Subject settings]
+Subject 1 (guardian robot): Refer to Image 3. A near-future weathered retro robot with an aged blue-green metal body, mottled rust, a domed head, two glowing red circular camera eyes, thin antennas, and slender articulated limbs. It is very tall, about twice the height of a human.
+Subject 2 (elderly grandmother): Refer to Image 4. A frail elderly woman with silver hair tied into a low bun, deep wrinkles, wearing a bright golden floor-length dress with gold-and-blue embroidered details on the chest. Her expression is full of reluctance and sorrow. Her height only reaches the robot's chest.
+Environment (dusk grassland launch site): Refer to Image 2. A near-future grassland at dusk, with the sky gradually shifting from warm gold to cool blue. On the distant horizon, a launch tower stands with a white rocket, steam rising around it. Knee-high wild grass sways in the wind across a vast, open landscape.
+[Overall style]
+Live-action color cinematic film, realistic photoreal texture, full-color visuals throughout. Color 35mm film look, fine realistic film grain, rich cinematic color grading, IMAX large-format feel. Handheld cinematography with breathing-like camera shake, shallow depth of field, wide aperture, continuous drifting foreground grass, sparks, and ash. Slight Dutch angle. Strong contrast between warm golden sunset light, cool twilight blue, and explosive warm orange. 16:9 horizontal frame. Near-future emotional disaster-film atmosphere: quiet, tragic, protective, and filled with reluctance.
+[Strictly exclude]
+Black-and-white, monochrome, grayscale, desaturated visuals; hand-drawn, sketch, line art, illustration, comics, animation; storyboard frames, rough sketches; tilt-shift miniature look, toy-like appearance, plastic CG, glossy overexposed CG.
+[Shot list] (9 shots, approximately 30 seconds)
+Shot 1 (0-3s): Extreme wide shot, ultra-low camera position close to the ground, looking upward, handheld camera slowly tilting downward. Refer to the grassland composition in Image 2. The dusk grassland feels vast and empty. Knee-high wild grass in the foreground sways out of focus, and warm golden lens flare sweeps across the frame.
+Shot 2 (3-6s): Medium front shot with a handheld camera. The robot supports the elderly woman.
+Shot 3 (6-10s): Facial close-up. The elderly woman looks reluctant to part. Dialogue (elderly woman): "Fly safe, my child. Come back to me."
+Shot 4 (10-14s): Extreme wide shot tilting upward. The rocket rises with a thick white smoke trail. Dialogue (elderly woman): "There he goes... there he goes."
+Shot 5 (14-18s): Extreme wide shot. The rocket explodes and breaks apart in midair. Dialogue (elderly woman): "No... no, no—"
+Shot 6 (18-22s): Extreme facial close-up. The elderly woman's pupils contract and tears fall. Dialogue (elderly woman): "...he was almost there."
+Shot 7 (22-25s): Close-up transitioning to a medium close-up. The elderly woman breaks down in tears. Dialogue (elderly woman): "Bring him back! Please—bring him back!"
+Shot 8 (25-28s): Ultra-low-angle, nearly vertical upward shot. The robot embraces the elderly woman, forming a protective dome around her. Dialogue (robot): "Don't look up. I've got you."
+Shot 9 (28-30s): Extreme wide rear shot. The two figures embrace tightly in silhouette. Dialogue (robot): "I'm still here. I'll stay... as long as you need."
+Input: images
+Image 1
+Image 2
+Image 3
+Image 4
+Output
+    
+    
+    
+    
+    
+    
+    
+      
+Keyframe reference
+Input: text
+Create a one-shot vertical pixel-art wuxia-themed video based on @Image 1 to @Image 6. Use Chinese-style 8-bit wuxia background music. The entire video should use a unified light-blue background, consistent pixel-art style, and a clean, bright, transparent visual look.
+Shot 1:
+Hold on the ink-wash-style "江湖风云" logo from @Image 1. The background is the unified light-blue color. Keep the frame still for about 1 second.
+Shot 2:
+After the text area from @Image 1 disappears, the pixel-art close-up face of the male wuxia character from @Image 2 slides in from the bottom of the frame. The character blinks and looks toward the camera, then quickly moves downward and exits the frame. After the character exits, the original logo area transforms into the blue pixel-art "武功秘籍" martial arts manual from @Image 3.
+Shot 3:
+Immediately transition to @Image 4. A small pixel-art wuxia character jumps forcefully upward from the bottom of the frame and hits the blue diamond-shaped question mark icon above. Bold dark-blue text "今日闯江湖!" pops out above the question mark icon. After landing, the character strikes the standing pose from @Image 4, then raises a hand to greet the viewer. Next, the character prepares to run, turns toward the right side of the frame, and runs to the right, with the running pose referencing @Image 5. The camera follows the character smoothly to the right, and the character jumps out of frame from the right side.
+Shot 4:
+The UI interface from @Image 6 slides into the frame from the right. The pixel-art wuxia character jumps in from the upper-right corner and lands at the lower-right side of the large "三月廿七日" text. The character opens both arms in an enthusiastic presentation pose and freezes. The final frame holds on this composition.
+Overall requirements:
+Pixel-art wuxia visual style throughout, with a unified light-blue background tone. The camera movement should be continuous and smooth, presenting a one-shot flow with seamless position shifts and follow movement. Element transitions should feel natural, and character actions should connect smoothly. No stuttering, no flickering. Text and UI must remain clear and stable.
+Input: images
+Image 1
+Image 2
+Image 3
+Input: images (continued)
+Image 4
+Image 5
+Image 6
+Output
+    
+    
+    
+    
+    
+    
+    
+      
+Edit videos
+Video instruction editing
+Use a prompt to add, remove, or modify visual elements in a video.
+Input: text
+Preserve the composition, camera position, lighting, and performance rhythm of @Video 1. Only modify the female lead's appearance and expression: let her naturally age from her twenties to around sixty. The restraint in her eyes gradually softens, tears slide past the corners of her eyes, and the corners of her mouth slowly lift until she finally smiles through her tears. The entire video should be a continuous one-shot, with no jump cuts and no flickering. Her facial features should gradually age without drifting or changing identity.
+Input: video
+    
+    
+    
+    
+    
+    
+    
+      
+Output
+    
+    
+    
+    
+    
+    
+    
+      
+Video editing with reference images
+Use prompts to add, remove, or modify video content, with support for additional reference images to guide the editing results.
+Input: text
+Replace the two-person fight in @Video 1 with an empty-handed probing exchange before a cold-weapon duel.
+Replace the scene with a medieval stone castle platform, an ancient courtyard, an outer platform of a mountain fortress, or a simple stone-brick duel arena. The background should include castle walls, wind, fog, distant mountain ridges, and a flat stone ground. Refer to @Image 1 for the environment.
+Replace the man in dark clothing in the video with @Image 2, and replace the man in light-colored clothing with @Image 3. Keep the original actions and rhythm unchanged.
+AI effects should only enhance the environment and texture: wind-blown clothing, light fog, a small amount of dust at contact points, cool metallic reflections, subtle film grain, and an epic color palette. The overall style should be restrained, realistic, and evoke a classic hardcore duel atmosphere. Keep the background music synchronized with the action beats.
+Input: video and images
+Image 1
+Image 2
+Input: video and images (continued)
+Image 3
+    
+    
+    
+    
+    
+    
+    
+      
+Video 1
+Output
+    
+    
+    
+    
+    
+    
+    
+      
+Video audio editing
+Input: text
+Translate the spoken dialogue in the video into Chinese, with no subtitles. Precisely adjust the lip movements to match the translated speech, while keeping everything else unchanged.
+Input: video
+    
+    
+    
+    
+    
+    
+    
+      
+Output
+    
+    
+    
+    
+    
+    
+    
+      
+Other examples
+Video extension
+For video extension tasks, the volume of the generated video may differ slightly from the input video. When extending a video originally generated by Seedance 2.5, the volume difference is usually smaller, resulting in better seamless continuity.
+Input: text
+Extend @Video 1 by 5 seconds. A bee flies in and lands on the flower. Then, in a macro close-up, its legs and abdomen are covered with golden pollen particles. The bee flaps its wings and takes off, and the camera follows it as it flies toward another flower of the same species. In slow motion, pollen shakes loose from the bee's fine hairs and falls precisely into the flower's stamen, magnifying the moment of pollination.
+warning
+Select mov as the output format.
+Input: video
+    
+    
+    
+    
+    
+    
+    
+      
+Output
+    
+    
+    
+    
+    
+    
+    
+      
+Stitched video:
+    
+    
+    
+    
+    
+    
+    
+      
+Pay close attention around the 15-second mark: there should be no visible stitching or transition artifacts.
+One-click video creation
+Input: text
+Turn all images into a one-click video. The image order can be freely arranged. Generate a coffee shop vlog in a hand-drawn animated doodle cutout style, documenting the fun daily moments of a puppy wearing different cute outfits and taking photos at the coffee shop. Generate trendy, internet-style playful audio or BGM.
+The images may move slightly, creating a live-photo effect, but do not alter the original images. Keep the visuals highly consistent with the original images.
+Input: images
+Image 1
+Image 2
+Image 3
+Input: images (continued)
+Image 4
+Image 5
+Image 6
+Input: images (continued)
+Image 7
+Image 8
+Output
+    
+    
+    
+    
+    
+    
+    
+      
+Seamless video transition
+Input: text
+Seamlessly connect [Video 1] and [Video 2]. At the end of [Video 1], the camera should quickly fly upward to the top, rapidly turn back, and then dive vertically downward, creating a natural seamless transition into [Video 2]. During the transition, the mahjong tiles gradually transform into high-rise buildings, and the entire scene changes accordingly. Do not alter the two uploaded videos themselves.
+Input: videos
+    
+    
+    
+    
+    
+    
+    
+      
+Video 1
+    
+    
+    
+    
+    
+    
+    
+      
+Video 2
+Output
+    
+    
+    
+    
+    
+    
+    
+      
+Summary
+Compared with Seedance 2.0, Seedance 2.5 is not a cross-generational leap in the same way that 2.0 was compared with 1.5. Seedance 2.0 already achieved a major breakthrough in core generation capabilities, while Seedance 2.5 builds on that foundation with systematic enhancements for real production scenarios. These include longer video generation, richer omni reference support, more stable editing and extension capabilities, and improvements in aspect ratio control, audio-visual continuity, controllability, and workflow adaptability.
+Therefore, the value of Seedance 2.5 is not simply that “a single video looks better,” but that it advances the model further in key areas such as reusability, deliverability, and scalable production. It pushes Seedance from an impressive creative generation model toward a scalable, end-to-end video creation workflow.
+Last updated:  September 28, 2026 14:21:12
+Was this page helpful to you?
+Yes
+No
+Products and solutions
+See all products
+Pricing
+Developers
+Documentation
+API Explorer
+SDK
+BytePlus Discord Community
+Learn and build
+BytePlus Free Tier
+AI Startups Accelerator
+BytePlus Concepts
+Customer success
+BytePlus Academy
+Blog
+Insights
+Connect
+Partner Central
+Partner Network
+Events & webinars
+Company
+About us
+Trust center
+Careers
+Engage and support
+Contact sales
+Contact support
+Become a Partner
+Join Affiliate Program
+Report abuse
+Sitemap
+English
+© 2026 BytePlus Pte Ltd.
+Terms
+•
+Privacy
+•
+The AI-native enterprise partner from
+rangeDom

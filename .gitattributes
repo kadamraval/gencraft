@@ -1,0 +1,8 @@
+# Binary and generated files: no text diff
+*.xlsx binary
+*.png binary
+*.ico binary
+*.icns binary
+src/lib/knowledge/pack.json -diff
+src/lib/registry/registry.snapshot.json -diff
+package-lock.json -diff

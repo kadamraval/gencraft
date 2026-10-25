@@ -1,0 +1,22 @@
+name: Pull request target
+# Contributions go into the dev branch (the inbox); main holds released versions only. A pull request opened against main is moved to dev.
+# This workflow never checks out or runs the pull request's code.
+on:
+  pull_request_target:
+    types: [opened, reopened]
+    branches: [main]
+permissions:
+  pull-requests: write
+jobs:
+  retarget:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Move the pull request to dev
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          if [ "$AUTHOR" = "kadamraval" ]; then exit 0; fi
+          gh pr edit "$PR" --repo "$GITHUB_REPOSITORY" --base dev
+          gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body "Thanks! Pull requests go into the \`dev\` branch (\`main\` holds released versions only), so this one was moved to \`dev\`."

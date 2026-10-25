@@ -1,0 +1,12 @@
+{
+  "name": "gencraft-library-packs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "tsx tools/cli.mts validate .",
+    "build": "tsx tools/cli.mts build . dist library"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0"
+  }
+}

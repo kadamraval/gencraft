@@ -1,0 +1,347 @@
+{
+  "DOCS": [
+    {
+      "id": "welcome",
+      "group": "Getting started",
+      "title": "Welcome to Gencraft",
+      "summary": "What the app does and how to be ready in five minutes.",
+      "sections": [
+        {
+          "h": "What it is",
+          "blocks": [
+            {
+              "p": "Gencraft is a desktop studio for making images, video, voice and finished stories with AI. It does not run models itself. You bring your own keys from providers such as fal, Replicate, OpenRouter, Gemini and OpenAI, and the app sends your prompt to them."
+            },
+            {
+              "p": "What you make is saved on your device. The providers bill you directly for what you run, and the app shows an estimate of the cost as you go."
+            }
+          ]
+        },
+        {
+          "h": "The first five minutes",
+          "blocks": [
+            {
+              "steps": [
+                "Open Settings, then Providers, and paste one API key.",
+                "Open Settings, then General, and choose where results are saved.",
+                "Go to Create, pick a model and write a prompt.",
+                "Optional: make a brand kit and a few elements, then start a story."
+              ]
+            },
+            {
+              "tip": "The Get started list on Home ticks each of these off for you."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "providers",
+      "group": "Getting started",
+      "title": "Providers and keys",
+      "summary": "Connect a provider and choose which models appear.",
+      "sections": [
+        {
+          "h": "Add a key",
+          "blocks": [
+            {
+              "steps": [
+                "Open Settings, then Providers.",
+                "Pick a provider and paste its key into the box.",
+                "Press Test. A green result means the key works.",
+                "Switch on the models you want in the list."
+              ]
+            },
+            {
+              "p": "Only the models you switch on appear in the model picker on Create. The first model in a chain is the main one; the rest are used if it fails."
+            }
+          ]
+        },
+        {
+          "h": "Which providers",
+          "blocks": [
+            {
+              "list": [
+                "fal: many image and video models.",
+                "Replicate: a large catalog of community and official models.",
+                "OpenRouter: chat and text models from many makers.",
+                "Gemini and OpenAI: their own text, image and speech models."
+              ]
+            }
+          ]
+        },
+        {
+          "h": "Keeping a key safe",
+          "blocks": [
+            {
+              "p": "Keys are stored on this device and are never put in a backup file. Treat the device like the key: anyone who can open the app can use it. You can set a master password in Settings, General."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "create",
+      "group": "Making things",
+      "title": "Create",
+      "summary": "Images, video, voice and music from a prompt.",
+      "sections": [
+        {
+          "h": "Make something",
+          "blocks": [
+            {
+              "steps": [
+                "Choose what to make: image, video, audio or text.",
+                "Open the model picker and choose a model. The row shows what it accepts and what it costs.",
+                "Write the prompt and set the options the model offers.",
+                "Press send. You can keep sending while earlier runs are still going."
+              ]
+            },
+            {
+              "p": "Several runs can go at once. The rest wait in line and start by themselves. You can cancel one that is waiting. The number that run together is set in Settings, General, Limits."
+            }
+          ]
+        },
+        {
+          "h": "The plus menu",
+          "blocks": [
+            {
+              "list": [
+                "Upload: add your own picture, clip or sound as a reference.",
+                "Created: reuse something you already made.",
+                "Element: attach a saved character, place, product or look.",
+                "Template and Liked: start from a template or a favorite."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "library",
+      "group": "Making things",
+      "title": "Library",
+      "summary": "Find, sort and reuse everything you made.",
+      "sections": [
+        {
+          "h": "What is in it",
+          "blocks": [
+            {
+              "p": "Every result you generate and every file you upload is in the Library. Results are filed by project, and you can add them to your own folders."
+            }
+          ]
+        },
+        {
+          "h": "Disk space",
+          "blocks": [
+            {
+              "p": "The Library keeps real files. Settings, General, Limits has a warning for when the Library grows past a size you choose, so it never fills the disk without telling you."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "story",
+      "group": "Stories",
+      "title": "Story",
+      "summary": "From a script to a finished cut.",
+      "sections": [
+        {
+          "h": "The four parts",
+          "blocks": [
+            {
+              "list": [
+                "Overview: the cover and the numbers for the story.",
+                "Cast: the characters, locations, props and products, each with a colour, a role, a description and pictures.",
+                "Script: a screenplay page in the standard format. Tab and Return move between scene heading, action, character and dialogue like other screenwriting tools. You can break it into scenes in one step and import or export .fountain files.",
+                "Scene: each beat is a row with its prompt, references, camera, light and four take slots.",
+                "Edit: a timeline to trim, split, reorder, caption and add sound, then export."
+              ]
+            }
+          ]
+        },
+        {
+          "h": "The agent",
+          "blocks": [
+            {
+              "p": "The Agent on the right works on whichever part you are in: it writes and rewrites the script, or cuts and captions on the timeline. It needs a text model from one of your providers."
+            }
+          ]
+        },
+        {
+          "h": "Cutting",
+          "blocks": [
+            {
+              "list": [
+                "C for the blade, V to select, S to split at the playhead.",
+                "Drag either edge of a clip to trim. Drag a clip to move it.",
+                "Ctrl and the mouse wheel zoom the timeline. Space plays."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "brand",
+      "group": "Brand",
+      "title": "Brand kits",
+      "summary": "One place for a brand's logo, colors, fonts and rules.",
+      "sections": [
+        {
+          "h": "Make a kit",
+          "blocks": [
+            {
+              "p": "Press Add brand kit. Type a website and press Fetch to read its name and logo, or upload a logo and type the name yourself."
+            },
+            {
+              "tip": "Fetching a site reads the site's public home page. If a site blocks it, add the logo by hand."
+            }
+          ]
+        },
+        {
+          "h": "What a kit holds",
+          "blocks": [
+            {
+              "list": [
+                "About: name, tagline, description, website and social links.",
+                "Logo: tag each logo as Primary, Light, Dark, Light Mono or Dark Mono. The app shows the right one for the light or dark look.",
+                "Colors and fonts: pick from any Google Font.",
+                "Products: add many at once with names, categories and descriptions.",
+                "Moodboard, Template and Rules."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "elements",
+      "group": "Brand",
+      "title": "Elements",
+      "summary": "Reusable characters, places, products and looks.",
+      "sections": [
+        {
+          "h": "Two kinds",
+          "blocks": [
+            {
+              "list": [
+                "Character, location, product and prop are pictures. They are sent to the model as references.",
+                "Camera, light, style and effects are words added to your prompt. Write them, or give an example picture and let a vision model describe it."
+              ]
+            }
+          ]
+        },
+        {
+          "h": "Using them",
+          "blocks": [
+            {
+              "p": "In Create, open the plus menu, choose Element and pick one. The model's limit on references is shown, and earlier categories keep their slot first when there are too many."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "settings",
+      "group": "Settings and data",
+      "title": "Settings and backup",
+      "summary": "Where files go, how the app looks and how to back up.",
+      "sections": [
+        {
+          "h": "General",
+          "blocks": [
+            {
+              "list": [
+                "Save folder: where results are copied.",
+                "Appearance: light or dark, and the light skins.",
+                "Currency: prices are shown in the one you choose.",
+                "Master password: locks the app screen. It is a screen lock, not encryption of your files."
+              ]
+            }
+          ]
+        },
+        {
+          "h": "Backup",
+          "blocks": [
+            {
+              "p": "Back up to a folder, Google Drive or Dropbox, daily or weekly, and restore from the same place. The backup holds your uploads, results, elements, chats and folders. It never holds your API keys."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "troubleshooting",
+      "group": "Settings and data",
+      "title": "Troubleshooting",
+      "summary": "The usual reasons something does not run.",
+      "sections": [
+        {
+          "h": "A run fails",
+          "blocks": [
+            {
+              "list": [
+                "No key: the message names the provider. Add a key in Settings, Providers.",
+                "The key is rejected: press Test on the provider. Keys with a space or a line break at the end fail.",
+                "A model was retired: switch to its newer version in the list.",
+                "Out of credit: top up with the provider. The app only shows an estimate."
+              ]
+            }
+          ]
+        },
+        {
+          "h": "Still stuck",
+          "blocks": [
+            {
+              "p": "Open Help, then Support, and use Copy details to send us what we need to look into it. It holds the version and settings but never your keys."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "FAQ": [
+    {
+      "group": "Keys",
+      "q": "Where do I get an API key?",
+      "a": "From the provider's own site: fal.ai, replicate.com, openrouter.ai, Google AI Studio (Gemini) or platform.openai.com. Create a key there and paste it in Settings, Providers."
+    },
+    {
+      "group": "Keys",
+      "q": "Is my key sent anywhere except the provider?",
+      "a": "No. The app sends your key only to the provider it belongs to, when you run something or press Test. Keys are kept on this device and are left out of backups."
+    },
+    {
+      "group": "Generation",
+      "q": "Why does a run say it is waiting?",
+      "a": "Only a few runs go at once so the app and your providers stay responsive. The rest wait in line and start on their own. Change the number in Settings, General, Limits."
+    },
+    {
+      "group": "Generation",
+      "q": "Why is the price an estimate?",
+      "a": "Providers change prices and bill you themselves. The app uses the price on the provider's page when the model list was last refreshed."
+    },
+    {
+      "group": "Story",
+      "q": "Can I use my own script?",
+      "a": "Yes. Paste it into Script or import a .fountain file, then press Break into scenes."
+    },
+    {
+      "group": "Story",
+      "q": "How do I export the cut?",
+      "a": "In Edit, press Export. The cut is rendered in real time on your device, so a long cut takes as long as it runs."
+    },
+    {
+      "group": "Brand",
+      "q": "The website did not give me a logo.",
+      "a": "Some sites block reading. Upload the logo yourself in the new kit window or in the Logo card."
+    },
+    {
+      "group": "Data",
+      "q": "How do I move to another computer?",
+      "a": "Back up to a folder, Google Drive or Dropbox in Settings, General, then restore on the other computer. Add your API keys again there."
+    }
+  ]
+}

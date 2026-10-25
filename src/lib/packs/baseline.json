@@ -1,0 +1,3113 @@
+{
+  "packs": [
+    {
+      "id": "caption-styles-basic",
+      "title": "Caption styles",
+      "version": 1,
+      "type": "caption-style",
+      "license": "Original to this project",
+      "items": [
+        {
+          "id": "classic",
+          "name": "Classic",
+          "tags": [
+            "clean",
+            "subtitle"
+          ],
+          "description": "White letters with a dark outline at the bottom",
+          "data": {
+            "style": {
+              "size": "m",
+              "position": "bottom",
+              "font": "sans",
+              "color": "white",
+              "look": "outline",
+              "animation": "none"
+            }
+          }
+        },
+        {
+          "id": "bold-yellow",
+          "name": "Bold yellow",
+          "tags": [
+            "social",
+            "bold"
+          ],
+          "description": "Big yellow display letters with a shadow",
+          "data": {
+            "style": {
+              "size": "l",
+              "position": "bottom",
+              "font": "display",
+              "color": "yellow",
+              "look": "shadow",
+              "animation": "pop"
+            }
+          }
+        },
+        {
+          "id": "boxed",
+          "name": "Boxed",
+          "tags": [
+            "clean",
+            "readable"
+          ],
+          "description": "White letters on a dark box",
+          "data": {
+            "style": {
+              "size": "m",
+              "position": "bottom",
+              "font": "sans",
+              "color": "white",
+              "look": "box",
+              "animation": "fade"
+            }
+          }
+        },
+        {
+          "id": "neon",
+          "name": "Neon",
+          "tags": [
+            "glow",
+            "night"
+          ],
+          "description": "Cyan letters with a soft shadow",
+          "data": {
+            "style": {
+              "size": "l",
+              "position": "middle",
+              "font": "display",
+              "color": "cyan",
+              "look": "shadow",
+              "animation": "fade"
+            }
+          }
+        },
+        {
+          "id": "retro-serif",
+          "name": "Retro serif",
+          "tags": [
+            "film",
+            "retro"
+          ],
+          "description": "Serif letters, plain, rising in",
+          "data": {
+            "style": {
+              "size": "m",
+              "position": "bottom",
+              "font": "serif",
+              "color": "white",
+              "look": "shadow",
+              "animation": "rise"
+            }
+          }
+        },
+        {
+          "id": "typewriter",
+          "name": "Typewriter",
+          "tags": [
+            "mono",
+            "story"
+          ],
+          "description": "Monospace letters typed out one by one",
+          "data": {
+            "style": {
+              "size": "m",
+              "position": "bottom",
+              "font": "mono",
+              "color": "white",
+              "look": "box",
+              "animation": "typewriter"
+            }
+          }
+        },
+        {
+          "id": "title-pop",
+          "name": "Title pop",
+          "tags": [
+            "title",
+            "bold"
+          ],
+          "description": "A very large centred title that springs in",
+          "data": {
+            "style": {
+              "size": "xl",
+              "position": "middle",
+              "font": "display",
+              "color": "white",
+              "look": "outline",
+              "animation": "pop"
+            }
+          }
+        },
+        {
+          "id": "top-note",
+          "name": "Top note",
+          "tags": [
+            "label"
+          ],
+          "description": "A small label at the top",
+          "data": {
+            "style": {
+              "size": "s",
+              "position": "top",
+              "font": "sans",
+              "color": "white",
+              "look": "box",
+              "animation": "fade"
+            }
+          }
+        },
+        {
+          "id": "alert",
+          "name": "Alert",
+          "tags": [
+            "warning",
+            "bold"
+          ],
+          "description": "Red display letters, shadow, popping in",
+          "data": {
+            "style": {
+              "size": "l",
+              "position": "middle",
+              "font": "display",
+              "color": "red",
+              "look": "shadow",
+              "animation": "pop"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "caption-styles-premium",
+      "title": "Premium caption styles",
+      "version": 1,
+      "type": "caption-style",
+      "license": "Original to this project",
+      "items": [
+        {
+          "id": "social-bold",
+          "name": "Social bold",
+          "tags": [
+            "social",
+            "bold",
+            "short-video"
+          ],
+          "description": "Big capitals with a thick black edge, popping in",
+          "data": {
+            "style": {
+              "size": "l",
+              "position": "middle",
+              "font": "display",
+              "color": "white",
+              "look": "stroke",
+              "animation": "pop",
+              "case": "upper"
+            }
+          }
+        },
+        {
+          "id": "hormozi-yellow",
+          "name": "Yellow punch",
+          "tags": [
+            "social",
+            "bold",
+            "short-video"
+          ],
+          "description": "Yellow capitals with a thick edge, bouncing in",
+          "data": {
+            "style": {
+              "size": "l",
+              "position": "middle",
+              "font": "display",
+              "color": "yellow",
+              "look": "stroke",
+              "animation": "bounce",
+              "case": "upper"
+            }
+          }
+        },
+        {
+          "id": "big-bounce",
+          "name": "Big bounce",
+          "tags": [
+            "social",
+            "bold",
+            "energy"
+          ],
+          "description": "Extra large capitals that spring into place",
+          "data": {
+            "style": {
+              "size": "xl",
+              "position": "middle",
+              "font": "display",
+              "color": "white",
+              "look": "stroke",
+              "animation": "bounce",
+              "case": "upper"
+            }
+          }
+        },
+        {
+          "id": "clean-social",
+          "name": "Clean social",
+          "tags": [
+            "social",
+            "clean",
+            "modern"
+          ],
+          "description": "White rounded letters with a soft shadow, zooming in",
+          "data": {
+            "style": {
+              "size": "m",
+              "position": "bottom",
+              "font": "rounded",
+              "color": "white",
+              "look": "shadow",
+              "animation": "zoom"
+            }
+          }
+        },
+        {
+          "id": "neon-cyan",
+          "name": "Neon cyan",
+          "tags": [
+            "neon",
+            "night",
+            "glow"
+          ],
+          "description": "A glowing cyan neon sign",
+          "data": {
+            "style": {
+              "size": "l",
+              "position": "middle",
+              "font": "rounded",
+              "color": "cyan",
+              "look": "neon",
+              "animation": "fade"
+            }
+          }
+        },
+        {
+          "id": "neon-pink",
+          "name": "Neon pink",
+          "tags": [
+            "neon",
+            "night",
+            "party"
+          ],
+          "description": "A glowing pink neon sign",
+          "data": {
+            "style": {
+              "size": "l",
+              "position": "middle",
+              "font": "display",
+              "color": "pink",
+              "look": "neon",
+              "animation": "zoom",
+              "case": "upper",
+              "spacing": "wide"
+            }
+          }
+        },
+        {
+          "id": "cinema-subtitle",
+          "name": "Cinema subtitle",
+          "tags": [
+            "film",
+            "subtitle",
+            "classic"
+          ],
+          "description": "Wide-spaced serif capitals with a soft shadow",
+          "data": {
+            "style": {
+              "size": "m",
+              "position": "bottom",
+              "font": "serif",
+              "color": "white",
+              "look": "shadow",
+              "animation": "fade",
+              "case": "upper",
+              "spacing": "wide"
+            }
+          }
+        },
+        {
+          "id": "documentary",
+          "name": "Documentary",
+          "tags": [
+            "clean",
+            "subtitle",
+            "info"
+          ],
+          "description": "Dark letters on a light plate, small and quiet",
+          "data": {
+            "style": {
+              "size": "s",
+              "position": "bottom",
+              "font": "sans",
+              "color": "white",
+              "look": "boxlight",
+              "animation": "fade"
+            }
+          }
+        },
+        {
+          "id": "retro-wave",
+          "name": "Retro wave",
+          "tags": [
+            "retro",
+            "synthwave",
+            "glow"
+          ],
+          "description": "Slanted pink capitals with a glow, sliding up",
+          "data": {
+            "style": {
+              "size": "l",
+              "position": "middle",
+              "font": "display",
+              "color": "pink",
+              "look": "glow",
+              "animation": "slide",
+              "case": "upper",
+              "spacing": "wide",
+              "italic": true
+            }
+          }
+        },
+        {
+          "id": "terminal",
+          "name": "Terminal",
+          "tags": [
+            "mono",
+            "tech",
+            "code"
+          ],
+          "description": "Green monospace typed onto a dark plate",
+          "data": {
+            "style": {
+              "size": "m",
+              "position": "bottom",
+              "font": "mono",
+              "color": "green",
+              "look": "box",
+              "animation": "typewriter"
+            }
+          }
+        },
+        {
+          "id": "elegant-script",
+          "name": "Elegant script",
+          "tags": [
+            "romantic",
+            "wedding",
+            "soft"
+          ],
+          "description": "Flowing script letters fading in",
+          "data": {
+            "style": {
+              "size": "l",
+              "position": "middle",
+              "font": "script",
+              "color": "white",
+              "look": "shadow",
+              "animation": "fade"
+            }
+          }
+        },
+        {
+          "id": "caution-tape",
+          "name": "Caution tape",
+          "tags": [
+            "warning",
+            "bold",
+            "label"
+          ],
+          "description": "Black capitals on a yellow plate, sliding up",
+          "data": {
+            "style": {
+              "size": "m",
+              "position": "bottom",
+              "font": "condensed",
+              "color": "yellow",
+              "look": "boxcolor",
+              "animation": "slide",
+              "case": "upper",
+              "spacing": "wide"
+            }
+          }
+        },
+        {
+          "id": "ocean-label",
+          "name": "Ocean label",
+          "tags": [
+            "label",
+            "clean",
+            "blue"
+          ],
+          "description": "White letters on a blue plate",
+          "data": {
+            "style": {
+              "size": "m",
+              "position": "bottom",
+              "font": "rounded",
+              "color": "blue",
+              "look": "boxcolor",
+              "animation": "fade"
+            }
+          }
+        },
+        {
+          "id": "lime-pop",
+          "name": "Lime pop",
+          "tags": [
+            "social",
+            "fun",
+            "bright"
+          ],
+          "description": "Bright lime letters with a thick edge, bouncing",
+          "data": {
+            "style": {
+              "size": "l",
+              "position": "middle",
+              "font": "rounded",
+              "color": "lime",
+              "look": "stroke",
+              "animation": "bounce",
+              "case": "upper"
+            }
+          }
+        },
+        {
+          "id": "orange-tag",
+          "name": "Orange tag",
+          "tags": [
+            "label",
+            "top",
+            "info"
+          ],
+          "description": "A small orange tag at the top",
+          "data": {
+            "style": {
+              "size": "s",
+              "position": "top",
+              "font": "sans",
+              "color": "orange",
+              "look": "boxcolor",
+              "animation": "slide",
+              "case": "upper",
+              "spacing": "wide"
+            }
+          }
+        },
+        {
+          "id": "soft-whisper",
+          "name": "Soft whisper",
+          "tags": [
+            "soft",
+            "gentle",
+            "light"
+          ],
+          "description": "Small rounded letters with a gentle glow",
+          "data": {
+            "style": {
+              "size": "m",
+              "position": "bottom",
+              "font": "rounded",
+              "color": "white",
+              "look": "glow",
+              "animation": "fade"
+            }
+          }
+        },
+        {
+          "id": "red-alert",
+          "name": "Red alert",
+          "tags": [
+            "warning",
+            "news",
+            "bold"
+          ],
+          "description": "Red capitals popping in with a thick edge",
+          "data": {
+            "style": {
+              "size": "l",
+              "position": "middle",
+              "font": "display",
+              "color": "red",
+              "look": "stroke",
+              "animation": "pop",
+              "case": "upper"
+            }
+          }
+        },
+        {
+          "id": "tight-mono-note",
+          "name": "Tight note",
+          "tags": [
+            "mono",
+            "minimal",
+            "tech"
+          ],
+          "description": "Tight white monospace on a dark plate",
+          "data": {
+            "style": {
+              "size": "s",
+              "position": "bottom",
+              "font": "mono",
+              "color": "white",
+              "look": "box",
+              "animation": "fade",
+              "spacing": "tight"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "effects-basic",
+      "title": "Basic looks",
+      "version": 1,
+      "type": "effect",
+      "license": "Original to this project",
+      "items": [
+        {
+          "id": "bw",
+          "name": "Black and white",
+          "tags": [
+            "color",
+            "classic"
+          ],
+          "description": "Removes all colour",
+          "data": {
+            "patch": {
+              "saturation": 0
+            }
+          }
+        },
+        {
+          "id": "vivid",
+          "name": "Vivid",
+          "tags": [
+            "color",
+            "pop"
+          ],
+          "description": "Rich colour and a little more contrast",
+          "data": {
+            "patch": {
+              "saturation": 150,
+              "contrast": 115
+            }
+          }
+        },
+        {
+          "id": "faded",
+          "name": "Faded film",
+          "tags": [
+            "color",
+            "film",
+            "retro"
+          ],
+          "description": "Soft, lifted blacks like an old print",
+          "data": {
+            "patch": {
+              "saturation": 70,
+              "contrast": 85,
+              "brightness": 108
+            }
+          }
+        },
+        {
+          "id": "punch",
+          "name": "High contrast",
+          "tags": [
+            "color",
+            "dramatic"
+          ],
+          "description": "Strong blacks and bright highlights",
+          "data": {
+            "patch": {
+              "contrast": 150
+            }
+          }
+        },
+        {
+          "id": "dim",
+          "name": "Dim",
+          "tags": [
+            "color",
+            "mood"
+          ],
+          "description": "Darker, quieter picture",
+          "data": {
+            "patch": {
+              "brightness": 70
+            }
+          }
+        },
+        {
+          "id": "dream",
+          "name": "Dream",
+          "tags": [
+            "blur",
+            "soft",
+            "mood"
+          ],
+          "description": "A soft, glowing haze",
+          "data": {
+            "patch": {
+              "blur": 4,
+              "brightness": 110,
+              "saturation": 120
+            }
+          }
+        },
+        {
+          "id": "soft",
+          "name": "Soft focus",
+          "tags": [
+            "blur",
+            "soft"
+          ],
+          "description": "A light blur",
+          "data": {
+            "patch": {
+              "blur": 2
+            }
+          }
+        },
+        {
+          "id": "mirror",
+          "name": "Mirror",
+          "tags": [
+            "transform"
+          ],
+          "description": "Flips the picture left to right",
+          "data": {
+            "patch": {
+              "flipH": true
+            }
+          }
+        },
+        {
+          "id": "zoom",
+          "name": "Zoom in 20%",
+          "tags": [
+            "transform",
+            "motion"
+          ],
+          "description": "Closer on the subject",
+          "data": {
+            "patch": {
+              "scale": 120
+            }
+          }
+        },
+        {
+          "id": "pip",
+          "name": "Picture in picture",
+          "tags": [
+            "transform",
+            "layout"
+          ],
+          "description": "A small window in the corner",
+          "data": {
+            "patch": {
+              "scale": 35,
+              "x": 30,
+              "y": 30
+            }
+          }
+        },
+        {
+          "id": "slow",
+          "name": "Slow motion",
+          "tags": [
+            "speed"
+          ],
+          "description": "Half speed",
+          "data": {
+            "patch": {
+              "speed": 50
+            }
+          }
+        },
+        {
+          "id": "fast",
+          "name": "Fast forward",
+          "tags": [
+            "speed"
+          ],
+          "description": "Double speed",
+          "data": {
+            "patch": {
+              "speed": 200
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "effects-lens",
+      "title": "Film and lens",
+      "version": 1,
+      "type": "effect",
+      "license": "Original to this project",
+      "items": [
+        {
+          "id": "grain-light",
+          "name": "Film grain light",
+          "tags": [
+            "grain",
+            "film",
+            "texture"
+          ],
+          "description": "A fine, light grain",
+          "data": {
+            "patch": {
+              "grain": 25
+            }
+          }
+        },
+        {
+          "id": "grain-heavy",
+          "name": "Film grain heavy",
+          "tags": [
+            "grain",
+            "film",
+            "gritty"
+          ],
+          "description": "Thick, visible grain",
+          "data": {
+            "patch": {
+              "grain": 60,
+              "contrast": 105
+            }
+          }
+        },
+        {
+          "id": "vignette-soft",
+          "name": "Vignette soft",
+          "tags": [
+            "vignette",
+            "focus"
+          ],
+          "description": "Gently darker corners",
+          "data": {
+            "patch": {
+              "vignette": 30
+            }
+          }
+        },
+        {
+          "id": "vignette-strong",
+          "name": "Vignette strong",
+          "tags": [
+            "vignette",
+            "focus",
+            "dramatic"
+          ],
+          "description": "Strongly darker corners",
+          "data": {
+            "patch": {
+              "vignette": 65
+            }
+          }
+        },
+        {
+          "id": "bloom-soft",
+          "name": "Bloom soft",
+          "tags": [
+            "glow",
+            "bloom",
+            "soft"
+          ],
+          "description": "A soft glow from bright parts",
+          "data": {
+            "patch": {
+              "bloom": 30
+            }
+          }
+        },
+        {
+          "id": "bloom-strong",
+          "name": "Bloom strong",
+          "tags": [
+            "glow",
+            "bloom",
+            "dreamy"
+          ],
+          "description": "A strong glow from bright parts",
+          "data": {
+            "patch": {
+              "bloom": 70
+            }
+          }
+        },
+        {
+          "id": "halation-film",
+          "name": "Halation",
+          "tags": [
+            "glow",
+            "film",
+            "red"
+          ],
+          "description": "The red halo of film round bright lights",
+          "data": {
+            "patch": {
+              "halation": 55,
+              "bloom": 15
+            }
+          }
+        },
+        {
+          "id": "chromatic",
+          "name": "Colour fringes",
+          "tags": [
+            "lens",
+            "chromatic",
+            "edge"
+          ],
+          "description": "Red and blue split at the edges like a cheap lens",
+          "data": {
+            "patch": {
+              "chroma": 45
+            }
+          }
+        },
+        {
+          "id": "sharpen-crisp",
+          "name": "Sharpen",
+          "tags": [
+            "sharp",
+            "detail"
+          ],
+          "description": "Crisper edges",
+          "data": {
+            "patch": {
+              "sharpen": 50
+            }
+          }
+        },
+        {
+          "id": "vhs",
+          "name": "VHS",
+          "tags": [
+            "retro",
+            "tape",
+            "analog"
+          ],
+          "description": "Soft, fringed, scan-lined video tape",
+          "data": {
+            "patch": {
+              "chroma": 30,
+              "scanlines": 40,
+              "grain": 30,
+              "fade": 20,
+              "blur": 1,
+              "saturation": 90
+            }
+          }
+        },
+        {
+          "id": "glitch-light",
+          "name": "Glitch light",
+          "tags": [
+            "glitch",
+            "digital"
+          ],
+          "description": "Now and then a band jumps sideways",
+          "data": {
+            "patch": {
+              "glitch": 40,
+              "chroma": 15
+            }
+          }
+        },
+        {
+          "id": "glitch-heavy",
+          "name": "Glitch heavy",
+          "tags": [
+            "glitch",
+            "digital",
+            "energy"
+          ],
+          "description": "Constant jumping bands and colour split",
+          "data": {
+            "patch": {
+              "glitch": 85,
+              "chroma": 35,
+              "scanlines": 20
+            }
+          }
+        },
+        {
+          "id": "crt",
+          "name": "Old screen",
+          "tags": [
+            "retro",
+            "tv",
+            "scanlines"
+          ],
+          "description": "Scan lines, glow and dark corners like a tube TV",
+          "data": {
+            "patch": {
+              "scanlines": 60,
+              "vignette": 40,
+              "bloom": 25,
+              "saturation": 110,
+              "chroma": 10
+            }
+          }
+        },
+        {
+          "id": "leak-warm",
+          "name": "Light leak warm",
+          "tags": [
+            "light-leak",
+            "film",
+            "warm"
+          ],
+          "description": "Warm orange light drifting in from the edges",
+          "data": {
+            "patch": {
+              "leak": 70,
+              "leakHue": 25
+            }
+          }
+        },
+        {
+          "id": "leak-cool",
+          "name": "Light leak cool",
+          "tags": [
+            "light-leak",
+            "film",
+            "cool"
+          ],
+          "description": "Cool blue light drifting in from the edges",
+          "data": {
+            "patch": {
+              "leak": 70,
+              "leakHue": 200
+            }
+          }
+        },
+        {
+          "id": "leak-rose",
+          "name": "Light leak rose",
+          "tags": [
+            "light-leak",
+            "film",
+            "pink"
+          ],
+          "description": "Pink light drifting in from the edges",
+          "data": {
+            "patch": {
+              "leak": 65,
+              "leakHue": 330
+            }
+          }
+        },
+        {
+          "id": "leak-gold",
+          "name": "Light leak gold",
+          "tags": [
+            "light-leak",
+            "film",
+            "gold"
+          ],
+          "description": "Golden light drifting in from the edges",
+          "data": {
+            "patch": {
+              "leak": 70,
+              "leakHue": 50
+            }
+          }
+        },
+        {
+          "id": "film-look",
+          "name": "Film look",
+          "tags": [
+            "film",
+            "cinematic",
+            "combo"
+          ],
+          "description": "Grain, halation, faded blacks and a light vignette together",
+          "data": {
+            "patch": {
+              "grain": 28,
+              "halation": 30,
+              "fade": 18,
+              "vignette": 22,
+              "contrast": 106,
+              "saturation": 104
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "effects-looks",
+      "title": "Colour looks",
+      "version": 1,
+      "type": "effect",
+      "license": "Original to this project",
+      "items": [
+        {
+          "id": "teal-orange",
+          "name": "Teal and orange",
+          "tags": [
+            "cinematic",
+            "blockbuster",
+            "split-tone"
+          ],
+          "description": "Teal shadows and warm orange highlights, the blockbuster look",
+          "data": {
+            "patch": {
+              "temperature": 16,
+              "tint": -4,
+              "shadowHue": 190,
+              "shadowTone": 40,
+              "highlightHue": 28,
+              "highlightTone": 36,
+              "contrast": 112,
+              "saturation": 110
+            }
+          }
+        },
+        {
+          "id": "golden-hour",
+          "name": "Golden hour",
+          "tags": [
+            "warm",
+            "sunset",
+            "glow"
+          ],
+          "description": "Low warm sun, soft glow and a little vignette",
+          "data": {
+            "patch": {
+              "temperature": 42,
+              "highlights": 10,
+              "shadows": 12,
+              "saturation": 112,
+              "vignette": 25,
+              "bloom": 18,
+              "halation": 10
+            }
+          }
+        },
+        {
+          "id": "blue-hour",
+          "name": "Blue hour",
+          "tags": [
+            "cool",
+            "dusk",
+            "mood"
+          ],
+          "description": "Cool, quiet light just after sunset",
+          "data": {
+            "patch": {
+              "temperature": -34,
+              "tint": -5,
+              "shadowHue": 225,
+              "shadowTone": 45,
+              "saturation": 95,
+              "contrast": 108,
+              "vignette": 20
+            }
+          }
+        },
+        {
+          "id": "bleach-bypass",
+          "name": "Bleach bypass",
+          "tags": [
+            "gritty",
+            "war",
+            "desaturated"
+          ],
+          "description": "Washed colour, hard contrast and grain",
+          "data": {
+            "patch": {
+              "saturation": 55,
+              "contrast": 135,
+              "fade": 8,
+              "grain": 25
+            }
+          }
+        },
+        {
+          "id": "faded-film",
+          "name": "Faded film",
+          "tags": [
+            "film",
+            "retro",
+            "matte"
+          ],
+          "description": "Lifted blacks, softer colour, a little grain",
+          "data": {
+            "patch": {
+              "fade": 40,
+              "saturation": 80,
+              "contrast": 92,
+              "temperature": 10,
+              "grain": 30,
+              "vignette": 15
+            }
+          }
+        },
+        {
+          "id": "warm-stock",
+          "name": "Warm film stock",
+          "tags": [
+            "film",
+            "warm",
+            "nostalgic"
+          ],
+          "description": "Warm colour with a gentle halo round the lights",
+          "data": {
+            "patch": {
+              "temperature": 22,
+              "saturation": 115,
+              "contrast": 108,
+              "highlightHue": 40,
+              "highlightTone": 20,
+              "grain": 18,
+              "halation": 15
+            }
+          }
+        },
+        {
+          "id": "green-stock",
+          "name": "Green film stock",
+          "tags": [
+            "film",
+            "green",
+            "natural"
+          ],
+          "description": "Cool greens and crisp shadows",
+          "data": {
+            "patch": {
+              "tint": -14,
+              "temperature": -6,
+              "saturation": 105,
+              "shadowHue": 150,
+              "shadowTone": 25,
+              "contrast": 106,
+              "grain": 15
+            }
+          }
+        },
+        {
+          "id": "vintage-70s",
+          "name": "Vintage 70s",
+          "tags": [
+            "retro",
+            "warm",
+            "grain"
+          ],
+          "description": "Warm, faded and grainy like an old print",
+          "data": {
+            "patch": {
+              "temperature": 28,
+              "fade": 30,
+              "saturation": 85,
+              "shadowHue": 20,
+              "shadowTone": 25,
+              "vignette": 35,
+              "grain": 35
+            }
+          }
+        },
+        {
+          "id": "noir",
+          "name": "Noir",
+          "tags": [
+            "black-and-white",
+            "drama",
+            "classic"
+          ],
+          "description": "Black and white with hard contrast and dark corners",
+          "data": {
+            "patch": {
+              "saturation": 0,
+              "contrast": 150,
+              "brightness": 95,
+              "vignette": 45,
+              "grain": 30
+            }
+          }
+        },
+        {
+          "id": "soft-pastel",
+          "name": "Soft pastel",
+          "tags": [
+            "light",
+            "dreamy",
+            "gentle"
+          ],
+          "description": "Light, airy and gently glowing",
+          "data": {
+            "patch": {
+              "saturation": 82,
+              "brightness": 112,
+              "contrast": 88,
+              "fade": 18,
+              "temperature": 6,
+              "bloom": 18
+            }
+          }
+        },
+        {
+          "id": "neon-night",
+          "name": "Neon night",
+          "tags": [
+            "night",
+            "city",
+            "cyberpunk"
+          ],
+          "description": "Purple shadows, pink lights and a neon glow",
+          "data": {
+            "patch": {
+              "saturation": 150,
+              "contrast": 120,
+              "shadowHue": 270,
+              "shadowTone": 50,
+              "highlightHue": 330,
+              "highlightTone": 45,
+              "bloom": 45,
+              "vignette": 30
+            }
+          }
+        },
+        {
+          "id": "moody-green",
+          "name": "Moody green",
+          "tags": [
+            "dark",
+            "mood",
+            "thriller"
+          ],
+          "description": "Dark, green-tinted and tense",
+          "data": {
+            "patch": {
+              "tint": -22,
+              "saturation": 80,
+              "contrast": 118,
+              "shadowHue": 160,
+              "shadowTone": 40,
+              "brightness": 94,
+              "vignette": 30
+            }
+          }
+        },
+        {
+          "id": "cross-process",
+          "name": "Cross process",
+          "tags": [
+            "retro",
+            "vivid",
+            "lab"
+          ],
+          "description": "Strong colour shifts, cyan shadows and yellow lights",
+          "data": {
+            "patch": {
+              "contrast": 125,
+              "saturation": 130,
+              "shadowHue": 200,
+              "shadowTone": 45,
+              "highlightHue": 60,
+              "highlightTone": 50,
+              "tint": 8
+            }
+          }
+        },
+        {
+          "id": "dreamy-glow",
+          "name": "Dreamy glow",
+          "tags": [
+            "soft",
+            "romantic",
+            "glow"
+          ],
+          "description": "A soft bloom over everything",
+          "data": {
+            "patch": {
+              "bloom": 60,
+              "halation": 20,
+              "brightness": 108,
+              "contrast": 92,
+              "saturation": 108,
+              "blur": 1,
+              "fade": 10
+            }
+          }
+        },
+        {
+          "id": "matte-black",
+          "name": "Matte black",
+          "tags": [
+            "matte",
+            "modern",
+            "fashion"
+          ],
+          "description": "Milky blacks and calm colour",
+          "data": {
+            "patch": {
+              "fade": 55,
+              "contrast": 115,
+              "saturation": 88,
+              "shadows": 10
+            }
+          }
+        },
+        {
+          "id": "vivid-pop",
+          "name": "Vivid pop",
+          "tags": [
+            "colourful",
+            "social",
+            "bright"
+          ],
+          "description": "Rich, punchy colour",
+          "data": {
+            "patch": {
+              "saturation": 150,
+              "vibrance": 40,
+              "contrast": 118
+            }
+          }
+        },
+        {
+          "id": "drama-desat",
+          "name": "Drama",
+          "tags": [
+            "desaturated",
+            "serious",
+            "cold"
+          ],
+          "description": "Muted colour, strong contrast, a cool cast",
+          "data": {
+            "patch": {
+              "saturation": 60,
+              "contrast": 130,
+              "vignette": 35,
+              "temperature": -8
+            }
+          }
+        },
+        {
+          "id": "sepia",
+          "name": "Sepia",
+          "tags": [
+            "old",
+            "photo",
+            "brown"
+          ],
+          "description": "Warm brown tone like an old photograph",
+          "data": {
+            "patch": {
+              "saturation": 25,
+              "temperature": 60,
+              "tint": 10,
+              "fade": 12,
+              "vignette": 25,
+              "grain": 15
+            }
+          }
+        },
+        {
+          "id": "sunset-blaze",
+          "name": "Sunset blaze",
+          "tags": [
+            "warm",
+            "orange",
+            "dramatic"
+          ],
+          "description": "Hot orange light and deep contrast",
+          "data": {
+            "patch": {
+              "temperature": 55,
+              "saturation": 135,
+              "contrast": 115,
+              "highlightHue": 20,
+              "highlightTone": 40,
+              "vignette": 25,
+              "bloom": 25
+            }
+          }
+        },
+        {
+          "id": "moonlight",
+          "name": "Moonlight",
+          "tags": [
+            "night",
+            "cool",
+            "quiet"
+          ],
+          "description": "Cold blue night with soft darks",
+          "data": {
+            "patch": {
+              "temperature": -45,
+              "brightness": 85,
+              "saturation": 70,
+              "shadowHue": 235,
+              "shadowTone": 40,
+              "contrast": 108,
+              "vignette": 35
+            }
+          }
+        },
+        {
+          "id": "summer-bright",
+          "name": "Summer bright",
+          "tags": [
+            "bright",
+            "happy",
+            "outdoor"
+          ],
+          "description": "Warm, bright and lively",
+          "data": {
+            "patch": {
+              "brightness": 108,
+              "saturation": 118,
+              "temperature": 14,
+              "vibrance": 25,
+              "highlights": 15
+            }
+          }
+        },
+        {
+          "id": "retro-cool-fade",
+          "name": "Retro cool fade",
+          "tags": [
+            "retro",
+            "cool",
+            "indie"
+          ],
+          "description": "Cool, faded and a bit grainy",
+          "data": {
+            "patch": {
+              "fade": 35,
+              "temperature": -12,
+              "saturation": 78,
+              "grain": 25
+            }
+          }
+        },
+        {
+          "id": "high-key",
+          "name": "High key",
+          "tags": [
+            "bright",
+            "clean",
+            "beauty"
+          ],
+          "description": "Bright, low contrast and clean",
+          "data": {
+            "patch": {
+              "brightness": 115,
+              "contrast": 90,
+              "shadows": 40,
+              "saturation": 90,
+              "bloom": 20
+            }
+          }
+        },
+        {
+          "id": "low-key",
+          "name": "Low key",
+          "tags": [
+            "dark",
+            "moody",
+            "dramatic"
+          ],
+          "description": "Dark, contrasty and shadowy",
+          "data": {
+            "patch": {
+              "brightness": 88,
+              "contrast": 125,
+              "shadows": -25,
+              "vignette": 40,
+              "saturation": 95
+            }
+          }
+        },
+        {
+          "id": "cyberpunk",
+          "name": "Cyberpunk",
+          "tags": [
+            "neon",
+            "sci-fi",
+            "city"
+          ],
+          "description": "Cyan shadows and magenta lights",
+          "data": {
+            "patch": {
+              "saturation": 135,
+              "contrast": 122,
+              "shadowHue": 185,
+              "shadowTone": 55,
+              "highlightHue": 315,
+              "highlightTone": 50,
+              "bloom": 35,
+              "chroma": 12
+            }
+          }
+        },
+        {
+          "id": "warm-portrait",
+          "name": "Warm portrait",
+          "tags": [
+            "skin",
+            "people",
+            "soft"
+          ],
+          "description": "Flattering warm skin and soft glow",
+          "data": {
+            "patch": {
+              "temperature": 12,
+              "vibrance": -8,
+              "highlights": -10,
+              "shadows": 15,
+              "bloom": 12,
+              "contrast": 96
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "text-layers",
+      "title": "Text layers",
+      "version": 1,
+      "type": "text-style",
+      "license": "Original designs; fonts are from Google Fonts (open licences)",
+      "items": [
+        {
+          "id": "big-impact",
+          "name": "Big impact",
+          "tags": [
+            "title",
+            "bold",
+            "social"
+          ],
+          "description": "Huge condensed capitals with a thick black edge",
+          "data": {
+            "text": "BIG IDEA",
+            "duration": 3,
+            "rich": {
+              "family": "Anton",
+              "weight": 400,
+              "size": 128,
+              "color": "#ffffff",
+              "stroke": {
+                "width": 5,
+                "color": "#000000"
+              },
+              "case": "upper",
+              "spacing": 2,
+              "animIn": {
+                "kind": "bounce",
+                "duration": 0.5
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.3
+              }
+            }
+          }
+        },
+        {
+          "id": "montserrat-bold",
+          "name": "Clean headline",
+          "tags": [
+            "title",
+            "modern",
+            "clean"
+          ],
+          "description": "A bold, modern headline that slides up",
+          "data": {
+            "text": "Your headline",
+            "duration": 3,
+            "rich": {
+              "family": "Montserrat",
+              "weight": 800,
+              "size": 84,
+              "color": "#ffffff",
+              "shadow": {
+                "blur": 14,
+                "x": 0,
+                "y": 6,
+                "color": "#000000"
+              },
+              "animIn": {
+                "kind": "slide-up",
+                "duration": 0.6
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.4
+              }
+            }
+          }
+        },
+        {
+          "id": "bebas-letters",
+          "name": "Bebas letters",
+          "tags": [
+            "title",
+            "film",
+            "opening"
+          ],
+          "description": "Tall capitals that come in letter by letter",
+          "data": {
+            "text": "COMING SOON",
+            "duration": 4,
+            "rich": {
+              "family": "Bebas Neue",
+              "weight": 400,
+              "size": 120,
+              "color": "#ffffff",
+              "spacing": 8,
+              "case": "upper",
+              "animIn": {
+                "kind": "letters",
+                "duration": 1
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.5
+              }
+            }
+          }
+        },
+        {
+          "id": "cinzel-gold",
+          "name": "Golden cinema",
+          "tags": [
+            "title",
+            "film",
+            "luxury"
+          ],
+          "description": "Gold gradient capitals, wide spaced, fading in",
+          "data": {
+            "text": "A FILM BY",
+            "duration": 4,
+            "rich": {
+              "family": "Cinzel",
+              "weight": 600,
+              "size": 72,
+              "color": "#f5d77a",
+              "gradient": {
+                "color": "#b8860b",
+                "angle": 90
+              },
+              "spacing": 14,
+              "case": "upper",
+              "shadow": {
+                "blur": 10,
+                "x": 0,
+                "y": 4,
+                "color": "#000000"
+              },
+              "animIn": {
+                "kind": "fade",
+                "duration": 1
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.8
+              }
+            }
+          }
+        },
+        {
+          "id": "playfair-italic",
+          "name": "Elegant italic",
+          "tags": [
+            "title",
+            "elegant",
+            "editorial"
+          ],
+          "description": "A refined italic serif",
+          "data": {
+            "text": "Make it beautiful",
+            "duration": 4,
+            "rich": {
+              "family": "Playfair Display",
+              "weight": 700,
+              "italic": true,
+              "size": 76,
+              "color": "#ffffff",
+              "shadow": {
+                "blur": 12,
+                "x": 0,
+                "y": 4,
+                "color": "#000000"
+              },
+              "animIn": {
+                "kind": "fade",
+                "duration": 0.8
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.6
+              }
+            }
+          }
+        },
+        {
+          "id": "pacifico-glow",
+          "name": "Glowing script",
+          "tags": [
+            "script",
+            "soft",
+            "romantic"
+          ],
+          "description": "Soft pink script with a glow, zooming in",
+          "data": {
+            "text": "Love story",
+            "duration": 4,
+            "rich": {
+              "family": "Pacifico",
+              "weight": 400,
+              "size": 88,
+              "color": "#ffd1e8",
+              "glow": {
+                "blur": 30,
+                "color": "#ff4fa3"
+              },
+              "animIn": {
+                "kind": "zoom",
+                "duration": 0.7
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.5
+              }
+            }
+          }
+        },
+        {
+          "id": "lobster-pop",
+          "name": "Social pop",
+          "tags": [
+            "social",
+            "fun",
+            "script"
+          ],
+          "description": "A white script with a red edge, popping in",
+          "data": {
+            "text": "Subscribe!",
+            "duration": 3,
+            "rich": {
+              "family": "Lobster",
+              "weight": 400,
+              "size": 86,
+              "color": "#ffffff",
+              "stroke": {
+                "width": 4,
+                "color": "#e11d48"
+              },
+              "shadow": {
+                "blur": 10,
+                "x": 0,
+                "y": 5,
+                "color": "#000000"
+              },
+              "animIn": {
+                "kind": "pop",
+                "duration": 0.5
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.3
+              }
+            }
+          }
+        },
+        {
+          "id": "oswald-lower-third",
+          "name": "Lower third",
+          "tags": [
+            "name",
+            "interview",
+            "label"
+          ],
+          "description": "A name plate at the lower left that slides in",
+          "data": {
+            "text": "NAME · ROLE",
+            "duration": 4,
+            "rich": {
+              "family": "Oswald",
+              "weight": 600,
+              "size": 38,
+              "color": "#ffffff",
+              "spacing": 4,
+              "case": "upper",
+              "align": "left",
+              "x": 26,
+              "y": 82,
+              "width": 40,
+              "bg": {
+                "color": "#1d4ed8",
+                "opacity": 95,
+                "padX": 28,
+                "padY": 14,
+                "radius": 6
+              },
+              "animIn": {
+                "kind": "slide-right",
+                "duration": 0.5
+              },
+              "animOut": {
+                "kind": "slide-left",
+                "duration": 0.4
+              }
+            }
+          }
+        },
+        {
+          "id": "poppins-subtitle",
+          "name": "Clean subtitle",
+          "tags": [
+            "subtitle",
+            "clean",
+            "info"
+          ],
+          "description": "A readable subtitle on a soft dark plate",
+          "data": {
+            "text": "Your words here",
+            "duration": 3,
+            "rich": {
+              "family": "Poppins",
+              "weight": 600,
+              "size": 40,
+              "color": "#ffffff",
+              "y": 86,
+              "width": 76,
+              "bg": {
+                "color": "#000000",
+                "opacity": 70,
+                "padX": 22,
+                "padY": 10,
+                "radius": 14
+              },
+              "animIn": {
+                "kind": "fade",
+                "duration": 0.3
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.3
+              }
+            }
+          }
+        },
+        {
+          "id": "orbitron-tech",
+          "name": "Tech readout",
+          "tags": [
+            "tech",
+            "sci-fi",
+            "glow"
+          ],
+          "description": "Cyan capitals typed out with a glow",
+          "data": {
+            "text": "SYSTEM ONLINE",
+            "duration": 4,
+            "rich": {
+              "family": "Orbitron",
+              "weight": 800,
+              "size": 72,
+              "color": "#22d3ee",
+              "spacing": 8,
+              "case": "upper",
+              "glow": {
+                "blur": 26,
+                "color": "#22d3ee"
+              },
+              "animIn": {
+                "kind": "typewriter",
+                "duration": 1.2
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.4
+              }
+            }
+          }
+        },
+        {
+          "id": "press-start-retro",
+          "name": "Arcade",
+          "tags": [
+            "retro",
+            "game",
+            "pixel"
+          ],
+          "description": "Yellow pixel letters with a brown edge, wiped in",
+          "data": {
+            "text": "GAME START",
+            "duration": 4,
+            "rich": {
+              "family": "Press Start 2P",
+              "weight": 400,
+              "size": 44,
+              "color": "#facc15",
+              "stroke": {
+                "width": 3,
+                "color": "#7c2d12"
+              },
+              "shadow": {
+                "blur": 0,
+                "x": 4,
+                "y": 4,
+                "color": "#000000"
+              },
+              "animIn": {
+                "kind": "wipe",
+                "duration": 0.8
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.3
+              }
+            }
+          }
+        },
+        {
+          "id": "marker-note",
+          "name": "Marker note",
+          "tags": [
+            "handwritten",
+            "fun",
+            "note"
+          ],
+          "description": "A tilted marker scribble that bounces in",
+          "data": {
+            "text": "Don't miss this",
+            "duration": 3,
+            "rich": {
+              "family": "Permanent Marker",
+              "weight": 400,
+              "size": 72,
+              "color": "#ffffff",
+              "rotation": -5,
+              "shadow": {
+                "blur": 8,
+                "x": 3,
+                "y": 4,
+                "color": "#000000"
+              },
+              "animIn": {
+                "kind": "bounce",
+                "duration": 0.5
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.3
+              }
+            }
+          }
+        },
+        {
+          "id": "bangers-comic",
+          "name": "Comic burst",
+          "tags": [
+            "comic",
+            "fun",
+            "action"
+          ],
+          "description": "Yellow comic capitals with a black edge, tilted",
+          "data": {
+            "text": "BOOM!",
+            "duration": 3,
+            "rich": {
+              "family": "Bangers",
+              "weight": 400,
+              "size": 120,
+              "color": "#fde047",
+              "stroke": {
+                "width": 6,
+                "color": "#111111"
+              },
+              "rotation": -4,
+              "case": "upper",
+              "spacing": 3,
+              "animIn": {
+                "kind": "pop",
+                "duration": 0.4
+              },
+              "animOut": {
+                "kind": "zoom",
+                "duration": 0.3
+              }
+            }
+          }
+        },
+        {
+          "id": "raleway-thin",
+          "name": "Thin minimal",
+          "tags": [
+            "minimal",
+            "clean",
+            "elegant"
+          ],
+          "description": "Very thin, widely spaced capitals",
+          "data": {
+            "text": "MINIMAL",
+            "duration": 4,
+            "rich": {
+              "family": "Raleway",
+              "weight": 200,
+              "size": 80,
+              "color": "#ffffff",
+              "spacing": 20,
+              "case": "upper",
+              "animIn": {
+                "kind": "fade",
+                "duration": 1
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.8
+              }
+            }
+          }
+        },
+        {
+          "id": "abril-gradient",
+          "name": "Fashion headline",
+          "tags": [
+            "title",
+            "fashion",
+            "editorial"
+          ],
+          "description": "A heavy serif headline with a rose gradient",
+          "data": {
+            "text": "The New Look",
+            "duration": 4,
+            "rich": {
+              "family": "Abril Fatface",
+              "weight": 400,
+              "size": 104,
+              "color": "#ffffff",
+              "gradient": {
+                "color": "#fda4af",
+                "angle": 90
+              },
+              "shadow": {
+                "blur": 14,
+                "x": 0,
+                "y": 6,
+                "color": "#000000"
+              },
+              "animIn": {
+                "kind": "slide-up",
+                "duration": 0.7
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.4
+              }
+            }
+          }
+        },
+        {
+          "id": "archivo-block",
+          "name": "Red block",
+          "tags": [
+            "label",
+            "bold",
+            "news"
+          ],
+          "description": "White capitals on a red block",
+          "data": {
+            "text": "LIVE",
+            "duration": 3,
+            "rich": {
+              "family": "Archivo Black",
+              "weight": 400,
+              "size": 72,
+              "color": "#ffffff",
+              "case": "upper",
+              "spacing": 2,
+              "bg": {
+                "color": "#ef4444",
+                "opacity": 100,
+                "padX": 34,
+                "padY": 8,
+                "radius": 4
+              },
+              "animIn": {
+                "kind": "slide-up",
+                "duration": 0.4
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.3
+              }
+            }
+          }
+        },
+        {
+          "id": "righteous-neon",
+          "name": "Violet neon",
+          "tags": [
+            "neon",
+            "night",
+            "glow"
+          ],
+          "description": "A bright sign with a violet glow",
+          "data": {
+            "text": "OPEN NOW",
+            "duration": 4,
+            "rich": {
+              "family": "Righteous",
+              "weight": 400,
+              "size": 90,
+              "color": "#ffffff",
+              "glow": {
+                "blur": 38,
+                "color": "#a855f7"
+              },
+              "case": "upper",
+              "spacing": 6,
+              "animIn": {
+                "kind": "zoom",
+                "duration": 0.6
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.4
+              }
+            }
+          }
+        },
+        {
+          "id": "caveat-hand",
+          "name": "Handwriting",
+          "tags": [
+            "handwritten",
+            "soft",
+            "personal"
+          ],
+          "description": "A warm handwritten line that blurs in",
+          "data": {
+            "text": "with love",
+            "duration": 4,
+            "rich": {
+              "family": "Caveat",
+              "weight": 700,
+              "size": 90,
+              "color": "#fef3c7",
+              "rotation": -3,
+              "shadow": {
+                "blur": 10,
+                "x": 0,
+                "y": 4,
+                "color": "#000000"
+              },
+              "animIn": {
+                "kind": "blur",
+                "duration": 0.8
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.5
+              }
+            }
+          }
+        },
+        {
+          "id": "dancing-wedding",
+          "name": "Wedding script",
+          "tags": [
+            "wedding",
+            "script",
+            "soft"
+          ],
+          "description": "A flowing white script with a soft glow",
+          "data": {
+            "text": "Happily ever after",
+            "duration": 5,
+            "rich": {
+              "family": "Dancing Script",
+              "weight": 700,
+              "size": 92,
+              "color": "#ffffff",
+              "glow": {
+                "blur": 18,
+                "color": "#ffffff"
+              },
+              "animIn": {
+                "kind": "fade",
+                "duration": 1.2
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 1
+              }
+            }
+          }
+        },
+        {
+          "id": "russo-sport",
+          "name": "Sport slam",
+          "tags": [
+            "sport",
+            "bold",
+            "energy"
+          ],
+          "description": "White capitals with a blue edge, sliding in",
+          "data": {
+            "text": "GAME DAY",
+            "duration": 3,
+            "rich": {
+              "family": "Russo One",
+              "weight": 400,
+              "size": 100,
+              "color": "#ffffff",
+              "stroke": {
+                "width": 4,
+                "color": "#0ea5e9"
+              },
+              "case": "upper",
+              "shadow": {
+                "blur": 12,
+                "x": 0,
+                "y": 6,
+                "color": "#000000"
+              },
+              "animIn": {
+                "kind": "slide-left",
+                "duration": 0.5
+              },
+              "animOut": {
+                "kind": "slide-right",
+                "duration": 0.4
+              }
+            }
+          }
+        },
+        {
+          "id": "grotesk-letters",
+          "name": "Modern letters",
+          "tags": [
+            "modern",
+            "title",
+            "tech"
+          ],
+          "description": "Clean bold type that arrives letter by letter",
+          "data": {
+            "text": "Design forward",
+            "duration": 4,
+            "rich": {
+              "family": "Space Grotesk",
+              "weight": 700,
+              "size": 78,
+              "color": "#ffffff",
+              "animIn": {
+                "kind": "letters",
+                "duration": 0.9
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.4
+              }
+            }
+          }
+        },
+        {
+          "id": "fredoka-bubble",
+          "name": "Bubble",
+          "tags": [
+            "fun",
+            "kids",
+            "playful"
+          ],
+          "description": "Round white letters with a pink edge, bouncing",
+          "data": {
+            "text": "Hello!",
+            "duration": 3,
+            "rich": {
+              "family": "Fredoka",
+              "weight": 700,
+              "size": 96,
+              "color": "#ffffff",
+              "stroke": {
+                "width": 6,
+                "color": "#ec4899"
+              },
+              "shadow": {
+                "blur": 0,
+                "x": 0,
+                "y": 6,
+                "color": "#9d174d"
+              },
+              "animIn": {
+                "kind": "bounce",
+                "duration": 0.5
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.3
+              }
+            }
+          }
+        },
+        {
+          "id": "playfair-quote",
+          "name": "Pull quote",
+          "tags": [
+            "quote",
+            "editorial",
+            "calm"
+          ],
+          "description": "A quiet italic quote, narrower",
+          "data": {
+            "text": "A line worth keeping",
+            "duration": 5,
+            "rich": {
+              "family": "Playfair Display",
+              "weight": 400,
+              "italic": true,
+              "size": 58,
+              "color": "#ffffff",
+              "width": 60,
+              "lineHeight": 1.3,
+              "animIn": {
+                "kind": "fade",
+                "duration": 1
+              },
+              "animOut": {
+                "kind": "fade",
+                "duration": 0.8
+              }
+            }
+          }
+        },
+        {
+          "id": "news-banner",
+          "name": "News banner",
+          "tags": [
+            "news",
+            "label",
+            "info"
+          ],
+          "description": "A red banner with condensed capitals at the bottom",
+          "data": {
+            "text": "BREAKING NEWS",
+            "duration": 4,
+            "rich": {
+              "family": "Roboto Condensed",
+              "weight": 700,
+              "size": 36,
+              "color": "#ffffff",
+              "spacing": 3,
+              "case": "upper",
+              "y": 90,
+              "width": 60,
+              "bg": {
+                "color": "#b91c1c",
+                "opacity": 100,
+                "padX": 26,
+                "padY": 10,
+                "radius": 0
+              },
+              "animIn": {
+                "kind": "slide-up",
+                "duration": 0.4
+              },
+              "animOut": {
+                "kind": "slide-down",
+                "duration": 0.3
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "transitions-basic",
+      "title": "Basic transitions",
+      "version": 1,
+      "type": "transition",
+      "license": "Original to this project",
+      "items": [
+        {
+          "id": "fade-in",
+          "name": "Fade in",
+          "tags": [
+            "fade"
+          ],
+          "description": "The clip comes up from black",
+          "data": {
+            "kind": "fade-in"
+          }
+        },
+        {
+          "id": "fade-out",
+          "name": "Fade out",
+          "tags": [
+            "fade"
+          ],
+          "description": "The clip goes down to black",
+          "data": {
+            "kind": "fade-out"
+          }
+        },
+        {
+          "id": "fade-both",
+          "name": "Fade in and out",
+          "tags": [
+            "fade"
+          ],
+          "description": "Both ends of the clip",
+          "data": {
+            "kind": "fade-both"
+          }
+        },
+        {
+          "id": "dip",
+          "name": "Dip to black between clips",
+          "tags": [
+            "fade",
+            "cut"
+          ],
+          "description": "Out of the selected clip and into the next one",
+          "data": {
+            "kind": "dip"
+          }
+        },
+        {
+          "id": "none",
+          "name": "No transition",
+          "tags": [
+            "cut"
+          ],
+          "description": "Cut straight through",
+          "data": {
+            "kind": "none"
+          }
+        }
+      ]
+    },
+    {
+      "id": "transitions-premium",
+      "title": "Premium transitions",
+      "version": 2,
+      "type": "transition",
+      "license": "Original shaders written for this project",
+      "items": [
+        {
+          "id": "dissolve",
+          "name": "Dissolve",
+          "tags": [
+            "fade",
+            "classic",
+            "smooth"
+          ],
+          "description": "One picture melts into the next",
+          "data": {
+            "kind": "shader",
+            "duration": 1,
+            "glsl": "vec4 transition(vec2 uv) {\n  return mix(getFromColor(uv), getToColor(uv), smoothstep(0.0, 1.0, progress));\n}\n"
+          }
+        },
+        {
+          "id": "dip-black",
+          "name": "Dip to black",
+          "tags": [
+            "fade",
+            "classic",
+            "drama"
+          ],
+          "description": "Down to black, then up into the next picture",
+          "data": {
+            "kind": "shader",
+            "duration": 1,
+            "glsl": "vec4 transition(vec2 uv) {\n  float a = smoothstep(0.0, 0.5, progress);\n  float b = smoothstep(0.5, 1.0, progress);\n  return mix(mix(getFromColor(uv), vec4(0.0, 0.0, 0.0, 1.0), a), getToColor(uv), b);\n}\n"
+          }
+        },
+        {
+          "id": "dip-white",
+          "name": "Flash to white",
+          "tags": [
+            "fade",
+            "flash",
+            "bright"
+          ],
+          "description": "A bright flash covers the change",
+          "data": {
+            "kind": "shader",
+            "duration": 0.8,
+            "glsl": "vec4 transition(vec2 uv) {\n  float a = smoothstep(0.0, 0.5, progress);\n  float b = smoothstep(0.5, 1.0, progress);\n  return mix(mix(getFromColor(uv), vec4(1.0), a), getToColor(uv), b);\n}\n"
+          }
+        },
+        {
+          "id": "wipe-right",
+          "name": "Wipe right",
+          "tags": [
+            "wipe",
+            "directional"
+          ],
+          "description": "The next picture sweeps in from the left",
+          "data": {
+            "kind": "shader",
+            "duration": 0.9,
+            "glsl": "uniform vec2 direction; // = vec2(1.0, 0.0)\nuniform float softness; // = 0.08\nvec4 transition(vec2 uv) {\n  vec2 n = normalize(direction);\n  float h = 0.5 * (abs(n.x) + abs(n.y));\n  float along = (dot(uv - 0.5, n) + h) / (2.0 * h);\n  float edge = progress * (1.0 + softness) - softness;\n  float m = smoothstep(edge, edge + softness, along);\n  return mix(getToColor(uv), getFromColor(uv), m);\n}\n",
+            "params": {
+              "direction": [
+                1,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "wipe-left",
+          "name": "Wipe left",
+          "tags": [
+            "wipe",
+            "directional"
+          ],
+          "description": "The next picture sweeps in from the right",
+          "data": {
+            "kind": "shader",
+            "duration": 0.9,
+            "glsl": "uniform vec2 direction; // = vec2(1.0, 0.0)\nuniform float softness; // = 0.08\nvec4 transition(vec2 uv) {\n  vec2 n = normalize(direction);\n  float h = 0.5 * (abs(n.x) + abs(n.y));\n  float along = (dot(uv - 0.5, n) + h) / (2.0 * h);\n  float edge = progress * (1.0 + softness) - softness;\n  float m = smoothstep(edge, edge + softness, along);\n  return mix(getToColor(uv), getFromColor(uv), m);\n}\n",
+            "params": {
+              "direction": [
+                -1,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "wipe-up",
+          "name": "Wipe up",
+          "tags": [
+            "wipe",
+            "directional"
+          ],
+          "description": "The next picture sweeps up from the bottom",
+          "data": {
+            "kind": "shader",
+            "duration": 0.9,
+            "glsl": "uniform vec2 direction; // = vec2(1.0, 0.0)\nuniform float softness; // = 0.08\nvec4 transition(vec2 uv) {\n  vec2 n = normalize(direction);\n  float h = 0.5 * (abs(n.x) + abs(n.y));\n  float along = (dot(uv - 0.5, n) + h) / (2.0 * h);\n  float edge = progress * (1.0 + softness) - softness;\n  float m = smoothstep(edge, edge + softness, along);\n  return mix(getToColor(uv), getFromColor(uv), m);\n}\n",
+            "params": {
+              "direction": [
+                0,
+                1
+              ]
+            }
+          }
+        },
+        {
+          "id": "wipe-down",
+          "name": "Wipe down",
+          "tags": [
+            "wipe",
+            "directional"
+          ],
+          "description": "The next picture sweeps down from the top",
+          "data": {
+            "kind": "shader",
+            "duration": 0.9,
+            "glsl": "uniform vec2 direction; // = vec2(1.0, 0.0)\nuniform float softness; // = 0.08\nvec4 transition(vec2 uv) {\n  vec2 n = normalize(direction);\n  float h = 0.5 * (abs(n.x) + abs(n.y));\n  float along = (dot(uv - 0.5, n) + h) / (2.0 * h);\n  float edge = progress * (1.0 + softness) - softness;\n  float m = smoothstep(edge, edge + softness, along);\n  return mix(getToColor(uv), getFromColor(uv), m);\n}\n",
+            "params": {
+              "direction": [
+                0,
+                -1
+              ]
+            }
+          }
+        },
+        {
+          "id": "push-left",
+          "name": "Push left",
+          "tags": [
+            "slide",
+            "push",
+            "directional"
+          ],
+          "description": "Both pictures slide left together",
+          "data": {
+            "kind": "shader",
+            "duration": 0.8,
+            "glsl": "uniform vec2 direction; // = vec2(-1.0, 0.0)\nvec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 uf = uv - direction * p;\n  vec2 ut = uv - direction * (p - 1.0);\n  bool inFrom = uf.x >= 0.0 && uf.x <= 1.0 && uf.y >= 0.0 && uf.y <= 1.0;\n  return inFrom ? getFromColor(uf) : getToColor(ut);\n}\n",
+            "params": {
+              "direction": [
+                -1,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "push-right",
+          "name": "Push right",
+          "tags": [
+            "slide",
+            "push",
+            "directional"
+          ],
+          "description": "Both pictures slide right together",
+          "data": {
+            "kind": "shader",
+            "duration": 0.8,
+            "glsl": "uniform vec2 direction; // = vec2(-1.0, 0.0)\nvec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 uf = uv - direction * p;\n  vec2 ut = uv - direction * (p - 1.0);\n  bool inFrom = uf.x >= 0.0 && uf.x <= 1.0 && uf.y >= 0.0 && uf.y <= 1.0;\n  return inFrom ? getFromColor(uf) : getToColor(ut);\n}\n",
+            "params": {
+              "direction": [
+                1,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "push-up",
+          "name": "Push up",
+          "tags": [
+            "slide",
+            "push",
+            "directional"
+          ],
+          "description": "Both pictures slide up together",
+          "data": {
+            "kind": "shader",
+            "duration": 0.8,
+            "glsl": "uniform vec2 direction; // = vec2(-1.0, 0.0)\nvec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 uf = uv - direction * p;\n  vec2 ut = uv - direction * (p - 1.0);\n  bool inFrom = uf.x >= 0.0 && uf.x <= 1.0 && uf.y >= 0.0 && uf.y <= 1.0;\n  return inFrom ? getFromColor(uf) : getToColor(ut);\n}\n",
+            "params": {
+              "direction": [
+                0,
+                1
+              ]
+            }
+          }
+        },
+        {
+          "id": "push-down",
+          "name": "Push down",
+          "tags": [
+            "slide",
+            "push",
+            "directional"
+          ],
+          "description": "Both pictures slide down together",
+          "data": {
+            "kind": "shader",
+            "duration": 0.8,
+            "glsl": "uniform vec2 direction; // = vec2(-1.0, 0.0)\nvec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 uf = uv - direction * p;\n  vec2 ut = uv - direction * (p - 1.0);\n  bool inFrom = uf.x >= 0.0 && uf.x <= 1.0 && uf.y >= 0.0 && uf.y <= 1.0;\n  return inFrom ? getFromColor(uf) : getToColor(ut);\n}\n",
+            "params": {
+              "direction": [
+                0,
+                -1
+              ]
+            }
+          }
+        },
+        {
+          "id": "zoom-through",
+          "name": "Zoom through",
+          "tags": [
+            "zoom",
+            "dynamic"
+          ],
+          "description": "Fly into the first picture and out of the next",
+          "data": {
+            "kind": "shader",
+            "duration": 1,
+            "glsl": "vec4 transition(vec2 uv) {\n  vec2 c = vec2(0.5);\n  float p = smoothstep(0.0, 1.0, progress);\n  float zf = 1.0 + p * 1.2;\n  float zt = 2.2 - p * 1.2;\n  vec4 a = getFromColor(c + (uv - c) / zf);\n  vec4 b = getToColor(c + (uv - c) / zt);\n  return mix(a, b, smoothstep(0.35, 0.65, p));\n}\n"
+          }
+        },
+        {
+          "id": "zoom-blur",
+          "name": "Zoom blur",
+          "tags": [
+            "zoom",
+            "blur",
+            "dynamic",
+            "energy"
+          ],
+          "description": "A fast radial blur carries the cut",
+          "data": {
+            "kind": "shader",
+            "duration": 0.9,
+            "glsl": "vec4 transition(vec2 uv) {\n  vec2 c = vec2(0.5);\n  float strength = sin(progress * 3.14159265) * 0.18;\n  vec4 a = vec4(0.0);\n  vec4 b = vec4(0.0);\n  for (int i = 0; i < 12; i++) {\n    float t = float(i) / 11.0;\n    vec2 s = c + (uv - c) * (1.0 - strength * t);\n    a += getFromColor(s);\n    b += getToColor(s);\n  }\n  return mix(a / 12.0, b / 12.0, smoothstep(0.35, 0.65, progress));\n}\n"
+          }
+        },
+        {
+          "id": "circle-open",
+          "name": "Circle open",
+          "tags": [
+            "shape",
+            "reveal"
+          ],
+          "description": "The next picture opens from the middle in a circle",
+          "data": {
+            "kind": "shader",
+            "duration": 0.9,
+            "glsl": "vec4 transition(vec2 uv) {\n  vec2 p = (uv - 0.5) * vec2(ratio, 1.0);\n  float reach = length(vec2(ratio, 1.0) * 0.5);\n  float r = progress * reach * 1.05;\n  float m = smoothstep(r, r - 0.03, length(p));\n  return mix(getFromColor(uv), getToColor(uv), m);\n}\n"
+          }
+        },
+        {
+          "id": "clock-wipe",
+          "name": "Clock wipe",
+          "tags": [
+            "shape",
+            "reveal",
+            "classic"
+          ],
+          "description": "A sweeping hand reveals the next picture",
+          "data": {
+            "kind": "shader",
+            "duration": 1,
+            "glsl": "vec4 transition(vec2 uv) {\n  vec2 d = uv - 0.5;\n  float angle = atan(d.x, -d.y);\n  float a = (angle + 3.14159265) / 6.2831853;\n  float m = step(a, progress);\n  return mix(getFromColor(uv), getToColor(uv), m);\n}\n"
+          }
+        },
+        {
+          "id": "blinds",
+          "name": "Blinds",
+          "tags": [
+            "slats",
+            "classic"
+          ],
+          "description": "Slats turn over to show the next picture",
+          "data": {
+            "kind": "shader",
+            "duration": 0.9,
+            "glsl": "uniform float slats; // = 10.0\nvec4 transition(vec2 uv) {\n  float m = step(fract(uv.x * slats), progress);\n  return mix(getFromColor(uv), getToColor(uv), m);\n}\n"
+          }
+        },
+        {
+          "id": "pixelize",
+          "name": "Pixelize",
+          "tags": [
+            "digital",
+            "retro"
+          ],
+          "description": "Both pictures break into blocks and back",
+          "data": {
+            "kind": "shader",
+            "duration": 0.9,
+            "glsl": "uniform float blocks; // = 48.0\nvec4 transition(vec2 uv) {\n  float amount = sin(progress * 3.14159265);\n  float size = mix(1.0, blocks, amount);\n  vec2 grid = vec2(size * ratio, size);\n  vec2 q = amount > 0.01 ? (floor(uv * grid) + 0.5) / grid : uv;\n  return mix(getFromColor(q), getToColor(q), smoothstep(0.4, 0.6, progress));\n}\n"
+          }
+        },
+        {
+          "id": "glitch",
+          "name": "Glitch",
+          "tags": [
+            "digital",
+            "glitch",
+            "energy"
+          ],
+          "description": "Colour splits and torn blocks jump to the next picture",
+          "data": {
+            "kind": "shader",
+            "duration": 0.7,
+            "glsl": "float rnd(vec2 s) {\n  return fract(sin(dot(s, vec2(12.9898, 78.233))) * 43758.5453);\n}\nvec4 transition(vec2 uv) {\n  float amount = sin(progress * 3.14159265);\n  float row = floor(uv.y * 24.0);\n  float shake = (rnd(vec2(row, floor(progress * 14.0))) - 0.5) * 0.22 * amount;\n  vec2 u = uv + vec2(shake, 0.0);\n  float split = 0.012 * amount;\n  vec4 a = vec4(getFromColor(u + vec2(split, 0.0)).r, getFromColor(u).g, getFromColor(u - vec2(split, 0.0)).b, 1.0);\n  vec4 b = vec4(getToColor(u + vec2(split, 0.0)).r, getToColor(u).g, getToColor(u - vec2(split, 0.0)).b, 1.0);\n  float cut = progress + (rnd(vec2(row, 3.0)) - 0.5) * 0.3 * amount;\n  return mix(a, b, step(0.5, cut));\n}\n"
+          }
+        },
+        {
+          "id": "whip-pan",
+          "name": "Whip pan",
+          "tags": [
+            "motion",
+            "blur",
+            "dynamic",
+            "energy"
+          ],
+          "description": "A fast sideways whip hides the cut",
+          "data": {
+            "kind": "shader",
+            "duration": 0.7,
+            "glsl": "vec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  float blur = sin(progress * 3.14159265) * 0.12;\n  vec4 a = vec4(0.0);\n  vec4 b = vec4(0.0);\n  for (int i = 0; i < 12; i++) {\n    float t = float(i) / 11.0 - 0.5;\n    vec2 sa = vec2(uv.x - p + t * blur, uv.y);\n    vec2 sb = vec2(uv.x - p + 1.0 + t * blur, uv.y);\n    a += getFromColor(fract(sa));\n    b += getToColor(fract(sb));\n  }\n  a /= 12.0;\n  b /= 12.0;\n  return (uv.x - p >= 0.0) ? a : b;\n}\n"
+          }
+        },
+        {
+          "id": "spin-zoom",
+          "name": "Spin zoom",
+          "tags": [
+            "spin",
+            "dynamic"
+          ],
+          "description": "The picture turns and zooms into the next",
+          "data": {
+            "kind": "shader",
+            "duration": 1,
+            "glsl": "vec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 c = vec2(0.5);\n  vec2 d = (uv - c) * vec2(ratio, 1.0);\n  float turn = p * 1.2;\n  float cs = cos(turn);\n  float sn = sin(turn);\n  vec2 r = vec2(cs * d.x - sn * d.y, sn * d.x + cs * d.y);\n  float z = 1.0 + p * 0.8;\n  vec2 sa = c + (r / z) / vec2(ratio, 1.0);\n  float zb = 1.8 - p * 0.8;\n  vec2 rb = vec2(cs * d.x + sn * d.y, -sn * d.x + cs * d.y);\n  vec2 sb = c + (rb / zb) / vec2(ratio, 1.0);\n  return mix(getFromColor(sa), getToColor(sb), smoothstep(0.4, 0.6, p));\n}\n"
+          }
+        },
+        {
+          "id": "luma-fade",
+          "name": "Luma fade",
+          "tags": [
+            "fade",
+            "film",
+            "organic"
+          ],
+          "description": "Bright parts of the first picture hold on longest",
+          "data": {
+            "kind": "shader",
+            "duration": 1,
+            "glsl": "vec4 transition(vec2 uv) {\n  float l = dot(getFromColor(uv).rgb, vec3(0.299, 0.587, 0.114));\n  float th = progress * 1.3 - 0.15;\n  float m = smoothstep(th - 0.12, th + 0.12, l);\n  return mix(getToColor(uv), getFromColor(uv), m);\n}\n"
+          }
+        },
+        {
+          "id": "noise-dissolve",
+          "name": "Noise dissolve",
+          "tags": [
+            "dissolve",
+            "grain",
+            "texture"
+          ],
+          "description": "The picture breaks up into grain and the next one shows through",
+          "data": {
+            "kind": "shader",
+            "duration": 1,
+            "glsl": "float hash(vec2 p) {\n  p = fract(p * vec2(443.897, 441.423));\n  p += dot(p, p.yx + 19.19);\n  return fract((p.x + p.y) * p.x);\n}\nvec4 transition(vec2 uv) {\n  float n = hash(floor(uv * vec2(ratio, 1.0) * 90.0));\n  float m = smoothstep(n - 0.06, n + 0.06, progress * 1.3 - 0.12);\n  return mix(getFromColor(uv), getToColor(uv), m);\n}\n"
+          }
+        },
+        {
+          "id": "swirl",
+          "name": "Swirl",
+          "tags": [
+            "twist",
+            "dynamic",
+            "playful"
+          ],
+          "description": "The picture twists round the middle into the next",
+          "data": {
+            "kind": "shader",
+            "duration": 1.1,
+            "glsl": "vec4 transition(vec2 uv) {\n  vec2 c = vec2(0.5);\n  vec2 d = (uv - c) * vec2(ratio, 1.0);\n  float dist = length(d);\n  float amount = sin(progress * 3.14159265) * 5.0 * (1.0 - smoothstep(0.0, 0.8, dist));\n  float cs = cos(amount);\n  float sn = sin(amount);\n  vec2 r = vec2(cs * d.x - sn * d.y, sn * d.x + cs * d.y) / vec2(ratio, 1.0) + c;\n  return mix(getFromColor(r), getToColor(r), smoothstep(0.35, 0.65, progress));\n}\n"
+          }
+        },
+        {
+          "id": "ripple",
+          "name": "Ripple",
+          "tags": [
+            "water",
+            "wave",
+            "dreamy"
+          ],
+          "description": "Waves run out from the middle and carry the change",
+          "data": {
+            "kind": "shader",
+            "duration": 1.1,
+            "glsl": "vec4 transition(vec2 uv) {\n  vec2 d = uv - 0.5;\n  float dist = length(d * vec2(ratio, 1.0));\n  vec2 off = normalize(d + vec2(0.00001)) * sin(dist * 42.0 - progress * 22.0) * 0.028 * sin(progress * 3.14159265);\n  return mix(getFromColor(uv + off), getToColor(uv + off), smoothstep(0.3, 0.7, progress));\n}\n"
+          }
+        },
+        {
+          "id": "barn-doors",
+          "name": "Barn doors",
+          "tags": [
+            "shape",
+            "reveal",
+            "classic"
+          ],
+          "description": "The next picture opens out from the middle, sideways",
+          "data": {
+            "kind": "shader",
+            "duration": 0.8,
+            "glsl": "vec4 transition(vec2 uv) {\n  float m = step(abs(uv.x - 0.5) * 2.0, progress);\n  return mix(getFromColor(uv), getToColor(uv), m);\n}\n"
+          }
+        },
+        {
+          "id": "barn-doors-up",
+          "name": "Barn doors up",
+          "tags": [
+            "shape",
+            "reveal",
+            "classic"
+          ],
+          "description": "The next picture opens out from the middle, up and down",
+          "data": {
+            "kind": "shader",
+            "duration": 0.8,
+            "glsl": "vec4 transition(vec2 uv) {\n  float m = step(abs(uv.y - 0.5) * 2.0, progress);\n  return mix(getFromColor(uv), getToColor(uv), m);\n}\n"
+          }
+        },
+        {
+          "id": "wipe-diagonal",
+          "name": "Wipe diagonal",
+          "tags": [
+            "wipe",
+            "directional"
+          ],
+          "description": "The next picture sweeps across the corner",
+          "data": {
+            "kind": "shader",
+            "duration": 0.9,
+            "glsl": "uniform vec2 direction; // = vec2(1.0, 0.0)\nuniform float softness; // = 0.08\nvec4 transition(vec2 uv) {\n  vec2 n = normalize(direction);\n  float h = 0.5 * (abs(n.x) + abs(n.y));\n  float along = (dot(uv - 0.5, n) + h) / (2.0 * h);\n  float edge = progress * (1.0 + softness) - softness;\n  float m = smoothstep(edge, edge + softness, along);\n  return mix(getToColor(uv), getFromColor(uv), m);\n}\n",
+            "params": {
+              "direction": [
+                1,
+                1
+              ]
+            }
+          }
+        },
+        {
+          "id": "wipe-diagonal-back",
+          "name": "Wipe diagonal back",
+          "tags": [
+            "wipe",
+            "directional"
+          ],
+          "description": "The next picture sweeps across the other corner",
+          "data": {
+            "kind": "shader",
+            "duration": 0.9,
+            "glsl": "uniform vec2 direction; // = vec2(1.0, 0.0)\nuniform float softness; // = 0.08\nvec4 transition(vec2 uv) {\n  vec2 n = normalize(direction);\n  float h = 0.5 * (abs(n.x) + abs(n.y));\n  float along = (dot(uv - 0.5, n) + h) / (2.0 * h);\n  float edge = progress * (1.0 + softness) - softness;\n  float m = smoothstep(edge, edge + softness, along);\n  return mix(getToColor(uv), getFromColor(uv), m);\n}\n",
+            "params": {
+              "direction": [
+                -1,
+                1
+              ]
+            }
+          }
+        },
+        {
+          "id": "tv-off",
+          "name": "TV off and on",
+          "tags": [
+            "retro",
+            "squeeze",
+            "digital"
+          ],
+          "description": "The picture squeezes to a line, then the next opens from it",
+          "data": {
+            "kind": "shader",
+            "duration": 0.8,
+            "glsl": "vec4 transition(vec2 uv) {\n  float p = progress;\n  float k = p < 0.5 ? 1.0 - p * 2.0 : (p - 0.5) * 2.0;\n  vec2 u = vec2(uv.x, 0.5 + (uv.y - 0.5) / max(k, 0.0001));\n  bool inside = u.y >= 0.0 && u.y <= 1.0;\n  vec4 c = p < 0.5 ? getFromColor(u) : getToColor(u);\n  return inside ? c : vec4(0.0, 0.0, 0.0, 1.0);\n}\n"
+          }
+        },
+        {
+          "id": "card-flip",
+          "name": "Card flip",
+          "tags": [
+            "flip",
+            "3d",
+            "playful"
+          ],
+          "description": "The picture turns over like a card to show the next",
+          "data": {
+            "kind": "shader",
+            "duration": 1,
+            "glsl": "vec4 transition(vec2 uv) {\n  float s = abs(cos(progress * 3.14159265));\n  vec2 u = vec2(0.5 + (uv.x - 0.5) / max(s, 0.0001), uv.y);\n  bool inside = u.x >= 0.0 && u.x <= 1.0;\n  vec4 c = progress < 0.5 ? getFromColor(u) : getToColor(u);\n  return inside ? vec4(c.rgb * mix(0.55, 1.0, s), 1.0) : vec4(0.0, 0.0, 0.0, 1.0);\n}\n"
+          }
+        },
+        {
+          "id": "slide-over-left",
+          "name": "Slide over left",
+          "tags": [
+            "slide",
+            "cover",
+            "directional"
+          ],
+          "description": "The next picture slides in over the first from the right",
+          "data": {
+            "kind": "shader",
+            "duration": 0.8,
+            "glsl": "uniform vec2 direction; // = vec2(-1.0, 0.0)\nvec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 ut = uv - direction * (p - 1.0);\n  bool inTo = ut.x >= 0.0 && ut.x <= 1.0 && ut.y >= 0.0 && ut.y <= 1.0;\n  return inTo ? getToColor(ut) : getFromColor(uv);\n}\n",
+            "params": {
+              "direction": [
+                -1,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "slide-over-right",
+          "name": "Slide over right",
+          "tags": [
+            "slide",
+            "cover",
+            "directional"
+          ],
+          "description": "The next picture slides in over the first from the left",
+          "data": {
+            "kind": "shader",
+            "duration": 0.8,
+            "glsl": "uniform vec2 direction; // = vec2(-1.0, 0.0)\nvec4 transition(vec2 uv) {\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 ut = uv - direction * (p - 1.0);\n  bool inTo = ut.x >= 0.0 && ut.x <= 1.0 && ut.y >= 0.0 && ut.y <= 1.0;\n  return inTo ? getToColor(ut) : getFromColor(uv);\n}\n",
+            "params": {
+              "direction": [
+                1,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "film-burn",
+          "name": "Film burn",
+          "tags": [
+            "film",
+            "light",
+            "retro",
+            "warm"
+          ],
+          "description": "A warm burn of light covers the change",
+          "data": {
+            "kind": "shader",
+            "duration": 1,
+            "glsl": "vec4 transition(vec2 uv) {\n  float flash = sin(progress * 3.14159265);\n  vec3 base = mix(getFromColor(uv).rgb, getToColor(uv).rgb, smoothstep(0.4, 0.6, progress));\n  float band = 0.6 + 0.4 * sin(uv.x * 5.0 + progress * 9.0) * sin(uv.y * 3.0 - progress * 4.0);\n  vec3 burn = vec3(1.0, 0.55, 0.18) * flash * 1.25 * band;\n  return vec4(1.0 - (1.0 - base) * (1.0 - clamp(burn, 0.0, 1.0)), 1.0);\n}\n"
+          }
+        },
+        {
+          "id": "mosaic-reveal",
+          "name": "Mosaic reveal",
+          "tags": [
+            "digital",
+            "tiles",
+            "reveal"
+          ],
+          "description": "Tiles of the next picture appear at random",
+          "data": {
+            "kind": "shader",
+            "duration": 0.9,
+            "glsl": "float hash(vec2 p) {\n  p = fract(p * vec2(443.897, 441.423));\n  p += dot(p, p.yx + 19.19);\n  return fract((p.x + p.y) * p.x);\n}\nvec4 transition(vec2 uv) {\n  vec2 g = floor(uv * vec2(16.0 * ratio, 16.0));\n  float n = hash(g);\n  float m = smoothstep(n - 0.08, n + 0.08, progress * 1.3 - 0.12);\n  return mix(getFromColor(uv), getToColor(uv), m);\n}\n"
+          }
+        },
+        {
+          "id": "stripes",
+          "name": "Stripes",
+          "tags": [
+            "slats",
+            "slide",
+            "playful"
+          ],
+          "description": "Stripes of the picture slide away in turn",
+          "data": {
+            "kind": "shader",
+            "duration": 0.9,
+            "glsl": "vec4 transition(vec2 uv) {\n  float row = floor(uv.y * 8.0);\n  float d = mod(row, 2.0) < 1.0 ? 1.0 : -1.0;\n  float p = smoothstep(0.0, 1.0, progress);\n  vec2 uf = uv - vec2(d * p, 0.0);\n  bool inFrom = uf.x >= 0.0 && uf.x <= 1.0;\n  return inFrom ? getFromColor(uf) : getToColor(uv);\n}\n"
+          }
+        },
+        {
+          "id": "dreamy-blur",
+          "name": "Dreamy blur",
+          "tags": [
+            "blur",
+            "soft",
+            "dreamy",
+            "romantic"
+          ],
+          "description": "Both pictures soften and melt into each other",
+          "data": {
+            "kind": "shader",
+            "duration": 1.1,
+            "glsl": "vec4 transition(vec2 uv) {\n  float amount = sin(progress * 3.14159265) * 0.035;\n  vec4 a = vec4(0.0);\n  vec4 b = vec4(0.0);\n  for (int i = 0; i < 14; i++) {\n    float ang = float(i) * 2.39996323;\n    float rr = sqrt((float(i) + 0.5) / 14.0);\n    vec2 o = vec2(cos(ang), sin(ang)) * rr * amount;\n    a += getFromColor(uv + o);\n    b += getToColor(uv + o);\n  }\n  return mix(a / 14.0, b / 14.0, smoothstep(0.3, 0.7, progress));\n}\n"
+          }
+        }
+      ]
+    }
+  ]
+}

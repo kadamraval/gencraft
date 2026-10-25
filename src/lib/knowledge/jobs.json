@@ -1,0 +1,784 @@
+{
+ "version": 1,
+ "jobs": [
+  {
+   "id": "video-edit",
+   "name": "Edit video (by prompt)",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-video",
+   "takesIn": "video + text",
+   "mayTake": "reference image",
+   "gives": "video",
+   "alsoKnownAs": [
+    "Prompt edit",
+    "instruct edit",
+    "video to video"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-extend",
+   "name": "Extend video",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-video",
+   "takesIn": "video (+ text)",
+   "mayTake": null,
+   "gives": "longer video",
+   "alsoKnownAs": [
+    "Generative extend",
+    "continue video"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-lip-sync",
+   "name": "Lip-sync",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-video",
+   "takesIn": "video or face + audio",
+   "mayTake": null,
+   "gives": "video",
+   "alsoKnownAs": [
+    "Lipsync",
+    "talking head"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-motion-transfer",
+   "name": "Motion transfer",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-video",
+   "takesIn": "picture + driving video",
+   "mayTake": "text",
+   "gives": "video",
+   "alsoKnownAs": [
+    "Motion control",
+    "character animation",
+    "animate"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-upscale",
+   "name": "Upscale video",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-video",
+   "takesIn": "video",
+   "mayTake": "scale",
+   "gives": "video",
+   "alsoKnownAs": [
+    "Super resolution",
+    "enhance",
+    "increase resolution"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-slow-motion",
+   "name": "Slow motion",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-video",
+   "takesIn": "video",
+   "mayTake": "frame rate",
+   "gives": "video",
+   "alsoKnownAs": [
+    "Frame interpolation",
+    "frame rate boost"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-denoise",
+   "name": "Restore / denoise video",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-video",
+   "takesIn": "video",
+   "mayTake": null,
+   "gives": "video",
+   "alsoKnownAs": [
+    "Deblur",
+    "denoise",
+    "remaster",
+    "restore"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-remove-background",
+   "name": "Remove background (video)",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-video",
+   "takesIn": "video",
+   "mayTake": null,
+   "gives": "video with transparency or a matte",
+   "alsoKnownAs": [
+    "Green screen",
+    "matting",
+    "background removal"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-remove-object",
+   "name": "Remove object (video)",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-video",
+   "takesIn": "video + text or mask",
+   "mayTake": null,
+   "gives": "video",
+   "alsoKnownAs": [
+    "Inpainting",
+    "erase"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-colorize",
+   "name": "Colorize video",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-video",
+   "takesIn": "video",
+   "mayTake": null,
+   "gives": "video",
+   "alsoKnownAs": [
+    "Colorization"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-relight",
+   "name": "Relight video",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-video",
+   "takesIn": "video (+ text)",
+   "mayTake": null,
+   "gives": "video",
+   "alsoKnownAs": [
+    "Relighting"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-restyle",
+   "name": "Restyle video",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-video",
+   "takesIn": "video + text",
+   "mayTake": null,
+   "gives": "video",
+   "alsoKnownAs": [
+    "Style transfer",
+    "video to video"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-reframe",
+   "name": "Reframe video",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-video",
+   "takesIn": "video",
+   "mayTake": "aspect ratio",
+   "gives": "video",
+   "alsoKnownAs": [
+    "Auto reframe",
+    "smart crop",
+    "outpaint video"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-dub",
+   "name": "AI dubbing",
+   "kind": "tool",
+   "group": "video",
+   "category": "audio-to-video",
+   "takesIn": "video + target language",
+   "mayTake": null,
+   "gives": "video",
+   "alsoKnownAs": [
+    "Translate video",
+    "dubbing"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-remove-fillers",
+   "name": "Remove filler words",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-video",
+   "takesIn": "video with speech",
+   "mayTake": null,
+   "gives": "video",
+   "alsoKnownAs": [
+    "Um and uh remover"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-sound-effects",
+   "name": "Video to sound effects",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-audio",
+   "takesIn": "video",
+   "mayTake": "text",
+   "gives": "audio or video with sound",
+   "alsoKnownAs": [
+    "Auto foley"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "video-music",
+   "name": "Video to music",
+   "kind": "tool",
+   "group": "video",
+   "category": "video-to-audio",
+   "takesIn": "video",
+   "mayTake": "text",
+   "gives": "audio",
+   "alsoKnownAs": [
+    "Score a video"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "audio-voice-isolation",
+   "name": "Voice isolation",
+   "kind": "tool",
+   "group": "audio",
+   "category": "audio-to-audio",
+   "takesIn": "audio",
+   "mayTake": null,
+   "gives": "audio",
+   "alsoKnownAs": [
+    "Vocal remover",
+    "isolate voice",
+    "speech enhance"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent",
+    "audio"
+   ]
+  },
+  {
+   "id": "audio-noise-reduction",
+   "name": "Noise reduction",
+   "kind": "tool",
+   "group": "audio",
+   "category": "audio-to-audio",
+   "takesIn": "audio",
+   "mayTake": null,
+   "gives": "audio",
+   "alsoKnownAs": [
+    "Remove background noise",
+    "studio sound"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent",
+    "audio"
+   ]
+  },
+  {
+   "id": "audio-stems",
+   "name": "Stem splitter",
+   "kind": "tool",
+   "group": "audio",
+   "category": "audio-to-audio",
+   "takesIn": "audio (a song)",
+   "mayTake": null,
+   "gives": "several audio files",
+   "alsoKnownAs": [
+    "Separate stems",
+    "Demucs"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent",
+    "audio"
+   ]
+  },
+  {
+   "id": "audio-voice-changer",
+   "name": "Voice changer",
+   "kind": "tool",
+   "group": "audio",
+   "category": "audio-to-audio",
+   "takesIn": "audio + target voice",
+   "mayTake": null,
+   "gives": "audio",
+   "alsoKnownAs": [
+    "Voice conversion",
+    "voice clone",
+    "RVC"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent",
+    "audio"
+   ]
+  },
+  {
+   "id": "audio-transcribe",
+   "name": "Transcribe",
+   "kind": "tool",
+   "group": "audio",
+   "category": "speech-to-text",
+   "takesIn": "audio or video",
+   "mayTake": "language",
+   "gives": "text with word times",
+   "alsoKnownAs": [
+    "Speech to text",
+    "transcription",
+    "captions"
+   ],
+   "usedIn": [
+    "story",
+    "edit",
+    "create",
+    "library",
+    "agent",
+    "audio"
+   ]
+  },
+  {
+   "id": "image-remove-background",
+   "name": "Remove background",
+   "kind": "tool",
+   "group": "image",
+   "category": "image-to-image",
+   "takesIn": "image",
+   "mayTake": null,
+   "gives": "image with transparency",
+   "alsoKnownAs": [
+    "Background removal",
+    "cutout"
+   ],
+   "usedIn": [
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "image-upscale",
+   "name": "Upscale",
+   "kind": "tool",
+   "group": "image",
+   "category": "image-to-image",
+   "takesIn": "image",
+   "mayTake": "scale",
+   "gives": "image",
+   "alsoKnownAs": [
+    "Super resolution",
+    "enhance"
+   ],
+   "usedIn": [
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "image-restore",
+   "name": "Restore",
+   "kind": "tool",
+   "group": "image",
+   "category": "image-to-image",
+   "takesIn": "image",
+   "mayTake": null,
+   "gives": "image",
+   "alsoKnownAs": [
+    "Face restore",
+    "denoise",
+    "old photo"
+   ],
+   "usedIn": [
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "image-remove-object",
+   "name": "Remove object",
+   "kind": "tool",
+   "group": "image",
+   "category": "image-to-image",
+   "takesIn": "image + text or mask",
+   "mayTake": null,
+   "gives": "image",
+   "alsoKnownAs": [
+    "Inpainting",
+    "erase"
+   ],
+   "usedIn": [
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "image-relight",
+   "name": "Relight",
+   "kind": "tool",
+   "group": "image",
+   "category": "image-to-image",
+   "takesIn": "image (+ text)",
+   "mayTake": null,
+   "gives": "image",
+   "alsoKnownAs": [
+    "Relighting"
+   ],
+   "usedIn": [
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "image-restyle",
+   "name": "Restyle",
+   "kind": "tool",
+   "group": "image",
+   "category": "image-to-image",
+   "takesIn": "image + text",
+   "mayTake": null,
+   "gives": "image",
+   "alsoKnownAs": [
+    "Style transfer"
+   ],
+   "usedIn": [
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "image-outpaint",
+   "name": "Generative fill",
+   "kind": "tool",
+   "group": "image",
+   "category": "image-to-image",
+   "takesIn": "image",
+   "mayTake": "aspect ratio",
+   "gives": "image",
+   "alsoKnownAs": [
+    "Outpaint",
+    "expand",
+    "uncrop"
+   ],
+   "usedIn": [
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "image-colorize",
+   "name": "Colorize",
+   "kind": "tool",
+   "group": "image",
+   "category": "image-to-image",
+   "takesIn": "image",
+   "mayTake": null,
+   "gives": "image",
+   "alsoKnownAs": [
+    "Colorization"
+   ],
+   "usedIn": [
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "image-edit",
+   "name": "Edit image (by prompt)",
+   "kind": "tool",
+   "group": "image",
+   "category": "image-to-image",
+   "takesIn": "image + text",
+   "mayTake": "more images",
+   "gives": "image",
+   "alsoKnownAs": [
+    "Prompt edit",
+    "instruct edit"
+   ],
+   "usedIn": [
+    "create",
+    "library",
+    "agent"
+   ]
+  },
+  {
+   "id": "text-to-image",
+   "name": "Text to image",
+   "kind": "create",
+   "group": "image",
+   "category": "text-to-image",
+   "takesIn": "text",
+   "mayTake": "reference images",
+   "gives": "image",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library"
+   ]
+  },
+  {
+   "id": "image-to-image",
+   "name": "Image to image",
+   "kind": "create",
+   "group": "image",
+   "category": "image-to-image",
+   "takesIn": "image + text",
+   "mayTake": "more images",
+   "gives": "image",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library"
+   ]
+  },
+  {
+   "id": "text-to-video",
+   "name": "Text to video",
+   "kind": "create",
+   "group": "video",
+   "category": "text-to-video",
+   "takesIn": "text",
+   "mayTake": "reference",
+   "gives": "video",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library"
+   ]
+  },
+  {
+   "id": "image-to-video",
+   "name": "Image to video",
+   "kind": "create",
+   "group": "video",
+   "category": "image-to-video",
+   "takesIn": "image + text",
+   "mayTake": "end frame",
+   "gives": "video",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library"
+   ]
+  },
+  {
+   "id": "reference-to-video",
+   "name": "Reference to video",
+   "kind": "create",
+   "group": "video",
+   "category": "reference-to-video",
+   "takesIn": "images/videos + text",
+   "mayTake": null,
+   "gives": "video",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library"
+   ]
+  },
+  {
+   "id": "audio-text-to-speech",
+   "name": "Voiceover (text to speech)",
+   "kind": "create",
+   "group": "audio",
+   "category": "text-to-speech",
+   "takesIn": "text",
+   "mayTake": "voice",
+   "gives": "audio",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library",
+    "story",
+    "edit",
+    "audio"
+   ]
+  },
+  {
+   "id": "audio-text-to-music",
+   "name": "Music",
+   "kind": "create",
+   "group": "audio",
+   "category": "text-to-audio",
+   "takesIn": "text",
+   "mayTake": "length",
+   "gives": "audio",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library",
+    "story",
+    "edit",
+    "audio"
+   ]
+  },
+  {
+   "id": "audio-text-to-sfx",
+   "name": "Sound effects",
+   "kind": "create",
+   "group": "audio",
+   "category": "text-to-audio",
+   "takesIn": "text",
+   "mayTake": "length",
+   "gives": "audio",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library",
+    "story",
+    "edit",
+    "audio"
+   ]
+  }
+ ]
+}

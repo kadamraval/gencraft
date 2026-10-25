@@ -1,0 +1,30 @@
+---
+// Shows the newest release's files for each system. It reads the public release list in the visitor's browser, so the page never needs rebuilding.
+---
+<div id="downloads" class="not-content">
+  <p id="downloads-status">Looking for the latest release...</p>
+  <ul id="downloads-list"></ul>
+</div>
+<script>
+  const status = document.getElementById("downloads-status")!
+  const list = document.getElementById("downloads-list")!
+  // The release workflow publishes this list beside the installers
+  fetch("https://kadamraval.github.io/gencraft/releases/downloads.json")
+    .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+    .then((data: { version: string; beta?: boolean; files: Array<{ name: string; url: string; os: string; size: number; sha256: string }> }) => {
+      status.textContent = `Latest version: ${data.version}${data.beta ? " (beta)" : ""}`
+      for (const f of data.files) {
+        const li = document.createElement("li")
+        const link = document.createElement("a")
+        link.href = f.url
+        link.textContent = f.name
+        const sum = document.createElement("code")
+        sum.textContent = f.sha256
+        li.append(`${f.os}: `, link, ` (${Math.max(1, Math.round(f.size / 1048576))} MB), SHA-256 `, sum)
+        list.append(li)
+      }
+    })
+    .catch(() => {
+      status.textContent = "The first public release is not out yet. Come back soon."
+    })
+</script>
