@@ -1,4 +1,3 @@
-import { assertCanAdd } from "@/lib/license"
 import * as React from "react"
 import { PRESET_SKILLS } from "./presets"
 import type { Skill, SkillScope } from "./types"
@@ -41,7 +40,6 @@ function commit(next: State) {
 }
 
 export function addSkill(input: Omit<Skill, "id" | "origin">): Skill {
-  assertCanAdd("skills", state.user.length)
   const skill: Skill = { ...input, id: `skill-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, origin: "user" }
   commit({ ...state, user: [...state.user, skill] })
   return skill
@@ -82,6 +80,11 @@ export function useSkills(): { presets: SkillView[]; mine: SkillView[] } {
 export function getSkillsSnapshot(): { presets: SkillView[]; mine: SkillView[] } {
   const view = (s: Skill): SkillView => ({ ...s, on: !state.off.includes(s.id) })
   return { presets: PRESET_SKILLS.map(view), mine: state.user.map(view) }
+}
+
+/** The skills the Agent can use: every one that is switched on, whatever kind of work it was written for. */
+export function agentSkills(all: { presets: SkillView[]; mine: SkillView[] }): SkillView[] {
+  return [...all.mine, ...all.presets].filter((s) => s.on)
 }
 
 /** The skills the composer offers in a mode: switched on and written for that kind of work. */

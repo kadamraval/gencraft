@@ -61,33 +61,6 @@ function Account() {
   )
 }
 
-function Profile() {
-  return (
-    <Stage>
-      <g className={float}>
-        <circle cx="120" cy="64" r="26" className="fill-card stroke-border" strokeWidth="1.5" />
-        <circle cx="120" cy="58" r="10" className="fill-muted-foreground" />
-        <path d="M100 82 a20 16 0 0 1 40 0" className="fill-muted-foreground" />
-      </g>
-      <rect x="86" y="104" width="68" height="10" rx="5" className={`${pop} fill-muted`} style={delay(0.3)} />
-      <circle cx="158" cy="42" r="7" className={`${pop} fill-primary`} style={delay(0.5)} />
-    </Stage>
-  )
-}
-
-function Project() {
-  return (
-    <Stage>
-      <g className={float}>
-        <path d="M60 52 h40 l8 10 h72 a8 8 0 0 1 8 8 v46 a8 8 0 0 1 -8 8 h-112 a8 8 0 0 1 -8 -8 v-56 a8 8 0 0 1 8 -8 Z" className="fill-card stroke-border" strokeWidth="1.5" />
-        <rect x="76" y="76" width="36" height="26" rx="4" className="fill-muted" />
-        <rect x="120" y="76" width="44" height="26" rx="4" className="fill-primary" />
-        <path d="M137 83 L137 95 L148 89 Z" className="fill-primary-foreground" />
-      </g>
-    </Stage>
-  )
-}
-
 /** Five small orbs circling a key: the five providers */
 function Keys() {
   return (
@@ -101,28 +74,6 @@ function Keys() {
       <circle cx="120" cy="72" r="24" className="fill-card stroke-border" strokeWidth="1.5" />
       <circle cx="113" cy="72" r="6" className="fill-none stroke-foreground" strokeWidth="3" />
       <path d="M119 72 H134 M129 72 v6 M134 72 v5" className={`${draw} fill-none stroke-foreground`} strokeWidth="3" strokeLinecap="round" strokeDasharray="120" />
-    </Stage>
-  )
-}
-
-function Drive() {
-  return (
-    <Stage>
-      <g className={float}>
-        <path d="M82 96 a22 22 0 0 1 4 -43 a30 30 0 0 1 58 -4 a24 24 0 0 1 12 47 Z" className="fill-card stroke-border" strokeWidth="1.5" />
-        <path d="M120 88 V64 M110 74 L120 64 L130 74" fill="none" className={`${draw} stroke-primary`} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="120" />
-      </g>
-    </Stage>
-  )
-}
-
-function Folder() {
-  return (
-    <Stage>
-      <g className={pop}>
-        <rect x="96" y="30" width="48" height="60" rx="5" className={`${float} fill-primary`} />
-        <path d="M72 60 h34 l8 9 h50 a8 8 0 0 1 8 8 v34 a8 8 0 0 1 -8 8 h-84 a8 8 0 0 1 -8 -8 v-43 a8 8 0 0 1 8 -8 Z" className="fill-card stroke-border" strokeWidth="1.5" />
-      </g>
     </Stage>
   )
 }
@@ -147,17 +98,10 @@ function Done() {
 export function OnboardingArt({ step }: { step: SetupStep }) {
   switch (step) {
     case "account":
+    case "pin":
       return <Account />
-    case "profile":
-      return <Profile />
-    case "project":
-      return <Project />
-    case "keys":
+    case "setup":
       return <Keys />
-    case "drive":
-      return <Drive />
-    case "folder":
-      return <Folder />
     case "done":
       return <Done />
     default:

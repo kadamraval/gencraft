@@ -18,7 +18,9 @@ class MemoryStorage {
 const storage = new MemoryStorage()
 ;(globalThis as unknown as { localStorage: MemoryStorage }).localStorage = storage
 
-const { readSetup, writeSetup, resetSetup, shouldShowSetup, stepsFor } = await import("../src/lib/home/onboarding.ts")
+const { isCode, isEmail, isPassword, isPin } = await import("../src/lib/account/validate.ts")
+const { clearSession, readSession, writeSession } = await import("../src/lib/account/session.ts")
+const { readSetup, writeSetup, resetSetup, shouldShowSetup, SETUP_STEPS } = await import("../src/lib/home/onboarding.ts")
 
 let passed = 0
 const check = (name: string, fn: () => void) => {
@@ -43,10 +45,10 @@ check("a device with an app lock does not", () => {
   assert.equal(shouldShowSetup(), false)
 })
 check("a setup in progress is shown again until it is finished, even after settings were saved", () => {
-  writeSetup({ step: "keys", plan: "paid" })
+  writeSetup({ step: "setup", plan: "paid" })
   storage.setItem("gencraft_studio_settings", "{}")
   assert.equal(shouldShowSetup(), true)
-  assert.equal(readSetup().step, "keys")
+  assert.equal(readSetup().step, "setup")
   assert.equal(readSetup().plan, "paid")
 })
 check("a finished setup is not shown again, and Run setup again brings it back", () => {
@@ -54,14 +56,29 @@ check("a finished setup is not shown again, and Run setup again brings it back",
   assert.equal(shouldShowSetup(), false)
   resetSetup()
   assert.equal(shouldShowSetup(), true)
-  assert.equal(readSetup().step, "plan")
+  assert.equal(readSetup().step, "account")
 })
-check("Free skips the account step, Paid has it", () => {
-  assert.ok(!stepsFor("free").includes("account"))
-  assert.ok(stepsFor("paid").includes("account"))
-  assert.equal(stepsFor("free")[0], "plan")
-  assert.equal(stepsFor("paid").at(-1), "done")
+check("the setup is short: sign up, a PIN, pricing, one setup screen, done", () => {
+  assert.deepEqual(SETUP_STEPS, ["account", "pin", "plan", "setup", "done"])
+  assert.equal(readSetup().step, "account")
 })
 
-console.log(`\n${passed} passed`)
+check("sign-up checks: email, password, code and PIN", () => {
+  assert.ok(isEmail("a@b.co") && !isEmail("a@b") && !isEmail("a b@c.de") && !isEmail(""))
+  assert.ok(isPassword("12345678") && !isPassword("1234567"))
+  assert.ok(isCode("123456") && isCode(" 123456 ") && !isCode("12345") && !isCode("12345a"))
+  assert.ok(isPin("1234") && isPin("123456") && !isPin("123") && !isPin("1234567") && !isPin("12a4"))
+})
+check("the signed-in session is kept on the device, for a guest too, and can be cleared", () => {
+  assert.equal(readSession(), null)
+  writeSession({ guest: true })
+  assert.equal(readSession()?.guest, true)
+  writeSession({ email: "a@b.co", guest: false })
+  assert.equal(readSession()?.email, "a@b.co")
+  clearSession()
+  assert.equal(readSession(), null)
+})
+
+console.log(`
+${passed} passed`)
 console.log(process.exitCode ? "some failed" : "all passed")

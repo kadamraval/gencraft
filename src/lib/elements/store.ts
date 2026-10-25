@@ -1,4 +1,3 @@
-import { assertCanAdd } from "@/lib/license"
 import * as React from "react"
 import type { ElementCategory, ElementItem, ElementRecord } from "./types"
 import { PRESETS } from "./presets"
@@ -63,12 +62,11 @@ export interface NewElement {
   text?: string
   origin?: ElementRecord["origin"]
   describedBy?: string
-  /** Put back from a backup: keeps its own id and date, and is not held to the Free plan limit */
+  /** Put back from a backup: keeps its own id and date */
   restore?: { id: string; createdAt: number }
 }
 
 export async function saveElement(input: NewElement): Promise<ElementItem> {
-  if (!input.restore) assertCanAdd("elements", (await listElements()).filter((e) => e.origin !== "preset").length)
   const record: ElementRecord = {
     id: input.restore?.id ?? `element-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     category: input.category,

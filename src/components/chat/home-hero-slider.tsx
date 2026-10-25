@@ -40,25 +40,11 @@ const SLIDER_ITEMS: SliderItem[] = [
     defaultPrompt: "Decompose a sci-fi orbital mystery narrative into 3 continuous 10s visual beats",
   },
   {
-    id: "item-05",
-    title: "Batch",
-    fileName: "05_batch-generation.png",
-    mode: "image",
-    defaultPrompt: "Character turnaround study, 4-angle frontal, profile, 45-degree, and action poses",
-  },
-  {
     id: "item-06",
     title: "Brand",
     fileName: "06_brand.png",
     mode: "image",
     defaultPrompt: "Modern architectural glass pavilion in Scandinavian mist, minimalist brand signature",
-  },
-  {
-    id: "item-07",
-    title: "Skills",
-    fileName: "07_skills.png",
-    mode: "video",
-    defaultPrompt: "Lone astronaut inspecting crystalline alien flora on red soil, terminal frame bridged",
   },
   {
     id: "item-08",

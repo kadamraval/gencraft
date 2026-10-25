@@ -95,7 +95,7 @@ import { plainValue } from "@/lib/registry/plain-names"
 import { NO_ENHANCE_KEY, shapeRun, TASK_KEY } from "@/lib/models/apply"
 import { profileFor } from "@/lib/models/profile"
 import type { EndpointFeature } from "@/lib/registry/features"
-import { skillsFor, useSkills } from "@/lib/skills/store"
+import { agentSkills, useSkills } from "@/lib/skills/store"
 import { LIMITS } from "@/lib/skills/limits"
 import type { Skill } from "@/lib/skills/types"
 
@@ -979,7 +979,7 @@ ${brandBrief(brandKit)}` } : base
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value
     setPrompt(val)
-    setSlashOpen(val.startsWith("/") && !val.includes(" "))
+    setSlashOpen(mode === "plan" && val.startsWith("/") && !val.includes(" "))
     if (val.startsWith("/")) setSlashIndex(0)
     const before = val.slice(0, e.target.selectionStart || val.length)
     // The list is open only while a name is being typed: after a finished @name and a space it closes
@@ -1178,11 +1178,15 @@ ${brandBrief(brandKit)}` } : base
   }
 
   // Skills offered for this mode, narrowed by what was typed after the slash
-  const skillScope = mode === "plan" ? "agent" : mode
+  // Skills belong to the Agent: Create and Edit have none
   const skillChoices = React.useMemo(() => {
+    if (mode !== "plan") return []
     const q = prompt.startsWith("/") ? prompt.slice(1).trim().toLowerCase() : ""
-    return skillsFor(allSkills, skillScope).filter((k) => !q || `${k.name} ${k.description}`.toLowerCase().includes(q))
-  }, [allSkills, skillScope, prompt])
+    return agentSkills(allSkills).filter((k) => !q || `${k.name} ${k.description}`.toLowerCase().includes(q))
+  }, [allSkills, mode, prompt])
+  React.useEffect(() => {
+    if (mode !== "plan") setActiveSkills((prev) => (prev.length ? [] : prev))
+  }, [mode])
 
   // A skill that fits what is being typed, offered but never applied on its own
   const pickSkill = (skill: Skill) => {
@@ -1571,10 +1575,7 @@ ${brandBrief(brandKit)}` } : base
             <div className="px-3 py-1.5 text-xs font-semibold uppercase text-muted-foreground">Skills</div>
             {skillChoices.length === 0 && (
               <p className="px-3 py-3 text-xs text-muted-foreground">
-                No skills for this mode.{" "}
-                <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={() => onOpenSettings?.("skills")}>
-                  Add one in Settings
-                </Button>
+                No skills yet. Add one in Agents, Skills.
               </p>
             )}
             {skillChoices.map((skill, idx) => {
@@ -1807,7 +1808,7 @@ ${brandBrief(brandKit)}` } : base
                   e.preventDefault()
                   void addFiles(files)
                 }}
-                placeholder={shotsOn ? "One shot per line, e.g. 4s A knight rides  ·  @ assets" : `${modeDef.placeholder}  ·  @ assets  ·  / skills`}
+                placeholder={shotsOn ? "One shot per line, e.g. 4s A knight rides  ·  @ assets" : `${modeDef.placeholder}  ·  @ assets${mode === "plan" ? "  ·  / skills" : ""}`}
                 className="relative max-h-none min-h-0 w-full resize-none border-0 bg-transparent p-0 text-sm leading-relaxed text-foreground shadow-none outline-none placeholder:text-muted-foreground/60 focus-visible:ring-0"
               />
             </div>

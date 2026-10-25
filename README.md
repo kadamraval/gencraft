@@ -63,12 +63,12 @@ Images, video, voice and music from a prompt.
 - Price estimate before each run and a running cost in the top bar
 - Several runs at once; the rest wait in line and start by themselves
 - If a model fails, the next one in your chain is tried
-- **Batch** runs, **Skills** (reusable instructions) and an **Agent** that plans the work and asks before it spends
+- **Agents** (Paid): plan the work, run a batch, follow your skills, and ask before they spend
 
 </td>
 <td width="50%" valign="top">
 
-<img src="docs/images/create.png" alt="Create screen with Image, Video, Audio, Agent, Batch, Brand, Skills and Story" width="100%">
+<img src="docs/images/create.png" alt="Create screen with Image, Video, Audio, Agent, Brand and Story" width="100%">
 
 </td>
 </tr>
@@ -157,7 +157,7 @@ You need a key for at least one provider; each additional key widens the choice 
 
 **Do I need a powerful computer or a GPU?** No. The models run at the providers. Any computer that runs the installer works.
 
-**Does Gencraft cost money?** Gencraft has no subscription and no credits. You pay each provider directly for what you run, and the app shows an estimate before every run. A licence for the app itself has not been announced.
+**Does Gencraft cost money?** Gencraft is free and open source, with no credits. Paid adds Agents, Connectors, building your own Apps and email support, and lifts the one-project limit: **One Year, $39** or **Lifetime, $99**, same features. You pay each provider directly for what you run, and the app shows an estimate before every run. See [Free and Paid](https://kadamraval.github.io/gencraft/docs/pricing/).
 
 **Where are my files?** In the save folder you choose (by default `Documents/Gencraft` on the desktop). The app keeps a Library of everything you made and uploaded.
 

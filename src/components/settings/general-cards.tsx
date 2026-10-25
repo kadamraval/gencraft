@@ -3,6 +3,7 @@ import { BadgeCheck, BarChart3, Loader2, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { FREE_LIMITS, activateLicense, removeLicense, useLicense } from "@/lib/license"
+import { FREE_MISSING, PRICES } from "@/lib/plans"
 import { usageLedger } from "@/lib/ledger/usage-store"
 import { useMoney } from "@/lib/currency/currency"
 import { cn } from "@/lib/utils"
@@ -39,10 +40,10 @@ export function LicenseCard() {
       {paid ? (
         <>
           <div className="space-y-0.5">
-            <p className="text-sm font-semibold text-foreground">No limits, the Agent, building Apps and support</p>
+            <p className="text-sm font-semibold text-foreground">Unlimited projects, Agents, Connectors, building Apps and email support</p>
             <p className="truncate text-xs text-muted-foreground">
               {license.licensee}
-              {license.issued ? ` · ${license.issued}` : ""}
+              {license.term === "year" && license.expires ? ` · One Year, until ${license.expires}` : license.issued ? ` · Lifetime · ${license.issued}` : ""}
             </p>
           </div>
           <Button type="button" variant="secondary" size="sm" className="h-8 self-start text-xs" onClick={removeLicense}>
@@ -52,11 +53,9 @@ export function LicenseCard() {
       ) : (
         <>
           <ul className="space-y-1 text-xs text-muted-foreground">
-            <li>Up to {FREE_LIMITS.folders} Library folders</li>
-            <li>Up to {FREE_LIMITS.skills} skills of your own</li>
-            <li>Up to {FREE_LIMITS.elements} saved elements</li>
-            <li>No Agent and no building your own Apps (built-in Apps run)</li>
-            <li>Community support</li>
+            <li>{FREE_LIMITS.projects} project</li>
+            <li>No {FREE_MISSING.join(", no ")}</li>
+            <li>Paid: {PRICES.year.line}, or {PRICES.lifetime.line}</li>
           </ul>
           <div className="mt-auto flex items-center gap-2">
             <Input value={key} onChange={(e) => setKey(e.target.value)} placeholder="License key" aria-label="License key" className="h-8 text-xs" />

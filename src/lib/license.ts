@@ -12,16 +12,23 @@ export interface LicenseInfo {
   plan: "free" | "paid"
   licensee?: string
   issued?: string
+  /** One Year or Lifetime. Keys sold before the plans existed carry neither and are lifetime. */
+  term?: "year" | "lifetime"
+  /** Last day a One Year key works (YYYY-MM-DD) */
+  expires?: string
 }
 
 /** What the Free plan allows. Paid has no limits. */
-export const FREE_LIMITS = { folders: 3, skills: 5, elements: 10 } as const
+export const FREE_LIMITS = { projects: 1 } as const
 export type LimitKind = keyof typeof FREE_LIMITS
 
 /** Features that are part of the paid plan only. The Free plan has everything else. */
-export type Feature = "agent" | "buildApps"
-const FREE_FEATURES: Record<Feature, boolean> = { agent: false, buildApps: false }
-export const FEATURE_NAMES: Record<Feature, string> = { agent: "The Agent", buildApps: "Building your own Apps" }
+export type Feature = "agent" | "buildApps" | "connectors"
+const FREE_FEATURES: Record<Feature, boolean> = { agent: false, buildApps: false, connectors: false }
+export const FEATURE_NAMES: Record<Feature, string> = { agent: "Agents", buildApps: "Building your own Apps", connectors: "Connectors" }
+
+/** True when a One Year key has run out. `today` is YYYY-MM-DD. Lifetime keys (no date) never run out. */
+export const licenseExpired = (expires: string | undefined, today: string): boolean => Boolean(expires) && today > (expires as string)
 
 /** Whether a plan includes a feature */
 export const planHas = (plan: LicenseInfo["plan"], feature: Feature): boolean => plan === "paid" || FREE_FEATURES[feature]
@@ -50,8 +57,10 @@ export async function verifyLicense(key: string): Promise<LicenseInfo | null> {
     const verifyKey = await crypto.subtle.importKey("jwk", publicKey as JsonWebKey, { name: "ECDSA", namedCurve: "P-256" }, false, ["verify"])
     const ok = await crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, verifyKey, fromB64url(signaturePart), payload)
     if (!ok) return null
-    const body = JSON.parse(new TextDecoder().decode(payload)) as { plan?: string; licensee?: string; issued?: string }
-    return body.plan === "paid" ? { plan: "paid", licensee: body.licensee, issued: body.issued } : null
+    const body = JSON.parse(new TextDecoder().decode(payload)) as { plan?: string; licensee?: string; issued?: string; term?: string; expires?: string }
+    if (body.plan !== "paid") return null
+    if (licenseExpired(body.expires, new Date().toISOString().slice(0, 10))) return null
+    return { plan: "paid", licensee: body.licensee, issued: body.issued, term: body.term === "year" ? "year" : "lifetime", expires: body.expires }
   } catch {
     return null
   }
@@ -124,8 +133,8 @@ export function useFeature(feature: Feature): boolean {
 /** Stops an addition that goes past the Free plan. Paid is never limited. */
 export function assertCanAdd(kind: LimitKind, current: number): void {
   if (info.plan === "paid" || current < FREE_LIMITS[kind]) return
-  const names: Record<LimitKind, string> = { folders: "Library folders", skills: "skills of your own", elements: "saved elements" }
-  throw new LimitError(`The Free plan has up to ${FREE_LIMITS[kind]} ${names[kind]}. Add a license key in Settings, General to remove the limit.`)
+  const names: Record<LimitKind, string> = { projects: "project" }
+  throw new LimitError(`The Free plan has ${FREE_LIMITS[kind]} ${names[kind]}. Paid has no limit: add a license key in Settings, General.`)
 }
 
 void loadLicense()

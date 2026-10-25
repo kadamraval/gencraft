@@ -12,7 +12,7 @@ export function UpgradeCard({ feature, communityBuild, className }: { feature: s
       <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-card text-foreground">
         <Lock className="h-5 w-5" />
       </span>
-      <h2 className="text-sm font-semibold text-foreground">{feature} is part of the paid plan</h2>
+      <h2 className="text-sm font-semibold text-foreground">{feature}: part of the paid plan</h2>
       <p className="text-xs text-muted-foreground">
         {communityBuild
           ? `This is the community build, which does not include ${feature}. The official Gencraft app includes it with a licence.`
@@ -29,7 +29,7 @@ export function UpgradeDialog({ open, onClose, feature, communityBuild }: { open
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="sr-only">{feature}</DialogTitle>
-          <DialogDescription className="sr-only">{feature} is part of the paid plan.</DialogDescription>
+          <DialogDescription className="sr-only">{feature}: part of the paid plan.</DialogDescription>
         </DialogHeader>
         <UpgradeCard feature={feature} communityBuild={communityBuild} />
       </DialogContent>

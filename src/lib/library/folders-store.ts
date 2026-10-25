@@ -1,4 +1,3 @@
-import { assertCanAdd } from "@/lib/license"
 import * as React from "react"
 
 /**
@@ -49,7 +48,6 @@ function commit(next: State) {
 }
 
 export function createFolder(title: string): Folder {
-  assertCanAdd("folders", state.folders.length)
   const folder: Folder = { id: `folder-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, title: title.trim() || "Untitled", createdAt: Date.now() }
   commit({ ...state, folders: [...state.folders, folder] })
   return folder
