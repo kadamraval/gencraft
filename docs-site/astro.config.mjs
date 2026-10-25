@@ -12,7 +12,7 @@ export default defineConfig({
       description: "Gencraft is a desktop AI studio for images, video, voice and finished stories, using your own provider keys. Guides, models and prices, downloads and how to contribute.",
       social: [{ icon: "github", label: "GitHub", href: "https://github.com/kadamraval/gencraft" }],
       sidebar: [
-        { label: "Start here", items: [{ label: "Download", slug: "download" }] },
+        { label: "Start here", items: [{ label: "Download", slug: "download" }, { label: "Free and Paid", slug: "pricing" }] },
         { label: "User guide", items: [{ autogenerate: { directory: "guide" } }] },
         { label: "Models and prices", items: [{ autogenerate: { directory: "models" } }] },
         { label: "Community", items: [{ label: "Contributing", slug: "contributing" }, { label: "Changelog", slug: "changelog" }] },

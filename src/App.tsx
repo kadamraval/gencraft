@@ -8,7 +8,8 @@ import { getToolRecords } from "@/lib/registry/store"
 import { ToolHostProvider } from "@/components/ai-tools/tool-host"
 import { usageLedger } from "@/lib/ledger/usage-store"
 import * as React from "react"
-import { askYesNo } from "@/lib/notice"
+import { askYesNo, limited } from "@/lib/notice"
+import { loadProjects, saveProjects } from "@/lib/projects/saved"
 import { NoticeToast } from "@/components/ui/notice-toast"
 import { setAppearance, useAppearance } from "@/lib/appearance"
 import { syncNewAssets } from "@/lib/integrations/cloud-sync"
@@ -79,11 +80,11 @@ import { repeatOf } from "@/lib/registry/param-logic"
 import type { EditAction } from "@/lib/registry/edit-actions"
 import { expectedRun, recordRunTime } from "@/lib/ledger/run-times"
 import { explainError } from "@/lib/errors/explain"
-import { AgentWorkspace } from "@pro/agent/agent-workspace"
+import { AgentWorkspace } from "@pro/agent/agent-sections"
 import { UpgradeCard } from "@/components/license/upgrade-card"
 import { OnboardingFlow } from "@/components/onboarding/onboarding-flow"
 import { shouldShowSetup } from "@/lib/home/onboarding"
-import { FEATURE_NAMES, useFeature } from "@/lib/license"
+import { FEATURE_NAMES, assertCanAdd, useFeature } from "@/lib/license"
 import { ChatWorkspace } from "@/components/chat/chat-workspace"
 import { agentBridge, chatBridge } from "@/lib/agent/bridge"
 import { legacyToUi } from "@/lib/chat/stream"
@@ -96,7 +97,7 @@ import { toInlineUrl } from "@/lib/registry/connectors"
 import { canRunAgent, canSearchWeb, chatModelFor, studioModel } from "@/lib/agent/model"
 import type { ProviderId } from "@/lib/ledger/usage-store"
 import type { GenerateArgs, GenerateKind } from "@/lib/agent/types"
-import { getSkillsSnapshot, skillsFor } from "@/lib/skills/store"
+import { agentSkills, getSkillsSnapshot } from "@/lib/skills/store"
 import { clampToSchema, defaultsFor } from "@/components/composer/schema-form"
 import { defaultModelFor } from "@/lib/registry/enabled"
 import { estimateRun } from "@/lib/registry/price"
@@ -201,42 +202,6 @@ const DEFAULT_SETTINGS: SettingsState = {
   },
 }
 
-const DEFAULT_PROJECTS: Project[] = [
-  {
-    id: "proj-1",
-    title: "Cyberpunk 2099 — Neon Sequence",
-    description: "10-second multi-beat narrative featuring lone courier in rainy alleyways.",
-    createdAt: "2026-10-06",
-    updatedAt: "Just now",
-    defaultMode: "video",
-    aspectRatio: "16:9",
-    scenesCount: 2,
-    assetsCount: 3,
-  },
-  {
-    id: "proj-2",
-    title: "Deep Space Telescope Anomaly",
-    description: "Sci-Fi orbital station documentary aesthetic with anamorphic flares.",
-    createdAt: "2026-10-05",
-    updatedAt: "Yesterday",
-    defaultMode: "video",
-    aspectRatio: "16:9",
-    scenesCount: 1,
-    assetsCount: 2,
-  },
-  {
-    id: "proj-3",
-    title: "Character Turnaround Study",
-    description: "Photorealistic portrait references and multi-angle turnaround sheets.",
-    createdAt: "2026-10-04",
-    updatedAt: "2 days ago",
-    defaultMode: "image",
-    aspectRatio: "1:1",
-    scenesCount: 0,
-    assetsCount: 4,
-  },
-]
-
 /** What the composer hands over to be made */
 interface SendParams {
   prompt: string
@@ -278,8 +243,8 @@ export function App() {
   }
 
   // Projects State
-  const [projects, setProjects] = React.useState<Project[]>(DEFAULT_PROJECTS)
-  const [activeProject, setActiveProject] = React.useState<Project | undefined>(DEFAULT_PROJECTS[0])
+  const [projects, setProjects] = React.useState<Project[]>(loadProjects)
+  const [activeProject, setActiveProject] = React.useState<Project | undefined>(() => projects[0])
   const [projectModalOpen, setProjectModalOpen] = React.useState(false)
 
   const handleSelectProject = (project: Project) => {
@@ -294,6 +259,7 @@ export function App() {
     defaultMode: GenerationMode
     aspectRatio: string
   }) => {
+    if (!limited(() => (assertCanAdd("projects", projects.length), true))) return
     const newProj: Project = {
       id: `proj-${Date.now()}`,
       title: params.title,
@@ -330,7 +296,7 @@ export function App() {
   // Settings Modal State
   const [settingsOpen, setSettingsOpen] = React.useState(false)
   const [initialSettingsTab, setInitialSettingsTab] = React.useState<
-    "general" | "providers" | "usage" | "integrations" | "skills"
+    "general" | "providers" | "usage" | "integrations"
   >("general")
   const [settings, setSettings] = React.useState<SettingsState>(() => {
     try {
@@ -393,6 +359,7 @@ export function App() {
   React.useEffect(() => startBackupScheduler(() => settingsRef.current.aiEngine.composioApiKey ?? ""), [])
   React.useEffect(() => startFolderMirror(), [])
   React.useEffect(() => setProjectNames(projects), [projects])
+  React.useEffect(() => saveProjects(projects), [projects])
 
   const [, setActiveBrandKit] = React.useState<BrandKit | undefined>(undefined)
   const [brandSubTab, setBrandSubTab] = React.useState<"brand" | "elements">("brand")
@@ -444,8 +411,8 @@ export function App() {
       setInitialSettingsTab("providers")
     } else if (tab === "integrations") {
       setInitialSettingsTab("integrations")
-    } else if (tab && ["general", "skills", "usage"].includes(tab)) {
-      setInitialSettingsTab(tab as "general" | "skills" | "usage")
+    } else if (tab && ["general", "usage"].includes(tab)) {
+      setInitialSettingsTab(tab as "general" | "usage")
     } else {
       setInitialSettingsTab("general")
     }
@@ -463,6 +430,7 @@ export function App() {
   const [reuseRequest, setReuseRequest] = React.useState<{ nonce: number; mode: GenerationMode; prompt: string; id: string; name: string; imageUrl?: string; images?: Array<{ id: string; name: string; url: string }>; edit?: { videoUrl: string; videoName?: string; modelId: string; task?: "edit" | "extend" } } | undefined>()
   const uploads = useUploads()
   const canUseAgent = useFeature("agent")
+  const canUseConnectors = useFeature("connectors")
   // A new install opens on the first-run setup (Free or Paid, then a guided setup); an existing one never does
   const [setupOpen, setSetupOpen] = React.useState(shouldShowSetup)
 
@@ -851,7 +819,7 @@ export function App() {
         research,
         generate,
         estimate: agentEstimate,
-        skills: skillsFor(getSkillsSnapshot(), "agent").map((k) => ({ id: k.id, name: k.name, description: k.description, method: k.method })),
+        skills: agentSkills(getSkillsSnapshot()).map((k) => ({ id: k.id, name: k.name, description: k.description, method: k.method })),
         limits: { budgetUsd: settings.aiEngine.agentBudgetUsd ?? 2, autoApproveUsd: agentAutoApproveUsd(settings.aiEngine), maxGenerations: 6 },
         requirePlanApproval: settings.aiEngine.agentApprovePlan !== false,
         aiTools: agentToolEnv("agent"),
@@ -1660,7 +1628,6 @@ export function App() {
         <OnboardingFlow
           settings={settings}
           onSaveSettings={setSettings}
-          onCreateProject={(title) => handleCreateProject({ title, description: "", defaultMode: "video", aspectRatio: "16:9" })}
           onFinish={() => {
             setSetupOpen(false)
             setMainTab("chat")
@@ -1896,6 +1863,9 @@ export function App() {
               </main>
             ) : mainTab === "inspiration" ? (
               <main className="flex-1 relative overflow-hidden">
+                {!canUseConnectors ? (
+                  <UpgradeCard feature={FEATURE_NAMES.connectors} />
+                ) : (
                 <InspirationView
                   layoutMode={layoutMode}
                   cardSizeStep={cardSizeStep}
@@ -1907,6 +1877,7 @@ export function App() {
                     setReuseRequest({ nonce: Date.now(), mode: "image", prompt: req.prompt, id: req.id, name: req.name, imageUrl: req.imageUrl, images: req.images })
                   }}
                 />
+                )}
               </main>
             ) : mainTab === "library" ? (
               /* PURE GRID WORKSPACE */

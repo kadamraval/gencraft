@@ -26,7 +26,7 @@ import type { ElementItem } from "../src/lib/elements/types.ts"
 import type { ModelRecord } from "../src/lib/registry/types.ts"
 import { taskOf } from "../src/lib/registry/tasks.ts"
 import fs from "node:fs"
-import { planHas, verifyLicense } from "../src/lib/license.ts"
+import { FREE_LIMITS, licenseExpired, planHas, verifyLicense } from "../src/lib/license.ts"
 import { findBookmark, parseBoards, parsePins, pinPictures } from "../src/lib/integrations/pinterest.ts"
 import { lineOf, selectWatched } from "../src/lib/registry/watchlist.ts"
 import { buildInput } from "../src/lib/registry/request.ts"
@@ -424,6 +424,8 @@ check("tasks: image-to-video, reference-to-video and text-to-video are told apar
 
 // plans: the Agent and building Apps are paid; everything else is on the Free plan
 check("plans: Free has no Agent and no App builder, Paid has both", planHas("free", "agent") === false && planHas("free", "buildApps") === false && planHas("paid", "agent") === true && planHas("paid", "buildApps") === true)
+check("plans: Connectors are paid too, and Free is limited to one project only", planHas("free", "connectors") === false && planHas("paid", "connectors") === true && Object.keys(FREE_LIMITS).join() === "projects" && FREE_LIMITS.projects === 1)
+check("license: a One Year key runs out after its last day, a Lifetime key never does", licenseExpired("2026-10-25", "2026-10-25") === false && licenseExpired("2026-10-25", "2026-10-26") === true && licenseExpired(undefined, "2099-01-01") === false)
 
 // license: a key is a signed note, checked with the public key the app carries
 {
@@ -439,6 +441,12 @@ check("plans: Free has no Agent and no App builder, Paid has both", planHas("fre
     check("license: a key signed with the private key is accepted and says who it is for", info?.plan === "paid" && info.licensee === "Test <t@example.com>", info)
     const forged = `GC-${b64(new TextEncoder().encode(JSON.stringify({ plan: "paid", licensee: "Someone Else", issued: "2026-10-10" })))}.${b64(signature)}`
     check("license: changing the note breaks the signature", (await verifyLicense(forged)) === null)
+    const sign = async (body: object) => {
+      const p2 = new TextEncoder().encode(JSON.stringify(body))
+      return `GC-${b64(p2)}.${b64(await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, key, p2))}`
+    }
+    check("license: an older key without a term is Lifetime", (await verifyLicense(good))?.term === "lifetime")
+    check("license: a One Year key works until its date, then Free", (await verifyLicense(await sign({ plan: "paid", licensee: "Y", issued: "2026-10-10", term: "year", expires: "2999-01-01" })))?.term === "year" && (await verifyLicense(await sign({ plan: "paid", licensee: "Y", issued: "2020-01-01", term: "year", expires: "2021-01-01" }))) === null)
   }
 }
 

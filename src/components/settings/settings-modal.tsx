@@ -3,7 +3,6 @@ import {
   Sliders,
   Cpu,
   Cloud,
-  Sparkles,
   Brain,
   Check,
   BarChart3,
@@ -25,8 +24,11 @@ import {
   ProviderLogo,
 } from "@/components/chat/brand-logos"
 import { ProviderModelList } from "./provider-models"
-import { SkillsSettings } from "./skills-settings"
 import { IntegrationsPanel } from "./integrations-panel"
+import { UpgradeCard } from "@/components/license/upgrade-card"
+import { FEATURE_NAMES, useFeature } from "@/lib/license"
+import { useMoney } from "@/lib/currency/currency"
+import { usageLedger } from "@/lib/ledger/usage-store"
 import { NoKeyBanner, ProviderKeyBar } from "./provider-key-bar"
 import { PROVIDERS } from "@/lib/registry/providers"
 import { getKeyState, useKeyedProviders } from "@/lib/registry/store"
@@ -41,7 +43,7 @@ interface SettingsModalProps {
   initialTab?: TabType
 }
 
-type TabType = "general" | "providers" | "usage" | "integrations" | "skills" | "memory"
+type TabType = "general" | "providers" | "usage" | "integrations" | "memory"
 
 export function SettingsModal({
   open,
@@ -51,6 +53,11 @@ export function SettingsModal({
   initialTab,
 }: SettingsModalProps) {
   const [activeTab, setActiveTab] = React.useState<TabType>(initialTab || "general")
+  const canConnect = useFeature("connectors")
+  const money = useMoney()
+  const [, tickLedger] = React.useReducer((n: number) => n + 1, 0)
+  React.useEffect(() => usageLedger.subscribe(tickLedger), [])
+  const monthSpend = usageLedger.getSpendOverview("monthly")
   const [localSettings, setLocalSettings] = React.useState<SettingsState>(settings)
 
   // Provider Selection (Strictly 5 providers)
@@ -107,8 +114,7 @@ export function SettingsModal({
     { id: "general" as const, label: "General", icon: Sliders },
     { id: "providers" as const, label: "Providers", icon: Cpu },
     { id: "usage" as const, label: "Usage", icon: BarChart3 },
-    { id: "integrations" as const, label: "Integrations", icon: Cloud },
-    { id: "skills" as const, label: "Skills", icon: Sparkles },
+    { id: "integrations" as const, label: "Connectors", icon: Cloud },
     { id: "memory" as const, label: "Memory", icon: Brain },
   ]
 
@@ -186,17 +192,21 @@ export function SettingsModal({
               {PROVIDERS.map((prov) => {
                 const isSelected = selectedProviderId === prov.id
                 const keyed = keyedProviders.includes(prov.id)
+                const spent = monthSpend.providers.find((p) => p.provider === prov.id)
                 return (
                   <Button
                     key={prov.id}
                     type="button"
                     variant="ghost"
                     onClick={() => setSelectedProviderId(prov.id)}
-                    className={`h-9 w-full justify-between rounded-xl px-2.5 ${isSelected ? "bg-secondary text-foreground" : "text-muted-foreground"}`}
+                    className={`h-11 w-full justify-between rounded-xl px-2.5 ${isSelected ? "bg-secondary text-foreground" : "text-muted-foreground"}`}
                   >
                     <span className="flex min-w-0 items-center gap-2">
                       <ProviderLogo provider={prov.id} size={14} />
-                      <span className="truncate text-xs font-medium">{prov.label}</span>
+                      <span className="flex min-w-0 flex-col items-start leading-tight">
+                        <span className="truncate text-xs font-medium">{prov.label}</span>
+                        <span className="truncate text-xs font-normal text-muted-foreground">{spent ? `${money.format(spent.costUsd)} this month` : "No usage this month"}</span>
+                      </span>
                     </span>
                     <span className={`h-2 w-2 flex-shrink-0 rounded-full ${keyed ? "bg-emerald-500" : "bg-muted-foreground/30"}`} title={keyed ? "Connected" : "No key"} />
                   </Button>
@@ -227,10 +237,7 @@ export function SettingsModal({
               )}
 
               {/* TAB 3: INTEGRATIONS */}
-              {activeTab === "integrations" && <IntegrationsPanel settings={localSettings} onSave={saveSettings} />}
-
-              {/* TAB 4: SKILLS */}
-              {activeTab === "skills" && <SkillsSettings />}
+              {activeTab === "integrations" && (canConnect ? <IntegrationsPanel settings={localSettings} onSave={saveSettings} /> : <UpgradeCard feature={FEATURE_NAMES.connectors} />)}
 
               {/* TAB 5: MEMORY */}
               {activeTab === "memory" && (

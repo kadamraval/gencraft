@@ -25,7 +25,7 @@ export function markOnboardingSeen(step: SeenStep) {
 const SETUP_KEY = "gencraft_setup_v1"
 
 export type Plan = "free" | "paid"
-export type SetupStep = "plan" | "account" | "profile" | "project" | "keys" | "drive" | "folder" | "done"
+export type SetupStep = "account" | "pin" | "plan" | "setup" | "done"
 
 export interface SetupState {
   /** The person finished or skipped the setup: it is not shown again unless they ask for it */
@@ -34,7 +34,7 @@ export interface SetupState {
   plan: Plan
 }
 
-const FRESH: SetupState = { done: false, step: "plan", plan: "free" }
+const FRESH: SetupState = { done: false, step: "account", plan: "free" }
 
 export function readSetup(): SetupState {
   try {
@@ -57,7 +57,7 @@ export function writeSetup(patch: Partial<SetupState>): SetupState {
 
 /** Run setup again from Settings */
 export function resetSetup(): void {
-  writeSetup({ done: false, step: "plan" })
+  writeSetup({ done: false, step: "account" })
 }
 
 /**
@@ -74,6 +74,5 @@ export function shouldShowSetup(): boolean {
   }
 }
 
-/** The steps of the setup in order: the Paid plan adds the account step after the plan choice */
-export const stepsFor = (plan: Plan): SetupStep[] =>
-  plan === "paid" ? ["plan", "account", "profile", "project", "keys", "drive", "folder", "done"] : ["plan", "profile", "project", "keys", "drive", "folder", "done"]
+/** The steps of the first-run setup, in order: sign up, an optional PIN, pricing, one quick setup screen, done */
+export const SETUP_STEPS: SetupStep[] = ["account", "pin", "plan", "setup", "done"]

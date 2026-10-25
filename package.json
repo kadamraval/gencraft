@@ -2,7 +2,7 @@
   "name": "gencraft",
   "private": true,
   "license": "AGPL-3.0-only",
-  "version": "0.1.0-beta.3",
+  "version": "0.1.0-beta.4",
   "type": "module",
   "scripts": {
     "licenses:check": "npx -y license-checker-rseidelsohn --production --onlyAllow \"MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;0BSD;Unlicense;MPL-2.0;CC0-1.0;BlueOak-1.0.0;WTFPL;AFL-2.1;MIT*;UNLICENSED\" --excludePackages gencraft@0.0.0",

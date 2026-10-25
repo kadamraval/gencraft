@@ -1,5 +1,6 @@
 import SparkMD5 from "spark-md5"
 import { composioCall, appFetch, isDesktopApp } from "@/lib/registry/net"
+import { hasFeature } from "@/lib/license"
 import { ComposioError, executeTool, isConnected, readComposioState } from "./composio"
 
 /**
@@ -175,7 +176,7 @@ let chain: Promise<void> = Promise.resolve()
 
 /** Queues new results for every connected target that has saving switched on. One at a time, so a burst stays gentle. */
 export function syncNewAssets(key: string, assets: SyncAsset[]) {
-  if (!key) return
+  if (!key || !hasFeature("connectors")) return
   for (const target of Object.keys(CLOUD_TARGETS) as CloudTarget[]) {
     if (!readCloud(target).enabled || !isConnected(target) || !readComposioState().accounts[target]) continue
     for (const asset of assets) {
@@ -195,7 +196,8 @@ export function syncNewAssets(key: string, assets: SyncAsset[]) {
 
 /** Saves a file that is not a result (a backup) to a folder of the given name in Drive or Dropbox. */
 export async function saveBlobToCloud(key: string, target: CloudTarget, name: string, blob: Blob, folder: string): Promise<void> {
-  if (!isConnected(target)) throw new ComposioError(`${CLOUD_TARGETS[target].label} is not connected. Connect it in Settings, Integrations.`)
+  if (!hasFeature("connectors")) throw new ComposioError("Connectors are part of the paid plan.")
+  if (!isConnected(target)) throw new ComposioError(`${CLOUD_TARGETS[target].label} is not connected. Connect it in Settings, Connectors.`)
   if (target === "googledrive") {
     const parent = await driveFolderId(key, folder, true)
     const file = await stageFile(key, "googledrive", "GOOGLEDRIVE_CREATE_FILE", name, blob)

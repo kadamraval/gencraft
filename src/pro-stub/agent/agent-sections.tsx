@@ -3,5 +3,5 @@ import type { AgentWorkspaceProps } from "@/components/agent/props"
 
 /** Stands in for the Agent screen in the community build. */
 export function AgentWorkspace(_props: AgentWorkspaceProps) {
-  return <UpgradeCard feature="The Agent" communityBuild />
+  return <UpgradeCard feature="Agents" communityBuild />
 }
