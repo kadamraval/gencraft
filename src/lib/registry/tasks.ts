@@ -1,4 +1,4 @@
-import type { ModelRecord, RegistryModality } from "./types"
+import type { ModelRecord, AppCategory } from "./types"
 
 /**
  * What the user wants to make. The task decides which settings can exist, and which model version runs
@@ -19,30 +19,30 @@ export type Task =
   | "audio-from-video"
   | "video-from-audio"
 
-export const TASKS: Record<Task, { modality: RegistryModality; label: string }> = {
-  chat: { modality: "text", label: "Chat" },
-  "text-to-image": { modality: "image", label: "Text to image" },
-  "image-edit": { modality: "image", label: "Edit or combine images" },
-  "text-to-video": { modality: "video", label: "Text to video" },
-  "image-to-video": { modality: "video", label: "Image to video" },
-  "reference-to-video": { modality: "video", label: "Reference to video" },
-  "video-edit": { modality: "video", label: "Video to video" },
-  speech: { modality: "audio", label: "Speech" },
-  "audio-generation": { modality: "audio", label: "Music and sound" },
-  "audio-edit": { modality: "audio", label: "Audio to audio" },
-  transcription: { modality: "audio", label: "Speech to text" },
-  "audio-from-video": { modality: "audio", label: "Video to audio" },
-  "video-from-audio": { modality: "video", label: "Audio to video" },
+export const TASKS: Record<Task, { category: AppCategory; label: string }> = {
+  chat: { category: "text", label: "Chat" },
+  "text-to-image": { category: "image", label: "Text to image" },
+  "image-edit": { category: "image", label: "Edit or combine images" },
+  "text-to-video": { category: "video", label: "Text to video" },
+  "image-to-video": { category: "video", label: "Image to video" },
+  "reference-to-video": { category: "video", label: "Reference to video" },
+  "video-edit": { category: "video", label: "Video to video" },
+  speech: { category: "audio", label: "Speech" },
+  "audio-generation": { category: "audio", label: "Music and sound" },
+  "audio-edit": { category: "audio", label: "Audio to audio" },
+  transcription: { category: "audio", label: "Speech to text" },
+  "audio-from-video": { category: "audio", label: "Video to audio" },
+  "video-from-audio": { category: "video", label: "Audio to video" },
 }
 
 /**
  * The task a model record serves. It comes from the provider's own category; reference-to-video is the one
  * task providers put in the endpoint name instead. Nothing here is guessed from the model's brand.
  */
-export function taskOf(record: Pick<ModelRecord, "modality" | "task" | "endpoint">): Task {
-  if (record.modality === "text") return "chat"
-  if (record.modality === "image") return record.task === "image-to-image" ? "image-edit" : "text-to-image"
-  if (record.modality === "video") {
+export function taskOf(record: Pick<ModelRecord, "category" | "task" | "endpoint">): Task {
+  if (record.category === "text") return "chat"
+  if (record.category === "image") return record.task === "image-to-image" ? "image-edit" : "text-to-image"
+  if (record.category === "video") {
     if (/(^|[/-])(reference-to-video|r2v)($|[/-])/i.test(record.endpoint)) return "reference-to-video"
     if (record.task === "audio-to-video") return "video-from-audio"
     if (record.task === "video-to-video") return "video-edit"

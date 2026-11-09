@@ -9,8 +9,8 @@ const check = (name: string, ok: boolean, extra = "") => {
   if (!ok) fails++
 }
 
-const rec = (provider: string, endpoint: string, name: string, props: Record<string, ParamProperty>, task = "text-to-image", modality: ModelRecord["modality"] = "image"): ModelRecord =>
-  ({ id: `${provider}/${endpoint}`, endpoint, name, provider, modality, task, family: name, logoKey: "", inputs: ["text"], params: { type: "object", properties: props }, price: { unit: "unknown", amount: null, source: "estimate", fetchedAt: "" }, status: "active" }) as ModelRecord
+const rec = (provider: string, endpoint: string, name: string, props: Record<string, ParamProperty>, task = "text-to-image", category: ModelRecord["category"] = "image"): ModelRecord =>
+  ({ id: `${provider}/${endpoint}`, endpoint, name, provider, category, task, family: name, logoKey: "", inputs: ["text"], params: { type: "object", properties: props }, price: { unit: "unknown", amount: null, source: "estimate", fetchedAt: "" }, status: "active" }) as ModelRecord
 
 const replicate = rec("replicate", "google/nano-banana-2.1", "Nano Banana 2.1", {
   aspect_ratio: { type: "string", enum: ["1:1"], tier: "common" },

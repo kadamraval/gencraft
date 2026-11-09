@@ -27,8 +27,8 @@ check("a collection or a demo space is not a model", rows[2]?.weights === undefi
 check("an ampersand is read as one", rows[4]?.name === "AT&T Voice")
 check("a row without an Elo is skipped", parseLeaderboard('<tr><td><span class="font-medium min-w-0 truncate">x</span></td></tr>').length === 0)
 
-const rec = (endpoint: string, name: string, modality: ModelRecord["modality"] = "image", provider = "fal", task = "text-to-image"): ModelRecord =>
-  ({ id: `${provider}/${endpoint}`, endpoint, name, provider, modality, task, family: name, logoKey: "", inputs: ["text"], params: { type: "object", properties: {} }, price: { unit: "unknown", amount: null, source: "estimate", fetchedAt: "" }, status: "active" }) as ModelRecord
+const rec = (endpoint: string, name: string, category: ModelRecord["category"] = "image", provider = "fal", task = "text-to-image"): ModelRecord =>
+  ({ id: `${provider}/${endpoint}`, endpoint, name, provider, category, task, family: name, logoKey: "", inputs: ["text"], params: { type: "object", properties: {} }, price: { unit: "unknown", amount: null, source: "estimate", fetchedAt: "" }, status: "active" }) as ModelRecord
 
 // Real board names against real model names
 const same = (board: string, endpoint: string, name: string) => matchScore(board, rec(endpoint, name)) > 0
@@ -42,7 +42,7 @@ check("a generic name needs its maker: TTS-1 is OpenAI's, not xAI's", matchScore
 check("a board name no model shares matches nothing", matchScore("Utopai X", rec("alibaba/wan-3", "Wan 3")) === 0)
 
 // What the picker starts with
-const e = (rank: number, name: string, maker: string, open = false): ShortlistEntry => ({ modality: "image", rank, name, maker, elo: 1000 - rank, open })
+const e = (rank: number, name: string, maker: string, open = false): ShortlistEntry => ({ category: "image", rank, name, maker, elo: 1000 - rank, open })
 const entries = [e(1, "GPT Image 2.5 Sunburst", "OpenAI"), e(2, "Nano Banana 2.1", "Google"), e(3, "Qwen-Image-2.1", "Alibaba", true), e(4, "Z-Image Turbo", "Alibaba", true)]
 const pool = [
   rec("openai/gpt-image-2.5/sunburst/edit", "GPT Image 2.5 Sunburst Edit", "image", "fal", "image-to-image"),

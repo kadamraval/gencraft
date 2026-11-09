@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs"
-import { familyKey, familyOf, findSibling, mergeRefs } from "../src/lib/registry/families"
+import { familyKey, familyOf, findSibling, mergeRefs, versionRows } from "../src/lib/registry/families"
 import { rowChips } from "../src/lib/registry/summary"
 import type { ModelRecord } from "../src/lib/registry/types"
 
@@ -8,8 +8,8 @@ const check = (name: string, ok: boolean, extra = "") => {
   console.log(`${ok ? "PASS" : "FAIL"}  ${name} ${ok ? "" : extra}`)
   if (!ok) fails++
 }
-const rec = (provider: string, endpoint: string, task: string, modality: ModelRecord["modality"] = "video"): ModelRecord =>
-  ({ id: `${provider}/${endpoint}`, endpoint, name: endpoint, provider, modality, task, family: endpoint, logoKey: "", inputs: ["text"], params: { type: "object", properties: {} }, price: { unit: "unknown", amount: null, source: "estimate", fetchedAt: "" }, status: "active" }) as ModelRecord
+const rec = (provider: string, endpoint: string, task: string, category: ModelRecord["category"] = "video"): ModelRecord =>
+  ({ id: `${provider}/${endpoint}`, endpoint, name: endpoint, provider, category, task, family: endpoint, logoKey: "", inputs: ["text"], params: { type: "object", properties: {} }, price: { unit: "unknown", amount: null, source: "estimate", fetchedAt: "" }, status: "active" }) as ModelRecord
 
 // Replicate names its versions with t2v, i2v and r2v
 const rep = ["wan-video/wan-2.7-t2v", "wan-video/wan-2.7-i2v", "wan-video/wan-2.7-r2v", "wan-video/wan-2.7-videoedit"].map((e, i) => rec("replicate", e, ["text-to-video", "image-to-video", "image-to-video", "image-to-video"][i]!))
@@ -21,7 +21,7 @@ check("another version of the model is another family", familyKey(rep[0]!) !== f
 check("the prime version is its own family", familyKey(other[1]!) !== familyKey(other[2]!))
 check("the family lists the versions that make things, not the one that edits", familyOf(rep[0]!, pool).map((r) => r.endpoint).sort().join() === "wan-video/wan-2.7-i2v,wan-video/wan-2.7-r2v,wan-video/wan-2.7-t2v", familyOf(rep[0]!, pool).map((r) => r.endpoint).join())
 check("an editing tool describes only itself", familyOf(rep[3]!, pool).length === 1 && familyOf(rep[3]!, pool)[0]!.id === rep[3]!.id)
-check("an image model of the same name is not in a video family", !familyOf(rep[0]!, pool).some((r) => r.modality === "image"))
+check("an image model of the same name is not in a video family", !familyOf(rep[0]!, pool).some((r) => r.category === "image"))
 check("the sibling for reference images is found on Replicate", findSibling(rep[0]!, pool, "reference-to-video")?.endpoint === "wan-video/wan-2.7-r2v")
 check("the sibling for a start frame is found on Replicate", findSibling(rep[0]!, pool, "image-to-video")?.endpoint === "wan-video/wan-2.7-i2v")
 
@@ -42,15 +42,23 @@ const r2v = { ...fal[2]!, summary: summary({ images: 10, videos: 5, audios: 5 })
 const merged = mergeRefs([t2v as ModelRecord, i2v, r2v])
 check("the family takes the most any version takes", merged?.images === 10 && merged?.videos === 5 && merged?.audios === 5 && merged?.start === true && merged?.end === true)
 const chips = rowChips(t2v as ModelRecord, [t2v as ModelRecord, i2v, r2v])
-check("a text-to-video row shows what its family can do", chips.includes("Start/End") && chips.includes("10 refs") && chips.includes("Video refs") && chips.includes("Audio refs"), chips.join())
-check("a lone version shows only its own", !rowChips(t2v as ModelRecord).includes("Start/End"))
+check("a text-to-video row shows what its family can do", chips.includes("Start frame") && chips.includes("End frame") && chips.includes("References") && chips.includes("Video in") && chips.includes("Audio in"), chips.join())
+check("a lone version shows only its own", !rowChips(t2v as ModelRecord).includes("Start frame"))
 
 // The real Wan 3.0 data shipped with the app
 const snap = JSON.parse(readFileSync(new URL("../src/lib/registry/registry.snapshot.json", import.meta.url), "utf8")) as { models: ModelRecord[] }
 const wan = snap.models.find((m) => m.id === "fal/alibaba/wan-3.0/text-to-video")!
 const wanChips = rowChips(wan, familyOf(wan, snap.models))
-check("real Wan 3.0 on fal: start and end frame, reference images, video and audio references, seed", ["Start/End", "Video refs", "Audio refs", "Seed"].every((c) => wanChips.includes(c)) && wanChips.some((c) => /refs?$/.test(c) && /^\d+/.test(c)), wanChips.join())
+check("real Wan 3.0 on fal: start and end frame, reference images, video and audio references, seed", ["Start frame", "End frame", "References", "Video in", "Audio in", "Seed"].every((c) => wanChips.includes(c)), wanChips.join())
 check("real Wan 3.0 prime stays separate", !familyOf(wan, snap.models).some((m) => /prime/.test(m.endpoint)))
+
+// One row per database version: its task endpoints and quality tiers are one model
+const v = (endpoint: string, task: string, tier?: string): ModelRecord => ({ ...rec("fal", endpoint, task), versionId: "kuaishou/kling-3.0", ...(tier ? { tier } : {}) })
+const kling = [v("fal-ai/kling-video/v3/standard/text-to-video", "text-to-video", "standard"), v("fal-ai/kling-video/v3/pro/image-to-video", "image-to-video", "pro"), v("fal-ai/kling-video/v3/pro/text-to-video", "text-to-video", "pro")]
+const rows = versionRows([...kling, rec("fal", "other/model", "text-to-video")])
+check("a version's endpoints and tiers are one row, the text endpoint at its best quality", rows.length === 2 && rows[0]!.endpoint === "fal-ai/kling-video/v3/pro/text-to-video", rows.map((r) => r.endpoint).join(", "))
+check("the row's family holds every endpoint and tier of the version", familyOf(rows[0]!, kling).length === 3)
+check("the same version on another provider is another row", versionRows([...kling, { ...kling[0]!, id: "replicate/x", provider: "replicate", endpoint: "kwaivgi/kling-v3-video" }]).length === 2)
 
 console.log(fails ? `${fails} FAILED` : "ALL PASS")
 process.exit(fails ? 1 : 0)

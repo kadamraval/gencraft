@@ -21,8 +21,12 @@ const END = /(^|_)(end|last|tail)(_|$)/
 const START = /^(image|image_url|input_image|input_image_url|start_image|start_image_url|first_frame|first_frame_url|first_frame_image|first_image_url|init_image|start_frame)$/
 const REFERENCE_ONE = /^(reference_image|reference_image_url|ref_image_url|style_image_url|subject_reference|subject_image_url)$/
 const IMAGE_LIST = /^(image_urls|reference_images|reference_image_urls|ref_image_urls|input_image_urls|image_input|input_images|image_style_references|images_input|subject_image_urls)$/
+const MASK = /^(mask|mask_url|mask_image|mask_image_url|inpaint_mask|mask_file)$/
 const VIDEO_LIST = /^(video_urls|reference_video_urls|reference_videos)$/
 const AUDIO_LIST = /^(audio_urls|reference_audio_urls|reference_audios)$/
+
+/** A field that takes the area to change (white where the model should work) */
+export const isMaskKey = (key: string): boolean => MASK.test(key.toLowerCase())
 
 /** "up to 5", "1-9 images", "maximum 7 total", "Max 4" in the provider's own description of the field. */
 export function limitFromText(text: string | undefined): { max: number; shared: boolean } | null {
@@ -46,7 +50,7 @@ export function limitFromText(text: string | undefined): { max: number; shared: 
 }
 
 /** Decides what a file field is for. Returns null for fields that are not reference inputs. */
-export function detectSlot(key: string, field: RawField, modality: ModelRecord["modality"]): RefSlot | null {
+export function detectSlot(key: string, field: RawField, category: ModelRecord["category"]): RefSlot | null {
   const k = key.toLowerCase()
   const list = field.type === "array"
   const stated = field.maxItems ? { max: field.maxItems, shared: false } : limitFromText(field.description)
@@ -72,7 +76,7 @@ export function detectSlot(key: string, field: RawField, modality: ModelRecord["
   if (/(^|_)audio(_url|_file)?$/.test(k)) return make("audio", "source")
   if (/image|frame/.test(k)) {
     if (END.test(k)) return make("image", "end")
-    if (modality === "video" && START.test(k)) return make("image", "start")
+    if (category === "video" && START.test(k)) return make("image", "start")
     if (START.test(k) || REFERENCE_ONE.test(k)) return make("image", "reference")
   }
   return null
@@ -88,6 +92,10 @@ export interface RefCapability {
   elements?: { key: string; max: number; stated: boolean }
   videos?: { key: string; list: boolean; max: number; stated: boolean }
   audios?: { key: string; list: boolean; max: number; stated: boolean }
+  /** The one picture field a model that also has a list asks for (the picture to edit, next to its list of extra references) */
+  single?: { key: string }
+  /** The field for the area to change: white where the model should work */
+  mask?: { key: string }
   /** A single video or audio the model works on (motion source, lip-sync voice) */
   sourceVideo?: { key: string }
   sourceAudio?: { key: string }
@@ -103,7 +111,15 @@ export function refCapability(record: Pick<ModelRecord, "params">): RefCapabilit
   const required = new Set(record.params.required ?? [])
   for (const [key, p] of Object.entries(record.params.properties)) {
     const s = p.slot
-    if (!s) continue
+    if (!s) {
+      // Read from the field itself when the reader named no role: a mask, or a plain picture to work on
+      if (isMaskKey(key) && (p.type === undefined || p.type === "string")) cap.mask = { key }
+      else if (p.format === "image" && p.type !== "array") {
+        if (!cap.images) cap.images = { key, list: false, max: 1, stated: true }
+        if (required.has(key)) cap.needs.push("reference")
+      }
+      continue
+    }
     if (s.role === "start") {
       cap.start = { key }
       if (required.has(key)) cap.needs.push("start")
@@ -111,6 +127,7 @@ export function refCapability(record: Pick<ModelRecord, "params">): RefCapabilit
     else if (s.role === "element") cap.elements = { key, max: s.max ?? 1, stated: s.max !== null }
     else if (s.role === "reference" && s.kind === "image") {
       // Prefer the list over a single field when a model has both
+      if (!s.list) cap.single = { key }
       if (!cap.images || (s.list && !cap.images.list)) cap.images = entry(key, s)
       if (required.has(key)) cap.needs.push("reference")
     } else if (s.role === "reference" && s.kind === "video") cap.videos = entry(key, s)
@@ -123,6 +140,7 @@ export function refCapability(record: Pick<ModelRecord, "params">): RefCapabilit
       if (required.has(key)) cap.needs.push("audio")
     }
   }
+  if (cap.single && !cap.images?.list) delete cap.single
   return cap
 }
 
@@ -166,6 +184,8 @@ export interface AssignInput {
   audios?: string[]
   sourceVideo?: string
   sourceAudio?: string
+  /** The area to change, white where the model should work */
+  mask?: string
 }
 
 /** Puts each file into the field the model really has. Used by every provider runner. */
@@ -178,7 +198,13 @@ export function assignRefs(cap: RefCapability, given: AssignInput): RefAssignmen
 
   let leftOver: string[] = []
   if (given.images.length > 0) {
-    if (cap.images) {
+    if (cap.images && cap.single && cap.images.list) {
+      // The picture to edit goes in its own field and the extra references in the list (a required field is not left empty)
+      input[cap.single.key] = given.images[0]
+      const rest = given.images.slice(1, 1 + cap.images.max)
+      leftOver = given.images.slice(1 + cap.images.max)
+      if (rest.length > 0) input[cap.images.key] = rest
+    } else if (cap.images) {
       const fit = given.images.slice(0, cap.images.max)
       leftOver = given.images.slice(cap.images.max)
       input[cap.images.key] = cap.images.list ? fit : fit[0]
@@ -190,6 +216,7 @@ export function assignRefs(cap: RefCapability, given: AssignInput): RefAssignmen
       input[cap.elements.key] = groups.map((g) => ({ frontal_image_url: g[0], ...(g.length > 1 ? { reference_image_urls: g.slice(1, 4) } : {}) }))
     } else leftOver = given.images
   }
+  if (given.mask && cap.mask) input[cap.mask.key] = given.mask
   if (given.videos?.length && cap.videos) input[cap.videos.key] = cap.videos.list ? given.videos.slice(0, cap.videos.max) : given.videos[0]
   if (given.audios?.length && cap.audios) input[cap.audios.key] = cap.audios.list ? given.audios.slice(0, cap.audios.max) : given.audios[0]
   return { input, leftOver }

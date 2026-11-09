@@ -1,5 +1,6 @@
 import * as React from "react"
 import type { MatchContext } from "@/lib/ai-tools/match"
+import { listBookmarks } from "@/lib/registry/bookmarks"
 import { editActionsFor } from "@/lib/registry/edit-actions"
 import { enabledSet } from "@/lib/registry/enabled"
 import { isRunnable } from "@/lib/registry/providers"
@@ -16,6 +17,7 @@ export function toolContextOf(listed: ModelRecord[], enabledIds: SettingsState["
     keyed: new Set(getKeyedProviders()),
     runnable: isRunnable,
     editActions: editActionsFor(listed, on),
+    bookmarks: new Set(listBookmarks()),
   }
 }
 

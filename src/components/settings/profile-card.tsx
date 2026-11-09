@@ -1,9 +1,10 @@
 import * as React from "react"
-import { Camera, Eye, EyeOff, User, X } from "lucide-react"
+import { Camera, User, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { shrinkImage } from "@/lib/brand/image"
-import { hasPassword, markUnlocked, removePassword, setPassword as saveMasterPassword } from "@/lib/auth/lock"
+import { PinInput } from "@/components/ui/pin-input"
+import { hasPassword, isPinLock, markUnlocked, removePassword, setPin } from "@/lib/auth/lock"
 import type { SettingsState } from "@/types"
 
 interface Props {
@@ -17,7 +18,6 @@ export function ProfileCard({ settings, onChange }: Props) {
   const [current, setCurrent] = React.useState("")
   const [isSet, setIsSet] = React.useState(hasPassword)
   const [busy, setBusy] = React.useState(false)
-  const [show, setShow] = React.useState(false)
   const [message, setMessage] = React.useState("")
   const general = settings.general
   const fileRef = React.useRef<HTMLInputElement>(null)
@@ -39,31 +39,32 @@ export function ProfileCard({ settings, onChange }: Props) {
     window.setTimeout(() => setMessage(""), 3500)
   }
 
-  const savePassword = async (e: React.FormEvent) => {
+  const savePin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (password.length < 4) return flash("Use at least 4 characters.")
-    if (isSet && !current) return flash("Type your current password first.")
+    if (password.length !== 6) return flash("Use exactly 6 digits.")
+    if (isSet && !current) return flash("Type your current PIN first.")
     setBusy(true)
-    const result = await saveMasterPassword(password, current)
+    const result = await setPin(password, current)
     setBusy(false)
-    if (result === "wrong-current") return flash("The current password is not right.")
+    if (result === "wrong-current") return flash("The current PIN is not right.")
+    if (result === "not-a-pin") return flash("Use exactly 6 digits.")
     setPassword("")
     setCurrent("")
     setIsSet(true)
     // Locked from now on, but this run of the app stays open
     markUnlocked(true)
-    flash(isSet ? "Password changed." : "Password set. The app asks for it each time you open it.")
+    flash(isSet ? "PIN changed." : "PIN set. The app asks for it each time you open it.")
   }
 
-  const dropPassword = async () => {
-    if (!current) return flash("Type your current password to remove it.")
+  const dropPin = async () => {
+    if (!current) return flash("Type your current PIN to remove it.")
     setBusy(true)
     const ok = await removePassword(current)
     setBusy(false)
-    if (!ok) return flash("The current password is not right.")
+    if (!ok) return flash("The current PIN is not right.")
     setCurrent("")
     setIsSet(false)
-    flash("Password removed. The app opens without one.")
+    flash("PIN removed. The app opens without one.")
   }
 
   return (
@@ -103,27 +104,33 @@ export function ProfileCard({ settings, onChange }: Props) {
         </div>
       </div>
 
-      <form onSubmit={savePassword} className="space-y-1.5 border-t border-border/50 pt-3">
+      <form onSubmit={savePin} className="space-y-2 border-t border-border/50 pt-3">
         <div className="flex items-center justify-between text-xs">
-          <span className="font-medium text-muted-foreground">Password · {isSet ? "On" : "Not set"}</span>
+          <span className="font-medium text-muted-foreground">PIN · {isSet ? "On" : "Not set"}</span>
           {message && <span className="text-foreground">{message}</span>}
         </div>
-        {isSet && <Input type={show ? "text" : "password"} value={current} onChange={(e) => setCurrent(e.target.value)} placeholder="Current password" aria-label="Current password" className="h-8 text-xs" />}
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Input type={show ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="New password" aria-label="New password" className="h-8 pr-8 text-xs" />
-            <Button type="button" variant="ghost" size="icon" aria-label={show ? "Hide password" : "Show password"} onClick={() => setShow((v) => !v)} className="absolute right-0.5 top-1/2 h-7 w-7 -translate-y-1/2 text-muted-foreground">
-              {show ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-            </Button>
-          </div>
-          <Button type="submit" variant="secondary" size="sm" className="h-8 text-xs" disabled={!password || busy}>
-            Save
-          </Button>
+        {isSet &&
+          (isPinLock() ? (
+            <div className="space-y-1">
+              <span className="text-xs text-muted-foreground">Current PIN</span>
+              <PinInput value={current} onChange={setCurrent} label="Current PIN" size="sm" className="justify-start" />
+            </div>
+          ) : (
+            <Input type="password" value={current} onChange={(e) => setCurrent(e.target.value)} placeholder="Current password (set before PINs)" aria-label="Current password" className="h-8 text-xs" />
+          ))}
+        <div className="space-y-1">
+          <span className="text-xs text-muted-foreground">{isSet ? "New PIN, 6 digits" : "PIN, 6 digits"}</span>
+          <PinInput value={password} onChange={setPassword} label="New PIN" size="sm" className="justify-start" />
+        </div>
+        <div className="flex justify-end gap-2">
           {isSet && (
-            <Button type="button" variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground" disabled={busy} onClick={dropPassword}>
+            <Button type="button" variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground" disabled={busy} onClick={dropPin}>
               Remove
             </Button>
           )}
+          <Button type="submit" variant="secondary" size="sm" className="h-8 text-xs" disabled={password.length !== 6 || busy}>
+            Save
+          </Button>
         </div>
       </form>
     </div>

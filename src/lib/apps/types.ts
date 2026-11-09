@@ -87,6 +87,10 @@ export interface AppSpec {
   output?: string[]
   /** Made by us for everyone, or by the person for themselves */
   system?: boolean
+  /** The category it sits under on the Apps page. Older apps have none: it is read from what they make (`appCategory`). */
+  category?: "image" | "video" | "audio" | "text"
+  /** The card picture: an image or a GIF the person chose, as a data URL. No cover: the card shows the name alone. */
+  cover?: string
   createdAt?: number
 }
 
@@ -151,4 +155,11 @@ export interface RunResult {
   costUsd: number
   /** What to show: the texts and the assets the app's output asks for */
   shown: { texts: Array<{ stepId: string; title: string; text: string }>; assets: MediaAsset[] }
+}
+
+/** The category an app sits under: the one it says, else what its last make step makes, else text */
+export function appCategory(spec: Pick<AppSpec, "category" | "steps">): "image" | "video" | "audio" | "text" {
+  if (spec.category) return spec.category
+  const made = [...spec.steps].reverse().find((s) => s.kind === "image" || s.kind === "video" || s.kind === "audio")
+  return (made?.kind as "image" | "video" | "audio" | undefined) ?? "text"
 }

@@ -1,4 +1,4 @@
-import { ArrowLeft, Check, Copy, Pencil, Play, Square, Trash2 } from "lucide-react"
+import { ArrowLeft, Check, Copy, ImagePlus, Pencil, Play, Square, Trash2 } from "lucide-react"
 import * as React from "react"
 import { MessageResponse } from "@/components/ai-elements/message"
 import { Shimmer } from "@/components/ai-elements/shimmer"
@@ -9,13 +9,14 @@ import type { EditAction } from "@/lib/registry/edit-actions"
 import { expectedRun } from "@/lib/ledger/run-times"
 import { ModelSelectorPopover } from "@/components/chat/model-selector-popover"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { ErrorNotice } from "@/components/ui/error-notice"
 import { estimateApp, defaultValues, missingInputs, referencesFor, runApp } from "@/lib/apps/engine"
 import type { Values } from "@/lib/apps/engine"
 import { getListedModels } from "@/lib/registry/store"
 import { needOf, slotsOf } from "@/lib/apps/capabilities"
 import { makeRunDeps, modelFor, priceOfStep, settingsFor } from "@/lib/apps/runtime"
-import { addRun, removeApp, useRuns } from "@/lib/apps/store"
+import { addRun, removeApp, saveApp, useRuns } from "@/lib/apps/store"
 import { GENERATE_KINDS } from "@/lib/apps/types"
 import type { AppSpec, AppStep, GenerateStepKind, InputValue, StepEvent } from "@/lib/apps/types"
 import { usageLedger } from "@/lib/ledger/usage-store"
@@ -31,7 +32,6 @@ import { AppInputs } from "./app-blocks"
 import type { PickRequest } from "./app-blocks"
 import { GenerationBar } from "./generation-bar"
 import type { BarStep } from "./generation-bar"
-import { appColor, appIcon } from "./icons"
 
 interface Props {
   spec: AppSpec
@@ -68,11 +68,52 @@ const isGenerate = (s: AppStep) => (GENERATE_KINDS as readonly string[]).include
  * An app, open. The left sidebar reads top to bottom: the app's icon and name, what to upload, the app's own options, then the
  * model and its settings, drawn the way the composer draws them. Generate is at the bottom. What the app has made is on the right.
  */
+const STEP_MODELS_KEY = "gencraft_app_step_models_v1"
+function readStepModels(appId: string): Record<string, string> {
+  try {
+    return (JSON.parse(localStorage.getItem(STEP_MODELS_KEY) ?? "{}") as Record<string, Record<string, string>>)[appId] ?? {}
+  } catch {
+    return {}
+  }
+}
+function writeStepModels(appId: string, models: Record<string, string>) {
+  try {
+    const all = JSON.parse(localStorage.getItem(STEP_MODELS_KEY) ?? "{}") as Record<string, Record<string, string>>
+    if (Object.keys(models).length > 0) all[appId] = models
+    else delete all[appId]
+    localStorage.setItem(STEP_MODELS_KEY, JSON.stringify(all))
+  } catch {
+    // storage unavailable: the choice lasts until the app closes
+  }
+}
+
 export function AppRunner({ spec, settings, assets, projectId, onBack, onAssets, onEdit, onRemix, onOpenSettings, layoutMode, cardSizeStep, onReuse, onTurnToVideo, onUseAsReference, onDelete, editActions, onEditMedia }: Props) {
-  const Icon = appIcon(spec.icon)
+  // The card picture: an image or a GIF, kept with the app on this device (small enough for local storage)
+  const [cover, setCover] = React.useState(spec.cover)
+  const [coverNote, setCoverNote] = React.useState<string | null>(null)
+  const coverInput = React.useRef<HTMLInputElement>(null)
+  const chooseCover = (file: File | undefined) => {
+    if (!file) return
+    if (file.size > 1_500_000) return setCoverNote("Choose a picture or GIF under 1.5 MB.")
+    const reader = new FileReader()
+    reader.onload = () => {
+      const url = String(reader.result)
+      setCover(url)
+      setCoverNote(null)
+      saveApp({ ...spec, cover: url })
+    }
+    reader.readAsDataURL(file)
+  }
   const runs = useRuns(spec.id)
   const [values, setValues] = React.useState<Values>(() => defaultValues(spec))
-  const [models, setModels] = React.useState<Record<string, string>>({})
+  // The model the person picked for a step, remembered for this app on this device; a step without one is Auto (best fit)
+  const [models, setModelsState] = React.useState<Record<string, string>>(() => readStepModels(spec.id))
+  const setModels = (next: Record<string, string> | ((prev: Record<string, string>) => Record<string, string>)) =>
+    setModelsState((prev) => {
+      const value = typeof next === "function" ? next(prev) : next
+      writeStepModels(spec.id, value)
+      return value
+    })
   const [stepSettings, setStepSettings] = React.useState<Record<string, Record<string, unknown>>>({})
   const [picking, setPicking] = React.useState<string | null>(null)
   const [running, setRunning] = React.useState(false)
@@ -109,7 +150,7 @@ export function AppRunner({ spec, settings, assets, projectId, onBack, onAssets,
       for (const i of spec.inputs) if (prev[i.id] !== undefined) fresh[i.id] = prev[i.id]
       return fresh
     })
-    setModels({})
+    setModelsState(readStepModels(spec.id))
     setStepSettings({})
     setError(null)
     setNotice(null)
@@ -145,7 +186,7 @@ export function AppRunner({ spec, settings, assets, projectId, onBack, onAssets,
     const listedNow = getListedModels()
     for (const step of generateSteps) {
       const given = referencesFor(step, values).length
-      const rec = given > 0 ? modelFor(step.kind as GenerateStepKind, step.model ?? "auto", given) : undefined
+      const rec = given > 0 ? modelFor(step.kind as GenerateStepKind, step.model ?? "auto", { ...needOf(step, spec.inputs), pictures: given }) : undefined
       if (rec && slotsOf(rec, listedNow).pictures < given) return setNotice(`${rec.name} takes at most ${slotsOf(rec, listedNow).pictures} reference picture${slotsOf(rec, listedNow).pictures === 1 ? "" : "s"}, and ${given} were given. Remove one or choose another model.`)
     }
     const limits = settings.aiEngine.limits ?? {}
@@ -183,7 +224,7 @@ export function AppRunner({ spec, settings, assets, projectId, onBack, onAssets,
 
   const barSteps: BarStep[] = generateSteps.map((step) => {
     const rec = modelFor(step.kind as GenerateStepKind, step.model ?? "auto", needOf(step, spec.inputs))
-    return { id: step.id, title: step.title, rec, shown: rec ? settingsFor(rec, step.params ?? {}) : {}, userSettings: step.userSettings, controlled: Object.keys(step.paramInputs ?? {}) }
+    return { id: step.id, title: step.title, rec, auto: !models[step.id], shown: rec ? settingsFor(rec, step.params ?? {}) : {}, userSettings: step.userSettings, controlled: Object.keys(step.paramInputs ?? {}) }
   })
   const pickingStep = picking ? generateSteps.find((s) => s.id === picking) : undefined
 
@@ -194,9 +235,7 @@ export function AppRunner({ spec, settings, assets, projectId, onBack, onAssets,
           <Button type="button" variant="ghost" size="iconSm" aria-label="Back to apps" onClick={onBack} className="h-7 w-7 flex-shrink-0 p-0 text-muted-foreground">
             <ArrowLeft className="size-4" />
           </Button>
-          <div className={cn("flex size-8 flex-shrink-0 items-center justify-center rounded-lg", appColor(spec.color))}>
-            <Icon className="size-4" />
-          </div>
+          {cover && <img src={cover} alt="" className="size-8 flex-shrink-0 rounded-lg object-cover" />}
           <p className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{spec.name}</p>
           {spec.system ? (
             <Button type="button" variant="ghost" size="iconSm" aria-label="Remix as my own" title="Remix as my own" onClick={() => onRemix(spec)} className="h-7 w-7 flex-shrink-0 p-0 text-muted-foreground hover:text-foreground">
@@ -207,6 +246,10 @@ export function AppRunner({ spec, settings, assets, projectId, onBack, onAssets,
               <Button type="button" variant="ghost" size="iconSm" aria-label="Edit with the agent" title="Edit with the agent" onClick={() => onEdit(spec)} className="h-7 w-7 flex-shrink-0 p-0 text-muted-foreground hover:text-foreground">
                 <Pencil className="size-3.5" />
               </Button>
+              <Button type="button" variant="ghost" size="iconSm" aria-label="Choose the card picture" title="Card picture (image or GIF)" onClick={() => coverInput.current?.click()} className="h-7 w-7 flex-shrink-0 p-0 text-muted-foreground hover:text-foreground">
+                <ImagePlus className="size-3.5" />
+              </Button>
+              <Input ref={coverInput} type="file" accept="image/*" className="hidden" onChange={(e) => chooseCover(e.target.files?.[0])} />
               <Button type="button" variant="ghost" size="iconSm" aria-label="Delete this app" title="Delete this app" onClick={() => (removeApp(spec.id), onBack())} className="h-7 w-7 flex-shrink-0 p-0 text-muted-foreground hover:text-destructive">
                 <Trash2 className="size-3.5" />
               </Button>
@@ -219,7 +262,7 @@ export function AppRunner({ spec, settings, assets, projectId, onBack, onAssets,
         </div>
 
         <div className="space-y-3 border-t border-border p-4">
-          {notice && <p className="text-xs text-destructive">{notice}</p>}
+          {(notice ?? coverNote) && <p className="text-xs text-destructive">{notice ?? coverNote}</p>}
           {barSteps.length > 0 && <GenerationBar steps={barSteps} picking={picking} onPick={(id) => setPicking(picking === id ? null : id)} onSetting={(id, k, v) => setStepSettings((prev) => ({ ...prev, [id]: { ...(prev[id] ?? {}), [k]: v } }))} />}
           {error && <ErrorNotice info={explainError(error)} fallbackTitle="It stopped" message={error} onRetry={() => void start(true)} />}
           {confirm !== null ? (
@@ -249,10 +292,31 @@ export function AppRunner({ spec, settings, assets, projectId, onBack, onAssets,
 
         {pickingStep && (
           <div className="absolute inset-x-0 bottom-32 z-50">
+            {models[pickingStep.id] && (
+              <div className="mx-4 mb-1 flex justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={() => {
+                    setModels((prev) => {
+                      const next = { ...prev }
+                      delete next[pickingStep.id]
+                      return next
+                    })
+                    setStepSettings((prev) => ({ ...prev, [pickingStep.id]: {} }))
+                    setPicking(null)
+                  }}
+                >
+                  Back to Auto (best fit)
+                </Button>
+              </div>
+            )}
             <ModelSelectorPopover
               compact
               activeModelId={modelFor(pickingStep.kind as GenerateStepKind, pickingStep.model ?? "auto", needOf(pickingStep, spec.inputs))?.id ?? ""}
-              modality={pickingStep.kind as GenerateStepKind}
+              category={pickingStep.kind as GenerateStepKind}
               needs={(pickingStep.references ?? []).length > 0 ? { images: 1 } : undefined}
               settings={settings}
               onOpenSettings={onOpenSettings}
@@ -318,9 +382,6 @@ export function AppRunner({ spec, settings, assets, projectId, onBack, onAssets,
                 hideFolders
                 empty={
                   <div className="flex min-h-[50vh] flex-col items-center justify-center gap-2 text-center">
-                    <div className={cn("flex size-10 items-center justify-center rounded-full", appColor(spec.color))}>
-                      <Icon className="size-5" />
-                    </div>
                     <p className="text-sm text-foreground">Your results will appear here</p>
                     <p className="max-w-xs text-xs text-muted-foreground">{spec.description}</p>
                   </div>
@@ -330,9 +391,6 @@ export function AppRunner({ spec, settings, assets, projectId, onBack, onAssets,
           ))}
           {madeKinds.length === 0 && runs.length === 0 && !running && (
             <div className="flex min-h-[50vh] flex-col items-center justify-center gap-2 text-center">
-              <div className={cn("flex size-10 items-center justify-center rounded-full", appColor(spec.color))}>
-                <Icon className="size-5" />
-              </div>
               <p className="text-sm text-foreground">Your results will appear here</p>
               <p className="max-w-xs text-xs text-muted-foreground">{spec.description}</p>
             </div>

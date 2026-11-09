@@ -1,4 +1,4 @@
-import type { RegistryModality } from "./types"
+import type { AppCategory } from "./types"
 
 /** The final provider list. Nothing outside these five appears anywhere in the app. */
 export const PROVIDERS = [
@@ -22,7 +22,7 @@ export function providerLabel(id: string): string {
  * A model outside this table is hidden instead of silently producing a fake result.
  * Flip an entry the moment its connector exists in live-connectors.ts.
  */
-export const RUNNABLE: Record<ProviderId, ReadonlyArray<RegistryModality>> = {
+export const RUNNABLE: Record<ProviderId, ReadonlyArray<AppCategory>> = {
   fal: ["image", "video", "audio", "text"],
   replicate: ["text", "image", "video", "audio"],
   openrouter: ["text", "image", "video", "audio"],
@@ -30,6 +30,6 @@ export const RUNNABLE: Record<ProviderId, ReadonlyArray<RegistryModality>> = {
   openai: ["text", "image", "video", "audio"],
 }
 
-export function isRunnable(provider: string, modality: RegistryModality): boolean {
-  return (RUNNABLE[provider as ProviderId] ?? []).includes(modality)
+export function isRunnable(provider: string, category: AppCategory): boolean {
+  return (RUNNABLE[provider as ProviderId] ?? []).includes(category)
 }

@@ -11,6 +11,10 @@ export interface ToolHost {
   /** Saves finished results to the Library */
   onAssets: (assets: MediaAsset[]) => void
   onOpenSettings: () => void
+  /** Opens a clip in Video Edit, the timeline editor */
+  onOpenInVideoEdit?: (clip: { url: string; name: string; seconds?: number }) => void
+  /** Opens an app (a built-in card of the Apps page) with this file already loaded */
+  onUseInApp?: (cardId: string, file: { url: string; name: string }) => void
 }
 
 const Ctx = React.createContext<ToolHost | null>(null)

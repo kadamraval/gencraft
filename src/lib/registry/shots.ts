@@ -13,17 +13,17 @@ export interface ShotsSwitch {
 
 const NATIVE_KEY = /^multi_?shots?$/
 
-type Target = Pick<ModelRecord, "modality" | "params">
+type Target = Pick<ModelRecord, "category" | "params">
 
 /** The host's own yes/no shots switch, when it has one. */
 export function nativeShotsKey(record: Target): string | undefined {
-  if (record.modality !== "video") return undefined
+  if (record.category !== "video") return undefined
   const props = record.params.properties
   return Object.keys(props).find((k) => NATIVE_KEY.test(k) && props[k]!.type === "boolean" && !props[k]!.rejected && !props[k]!.virtual)
 }
 
 export function shotsSwitch(record: Target): ShotsSwitch | undefined {
-  if (record.modality !== "video") return undefined
+  if (record.category !== "video") return undefined
   const props = record.params.properties
   const key = Object.keys(props).find((k) => NATIVE_KEY.test(k) && props[k]!.type === "boolean" && !props[k]!.rejected)
   return key ? { key, virtual: Boolean(props[key]!.virtual) } : undefined

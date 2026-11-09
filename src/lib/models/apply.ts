@@ -46,7 +46,7 @@ export interface ShapedRun {
   improved: Aspect[]
 }
 
-type Target = Pick<ModelRecord, "name" | "endpoint" | "modality" | "params">
+type Target = Pick<ModelRecord, "name" | "endpoint" | "category" | "params">
 
 /** One shot per line when Multi-shot is on and the person has not timed the lines themselves. */
 function shotLines(record: Target, prompt: string, params: Record<string, unknown>): { lines: string[]; extras: string } | undefined {
@@ -93,7 +93,7 @@ export function shapeRun(record: Target, prompt: string, withTask: Record<string
     const nativeKey = Object.keys(props).find((k) => attributeOfField(k) === "prompt_enhance")
     const nativeValue = nativeKey ? (params[nativeKey] ?? props[nativeKey]!.default) : undefined
     const result = enhancePrompt(prompt, {
-      modality: record.modality,
+      category: record.category,
       hasFiles: Boolean(files.start || files.end || files.images || files.videos || files.audios || files.sourceVideo || files.sourceAudio),
       hasTask: Boolean(feature),
       nativeOn: nativeValue === true,

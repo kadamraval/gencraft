@@ -1,4 +1,4 @@
-import type { ModelRecord, RegistryModality } from "./types"
+import type { ModelRecord, AppCategory } from "./types"
 import generated from "./shortlist.generated.json"
 
 /**
@@ -11,7 +11,7 @@ import generated from "./shortlist.generated.json"
  */
 
 export interface ShortlistEntry {
-  modality: Exclude<RegistryModality, "text">
+  category: Exclude<AppCategory, "text">
   /** Position on the board, 1 = best */
   rank: number
   name: string
@@ -142,12 +142,12 @@ const list = (generated as Shortlist).entries ?? []
 const entryCache = new Map<string, ShortlistEntry | undefined>()
 
 /** The leaderboard row this model is, if it is on a board. The closest name wins; a better rank breaks a tie. */
-export function entryFor(record: Pick<ModelRecord, "name" | "endpoint" | "modality">, entries: ShortlistEntry[] = list): ShortlistEntry | undefined {
-  const key = entries === list ? `${record.modality}|${record.name}|${record.endpoint}` : ""
+export function entryFor(record: Pick<ModelRecord, "name" | "endpoint" | "category">, entries: ShortlistEntry[] = list): ShortlistEntry | undefined {
+  const key = entries === list ? `${record.category}|${record.name}|${record.endpoint}` : ""
   if (key && entryCache.has(key)) return entryCache.get(key)
   let best: { e: ShortlistEntry; score: number } | undefined
   for (const e of entries) {
-    if (e.modality !== record.modality) continue
+    if (e.category !== record.category) continue
     const score = matchScore(e.name, record, e.maker)
     if (score < MIN_SCORE) continue
     if (!best || score > best.score || (score === best.score && e.rank < best.e.rank)) best = { e, score }
@@ -157,7 +157,7 @@ export function entryFor(record: Pick<ModelRecord, "name" | "endpoint" | "modali
 }
 
 /** Position on the board (1 = best), or undefined when the model is not on one. */
-export const shortlistRank = (record: Pick<ModelRecord, "name" | "endpoint" | "modality">): number | undefined => entryFor(record)?.rank
+export const shortlistRank = (record: Pick<ModelRecord, "name" | "endpoint" | "category">): number | undefined => entryFor(record)?.rank
 
 /** The weights are public. For the app's own use only: this is never shown to a person. */
-export const isOpenWeights = (record: Pick<ModelRecord, "name" | "endpoint" | "modality">): boolean => entryFor(record)?.open === true
+export const isOpenWeights = (record: Pick<ModelRecord, "name" | "endpoint" | "category">): boolean => entryFor(record)?.open === true

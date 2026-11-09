@@ -50,7 +50,7 @@ export function modelFor(kind: GenerateRequest["kind"], modelId: string, handed:
   const byId = new Map(listed.map((r) => [r.id, r]))
   const ranked = computeDefaultEnabled(listed)
     .map((id) => byId.get(id))
-    .filter((r): r is ModelRecord => Boolean(r) && r!.modality === kind)
+    .filter((r): r is ModelRecord => Boolean(r) && r!.category === kind)
   const wants = need.pictures > 0 || need.start || need.end || need.video || need.audio
   if (!wants) return ranked.find((r) => fits(r, need)) ?? ranked[0]
   // The best model that takes everything the step hands over, then any that takes pictures at all
@@ -88,12 +88,12 @@ export interface RuntimeOptions {
 /** One question to the person's chat model, with its fallbacks and cost recording */
 export async function askText(settings: SettingsState, actionName: string, prompt: string, system?: string): Promise<string> {
   const run = await executeWithFallback({
-    modality: "text",
+    category: "text",
     settings,
     actionName,
     onDiagnosticLog: () => undefined,
     execute: async (model) => {
-      const live = await dispatchLiveProviderRequest({ model, modality: "text", prompt: system ? `${system}
+      const live = await dispatchLiveProviderRequest({ model, category: "text", prompt: system ? `${system}
 
 ${prompt}` : prompt, settings, onLog: () => undefined })
       if (!live.textResponse) throw new Error("The model returned no text")
@@ -130,7 +130,7 @@ export function makeRunDeps(spec: AppSpec, options: RuntimeOptions): RunDeps {
       const ratio = typeof values.aspect_ratio === "string" ? values.aspect_ratio : undefined
       const duration = typeof values.duration === "number" ? values.duration : undefined
       const run = await executeWithFallback({
-        modality: req.kind,
+        category: req.kind,
         settings,
         primaryModelId: rec.id,
         actionName: `App: ${spec.name}`,
@@ -141,7 +141,7 @@ export function makeRunDeps(spec: AppSpec, options: RuntimeOptions): RunDeps {
           const live = await dispatchLiveProviderRequest({
             onActualCost: report,
             model,
-            modality: req.kind,
+            category: req.kind,
             prompt: composed.prompt,
             settings,
             params: values,

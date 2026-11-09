@@ -7,7 +7,7 @@ import type { SheetModel } from "./types"
 export interface Audit {
   models: number
   listings: number
-  byType: Record<string, number>
+  byCategory: Record<string, number>
   noListing: string[]
   notFound: string[]
   noPrice: string[]
@@ -16,9 +16,9 @@ export interface Audit {
 }
 
 export function auditSheet(sheet: SheetModel[]): Audit {
-  const a: Audit = { models: sheet.length, listings: 0, byType: {}, noListing: [], notFound: [], noPrice: [], conflicts: [], deprecated: [] }
+  const a: Audit = { models: sheet.length, listings: 0, byCategory: {}, noListing: [], notFound: [], noPrice: [], conflicts: [], deprecated: [] }
   for (const m of sheet) {
-    a.byType[m.type] = (a.byType[m.type] ?? 0) + 1
+    a.byCategory[m.category] = (a.byCategory[m.category] ?? 0) + 1
     if (m.listings.length === 0) a.noListing.push(`${m.id}: no host and no LiteLLM entry`)
     for (const l of m.listings) {
       a.listings++
@@ -26,9 +26,9 @@ export function auditSheet(sheet: SheetModel[]): Audit {
       if (l.seenBy.length === 0) a.notFound.push(`${where}: no source knows this endpoint`)
       if (!l.price.value) a.noPrice.push(where)
       if (l.status.value === "deprecated") a.deprecated.push(where)
-      for (const c of l.category.conflicts ?? []) a.conflicts.push(`${where}: category is ${m.category}, ${c.source} says ${c.value}`)
+      for (const c of l.task.conflicts ?? []) a.conflicts.push(`${where}: task is ${m.task}, ${c.source} says ${c.value}`)
       for (const c of l.price.conflicts ?? []) a.conflicts.push(`${where}: price is $${l.price.value?.amount} (${l.price.source}), ${c.source} says $${c.value.amount} ${c.value.unit.replace("per_", "per ")}`)
-      for (const c of l.job.conflicts ?? []) a.conflicts.push(`${where}: job is ${m.job}, ${c.source} suggests ${c.value}`)
+      for (const c of l.action.conflicts ?? []) a.conflicts.push(`${where}: action is ${m.action}, ${c.source} suggests ${c.value}`)
     }
   }
   return a
@@ -39,7 +39,7 @@ export function auditText(a: Audit, builtAt: string): string {
   return [
     "# Model sheet audit",
     "",
-    `Built ${builtAt}. ${a.models} models, ${a.listings} listings. By type: ${Object.entries(a.byType).map(([k, v]) => `${k} ${v}`).join(", ")}.`,
+    `Built ${builtAt}. ${a.models} models, ${a.listings} listings. By category: ${Object.entries(a.byCategory).map(([k, v]) => `${k} ${v}`).join(", ")}.`,
     "",
     ...list("No listing at all", a.noListing),
     ...list("Endpoint no source knows", a.notFound),

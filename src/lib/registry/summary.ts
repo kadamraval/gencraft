@@ -2,7 +2,7 @@ import { expectedRun } from "@/lib/ledger/run-times"
 import { audioSwitchKey } from "./canonical"
 import { familyHasMultiShot, familyHasSeed, mergeRefs } from "./families"
 import { refSummary } from "./slots"
-import type { ModelRecord, ModelSummary, ParamSchema, RegistryModality } from "./types"
+import type { ModelRecord, ModelSummary, ParamSchema, AppCategory } from "./types"
 
 const RES_ORDER = ["480p", "540p", "720p", "1080p", "1440p", "2k", "4k", "8k"]
 
@@ -37,7 +37,7 @@ const AUDIO_WORDS = /native audio|(?:with|and|plus|generates?|generating|include
 const NO_AUDIO_WORDS = /\b(?:no|without|silent|mute)\s+(?:audio|sound)|\bsilent\b/i
 
 /** Facts for the picker row, taken from the parameter schema and the provider's own description. */
-export function summarize(modality: RegistryModality, params: ParamSchema, description = "", opts: { audioKnown?: boolean } = {}): ModelSummary {
+export function summarize(category: AppCategory, params: ParamSchema, description = "", opts: { audioKnown?: boolean } = {}): ModelSummary {
   const props = params.properties
   const summary: ModelSummary = {}
 
@@ -55,7 +55,7 @@ export function summarize(modality: RegistryModality, params: ParamSchema, descr
   const aspects = (props.aspect_ratio ?? props.aspectRatio)?.enum
   if (aspects?.length) summary.aspects = aspects.map(String)
 
-  if (modality === "video") {
+  if (category === "video") {
     const sayso = Boolean(audioSwitchKey(props)) || (AUDIO_WORDS.test(description) && !NO_AUDIO_WORDS.test(description))
     // When the provider's data is thin (Replicate), silence is not proof: say nothing instead of "no audio"
     if (sayso || opts.audioKnown !== false) summary.audio = sayso
@@ -78,19 +78,19 @@ function refsText(refs: ModelSummary["refs"]): string[] {
 }
 
 /** One short line, e.g. "1080p · 10s · audio" or "up to 4K · 4 images". Empty when nothing is known. */
-export function formatSummary(modality: RegistryModality, s: ModelSummary | undefined): string {
+export function formatSummary(category: AppCategory, s: ModelSummary | undefined): string {
   if (!s) return ""
   const parts: string[] = []
-  if (modality === "video") {
+  if (category === "video") {
     if (s.maxResolution) parts.push(s.maxResolution)
     if (s.maxSeconds) parts.push(`${s.maxSeconds}s`)
     if (s.audio !== undefined) parts.push(s.audio ? "audio" : "no audio")
     parts.push(...refsText(s.refs))
-  } else if (modality === "image") {
+  } else if (category === "image") {
     if (s.maxResolution) parts.push(`up to ${s.maxResolution}`)
     if (s.maxImages && s.maxImages > 1) parts.push(`${s.maxImages} images`)
     parts.push(...refsText(s.refs))
-  } else if (modality === "audio") {
+  } else if (category === "audio") {
     if (s.maxSeconds) parts.push(`${s.maxSeconds}s`)
   } else if (s.contextTokens) {
     parts.push(s.contextTokens >= 1_000_000 ? `${Math.round(s.contextTokens / 100_000) / 10}M context` : `${Math.round(s.contextTokens / 1000)}K context`)
@@ -116,7 +116,7 @@ const TASK_LABEL: Record<string, string> = {
 export function rowInfo(m: ModelRecord): string {
   const label = m.task ? TASK_LABEL[m.task] : undefined
   const nameSaysIt = /\b(to|from)\b.*\b(video|image|speech|audio)\b|text to|image to|video to|edit/i.test(m.name)
-  return [label && !nameSaysIt ? label : "", formatSummary(m.modality, m.summary)].filter(Boolean).join(" · ")
+  return [label && !nameSaysIt ? label : "", formatSummary(m.category, m.summary)].filter(Boolean).join(" · ")
 }
 
 const seconds = (n: number) => (n < 60 ? `${Math.round(n)}s` : `${Math.floor(n / 60)}m ${Math.round(n % 60)}s`)
@@ -153,33 +153,87 @@ export function rowChips(m: ModelRecord, family: ModelRecord[] = [m]): string[] 
   // What the model can take is what all its versions can take together (see families.ts)
   const r = family.length > 1 ? mergeRefs(family) : s?.refs
   const chips: string[] = []
-  if (r?.start && r.end) chips.push("Start/End")
-  else if (r?.start) chips.push("Start")
-  if (r && r.images > 0) chips.push(r.stated ? `${r.images} ${r.images === 1 ? "ref" : "refs"}` : "Refs")
+  // Capabilities in the standard words people see everywhere (see capability/standardChips)
+  if (r?.start) chips.push("Start frame")
+  if (r?.end) chips.push("End frame")
+  if (r && r.images > 0) chips.push("References")
   const res = resolutionChip(m)
   if (res) chips.push(res)
-  if (m.modality === "video" || m.modality === "audio") {
+  if (m.category === "video" || m.category === "audio") {
     const length = durationChip(m)
     if (length) chips.push(length)
   }
-  if (m.modality === "image" && s?.maxImages && s.maxImages > 1) chips.push(`${s.maxImages} images`)
-  if (m.modality === "video" && s?.audio) chips.push("Audio")
-  if (r && r.videos > 0) chips.push("Video refs")
-  if (r && r.audios > 0) chips.push("Audio refs")
-  if (m.modality === "video" && familyHasMultiShot(family)) chips.push("Multi-shot")
-  if (m.modality !== "text" && familyHasSeed(family)) chips.push("Seed")
-  if (m.modality === "text") {
+  if (m.category === "image" && s?.maxImages && s.maxImages > 1) chips.push(`${s.maxImages} images`)
+  if (m.category === "video" && s?.audio) chips.push("With audio")
+  if (r && r.videos > 0) chips.push("Video in")
+  if (r && r.audios > 0) chips.push("Audio in")
+  if (m.category === "video" && familyHasMultiShot(family)) chips.push("Multi-shot")
+  if (m.category !== "text" && familyHasSeed(family)) chips.push("Seed")
+  if (m.category === "text") {
     if (s?.contextTokens) chips.push(s.contextTokens >= 1_000_000 ? `${Math.round(s.contextTokens / 100_000) / 10}M context` : `${Math.round(s.contextTokens / 1000)}K context`)
     if (s?.vision || m.inputs.includes("image")) chips.push("Vision")
     if (s?.reasoning) chips.push("Reasoning")
-    if (m.tools) chips.push("Tools")
+    if (m.tools) chips.push("Works with Agent")
     if (s?.webSearch) chips.push("Web search")
     if (s?.videoInput || m.inputs.includes("video")) chips.push("Video in")
     if (s?.audioInput || m.inputs.includes("audio")) chips.push("Audio in")
   }
+  for (const c of paramChips(m, family)) if (!chips.some((x) => sameChip(x, c))) chips.push(c)
   const run = expectedRun(m.id)
   if (run) chips.push(`~${seconds(run.seconds)}`)
   return chips
+}
+
+/** The settings most models of a kind have, in plain words, in the order a person looks for them */
+const COMMON_PARAMS: Array<[label: string, key: RegExp]> = [
+  ["Resolution", /^(resolution|image_size|size|megapixels)$/],
+  ["Aspect", /aspect_ratio/],
+  ["Length", /^(duration|duration_seconds|seconds|length|music_length_ms|num_frames)$/],
+  ["Quality", /^quality$/],
+  ["Images", /^(num_images|n|number_of_images|num_outputs|max_images)$/],
+  ["Voice", /^voice(_id|_name)?$/],
+  ["Language", /language/],
+  ["Instrumental", /instrumental/],
+  ["Audio", /^(generate_audio|with_audio|audio)$/],
+  ["Negative prompt", /negative_prompt/],
+  ["Seed", /^seed$/],
+  ["Temperature", /^temperature$/],
+  ["Max tokens", /^max_(completion_)?tokens$/],
+  ["Reasoning", /reasoning|thinking/],
+]
+/** Plumbing every provider adds: listed only behind "+N" */
+const PLUMBING = /^(output_format|output_compression|enable_safety_checker|safety_tolerance|sync_mode|webhook|image_passthrough|top_p|top_k|frequency_penalty|presence_penalty|stop|stream|logprobs|response_format)$/
+/** A file, the prompt itself, or an internal switch: not a setting a badge should name */
+const NOT_A_SETTING = /^(prompt|text|input|messages|system_prompt)$|_urls?$|_images?$|^image$|^video$|^audio$|frame$|mask/
+
+const sameChip = (a: string, b: string) => a.toLowerCase() === b.toLowerCase() || (b === "Resolution" && /\d(p|K)$/i.test(a)) || (b === "Length" && /\ds$/.test(a)) || (a === "With audio" && b === "Audio")
+const humanize = (key: string) => {
+  const words = key.replace(/_/g, " ").replace(/\s+/g, " ").trim()
+  return words.charAt(0).toUpperCase() + words.slice(1)
+}
+
+/**
+ * What a model's settings are, as badges: the common ones first (resolution, aspect, length, seed), then the ones this model has that most
+ * do not, then the plumbing. A row shows what fits; the rest wait behind "+N". Every category gets them, chat models included.
+ */
+export function paramChips(m: ModelRecord, family: ModelRecord[] = [m]): string[] {
+  const keys = new Set<string>()
+  for (const r of family) for (const [k, p] of Object.entries(r.params?.properties ?? {})) if (!p.format && !NOT_A_SETTING.test(k)) keys.add(k)
+  const common: string[] = []
+  const unique: string[] = []
+  const plumbing: string[] = []
+  const used = new Set<string>()
+  for (const [label, re] of COMMON_PARAMS) {
+    const hit = [...keys].filter((k) => re.test(k))
+    if (hit.length === 0) continue
+    common.push(label)
+    for (const k of hit) used.add(k)
+  }
+  for (const k of keys) {
+    if (used.has(k)) continue
+    ;(PLUMBING.test(k) ? plumbing : unique).push(humanize(k))
+  }
+  return [...common, ...unique.sort(), ...plumbing]
 }
 
 /** The first few badges stay on the row; the rest wait behind a "+N" the person can hover. */

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict"
-import { LEGACY_LOCK_KEYS, migrateLocalStorage } from "../src/lib/legacy-names.ts"
+import { LEGACY_LOCK_KEYS, ledgerCategory, migrateLocalStorage, withCategory } from "../src/lib/legacy-names.ts"
 
 let passed = 0
 const check = (name: string, fn: () => void) => {
@@ -69,6 +69,17 @@ check("running it twice changes nothing the second time", () => {
   migrateLocalStorage(s)
   assert.equal(migrateLocalStorage(s), 0)
   assert.deepEqual(s.keys(), ["gencraft_apps_v1"])
+})
+
+check("a model saved before the rename gets its category from the old modality field; a current one is left as it is", () => {
+  assert.deepEqual(withCategory({ id: "fal/x", modality: "video", name: "X" }), { id: "fal/x", name: "X", category: "video" })
+  const now = { id: "fal/y", category: "image" }
+  assert.equal(withCategory(now), now)
+})
+
+check("the spending ledger's old 'embedded' becomes 'embedding'; other categories stay", () => {
+  assert.equal(ledgerCategory("embedded"), "embedding")
+  assert.equal(ledgerCategory("video"), "video")
 })
 
 console.log(`

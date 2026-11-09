@@ -23,7 +23,7 @@ check("each shot's length is known for a warning", shotLength(three, 15) === 5 &
 
 // Alibaba's own Wan 3.0 entry reaches both hosts, and each host's own list is kept
 const rec = (provider: string, endpoint: string, props: Record<string, ParamProperty> = {}): ModelRecord =>
-  ({ id: `${provider}/${endpoint}`, endpoint, name: endpoint, provider, modality: "video", family: endpoint, logoKey: "", inputs: ["text"], params: { type: "object", properties: props, request: { promptKey: "prompt", fixed: {}, blockers: [] } }, price: { unit: "unknown", amount: null, source: "estimate", fetchedAt: "" }, status: "active" }) as ModelRecord
+  ({ id: `${provider}/${endpoint}`, endpoint, name: endpoint, provider, category: "video", family: endpoint, logoKey: "", inputs: ["text"], params: { type: "object", properties: props, request: { promptKey: "prompt", fixed: {}, blockers: [] } }, price: { unit: "unknown", amount: null, source: "estimate", fetchedAt: "" }, status: "active" }) as ModelRecord
 const rep = withOfficial(rec("replicate", "alibaba/wan-3", { duration: { type: "integer" } }))
 const fal = withOfficial(rec("fal", "alibaba/wan-3.0/text-to-video", { duration: { type: "integer" } }))
 check("Wan 3 on Replicate gets Multi-shot and Watermark", Boolean(rep.params.properties.multi_shot) && Boolean(rep.params.properties.watermark))

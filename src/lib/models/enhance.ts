@@ -29,7 +29,7 @@ const ADD: Record<"image" | "video", Partial<Record<Aspect, string>>> = {
 }
 
 export interface EnhanceContext {
-  modality: string
+  category: string
   /** A start or end frame, a reference picture, a video or a sound is attached */
   hasFiles?: boolean
   /** The run is an edit, an extend, a lip-sync or another task on an existing file */
@@ -54,25 +54,25 @@ export function keepsOriginal(original: string, improved: string): boolean {
 }
 
 /** Which of the aspects the prompt does not already say anything about. */
-export function missingAspects(prompt: string, modality: "image" | "video"): Aspect[] {
-  const wanted = Object.keys(ADD[modality]) as Aspect[]
+export function missingAspects(prompt: string, category: "image" | "video"): Aspect[] {
+  const wanted = Object.keys(ADD[category]) as Aspect[]
   return wanted.filter((a) => !WORDS[a].test(prompt))
 }
 
 export function enhancePrompt(prompt: string, ctx: EnhanceContext): Enhanced {
   const none: Enhanced = { prompt, added: [] }
-  const modality = ctx.modality
+  const category = ctx.category
   if (ctx.off || ctx.hasFiles || ctx.hasTask || ctx.nativeOn) return none
-  if (modality !== "image" && modality !== "video") return none
+  if (category !== "image" && category !== "video") return none
   const text = prompt.trim()
   if (!text || wordCount(text) >= DETAILED_WORDS) return none
   // A list of shots, timed lines, a script line or a tagged reference is the person's own structure: leave it
   if (/\n/.test(text) || /^\s*\d+(\.\d+)?\s*s\b/i.test(text) || /@\w/.test(text) || /<ref_image_\d+>|\bimage\s?\d+\b/i.test(text)) return none
   // Words that must appear in the result, or speech, are the person's exactly: do not pad around them
   if (/["“”'‘’][^"“”'‘’]{2,}["“”'‘’]/.test(text) && /\b(says?|said|text|reads?|written|caption|title|sign|saying|word|words|quote|quoted|dialogue)\b/i.test(text)) return none
-  const missing = missingAspects(text, modality)
+  const missing = missingAspects(text, category)
   if (missing.length === 0) return none
-  const phrases = missing.map((a) => ADD[modality][a]!).filter(Boolean)
+  const phrases = missing.map((a) => ADD[category][a]!).filter(Boolean)
   const improved = `${text.replace(/[.\s]+$/, "")}. ${phrases.join(", ")}.`
   // The safeguard: if the person's words were somehow not kept as they were, send the original
   return keepsOriginal(text, improved) ? { prompt: improved, added: missing } : none

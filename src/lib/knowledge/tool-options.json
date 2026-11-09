@@ -1,0 +1,55 @@
+{
+  "about": "The few options that help a person get a good result, the same for every model of a job. Each is matched to the setting the chosen model has for it by the names providers use (keys is a pattern on the setting name); a model without one has no such option.",
+  "jobs": {
+    "image-upscale": [
+      {
+        "label": "Scale",
+        "keys": "^(upscale_factor|scale_factor|scale|factor)$"
+      },
+      {
+        "label": "Detail",
+        "keys": "^(creativity|strength)$"
+      },
+      {
+        "label": "Improve Faces",
+        "keys": "^(face_enhancement|face_enhance)$"
+      }
+    ],
+    "image-relight": [
+      {
+        "label": "Light From",
+        "keys": "^(light_direction|light_source)$"
+      },
+      {
+        "label": "Kind of Light",
+        "keys": "^light_type$"
+      },
+      {
+        "label": "Strength",
+        "keys": "^(strength|intensity)$"
+      }
+    ],
+    "image-restyle": [
+      {
+        "label": "Style",
+        "keys": "^(style|image_style)$"
+      },
+      {
+        "label": "Strength",
+        "keys": "^style_strength$"
+      }
+    ],
+    "image-outpaint": [
+      {
+        "label": "Shape",
+        "keys": "^(aspect_ratio|outpaint)$"
+      }
+    ],
+    "image-remove-background": [
+      {
+        "label": "Edge Softness",
+        "keys": "^mask_blur$"
+      }
+    ]
+  }
+}

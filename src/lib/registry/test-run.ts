@@ -12,7 +12,7 @@ import type { SettingsState } from "@/types"
  * are the cheapest the model allows (one result, the shortest length), and the estimated cost is shown first.
  */
 
-const PROMPT: Record<ModelRecord["modality"], string> = {
+const PROMPT: Record<ModelRecord["category"], string> = {
   image: "A small red apple on a white table, soft daylight",
   video: "A calm sea at sunrise, slow camera move",
   audio: "Hello, this is a short test.",
@@ -37,7 +37,7 @@ export function testCost(record: ModelRecord): number | null {
 }
 
 export interface TestResult {
-  kind: ModelRecord["modality"]
+  kind: ModelRecord["category"]
   url?: string
   text?: string
   seconds: number
@@ -46,12 +46,12 @@ export interface TestResult {
 export async function runModelTest(id: string, settings: SettingsState): Promise<TestResult> {
   const record = getRecord(id)
   if (!record) throw new Error("This model is not available.")
-  const model: ResolvedModelInfo = { id: record.id, name: record.name, provider: record.provider as ProviderId, modality: record.modality, costNumeric: 0, costDisplay: "", specs: "", latency: "" }
+  const model: ResolvedModelInfo = { id: record.id, name: record.name, provider: record.provider as ProviderId, category: record.category, costNumeric: 0, costDisplay: "", specs: "", latency: "" }
   const started = performance.now()
   const live = await dispatchLiveProviderRequest({
     model,
-    modality: record.modality,
-    prompt: PROMPT[record.modality],
+    category: record.category,
+    prompt: PROMPT[record.category],
     settings,
     params: testValues(record),
     imageParams: { batchCount: 1, aspectRatio: "1:1" },
@@ -59,11 +59,11 @@ export async function runModelTest(id: string, settings: SettingsState): Promise
     audioParams: { duration: 3 },
   })
   const seconds = Math.round((performance.now() - started) / 100) / 10
-  if (record.modality === "text") {
+  if (record.category === "text") {
     if (!live.textResponse) throw new Error("The model returned no text.")
     return { kind: "text", text: live.textResponse, seconds }
   }
-  const url = record.modality === "image" ? live.imageUrls?.[0] : record.modality === "video" ? live.videoUrl : live.audioUrl
-  if (!url) throw new Error(`The provider finished but returned no ${record.modality} file.`)
-  return { kind: record.modality, url, seconds }
+  const url = record.category === "image" ? live.imageUrls?.[0] : record.category === "video" ? live.videoUrl : live.audioUrl
+  if (!url) throw new Error(`The provider finished but returned no ${record.category} file.`)
+  return { kind: record.category, url, seconds }
 }

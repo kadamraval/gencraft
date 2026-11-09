@@ -1,12 +1,12 @@
 ---
-title: "Jobs"
-description: "For each job Gencraft does, the best models on every provider, first choice first."
+title: "Tasks and tools"
+description: "For each task and tool Gencraft offers, the best models on every provider, first choice first."
 ---
 
 
-A job is what Gencraft does with a model, such as upscaling a video or making an image from text. From the model database of 2026-10-24.
+A task makes something, such as an image from text. A tool changes a file you already have, such as upscaling a video. From the model database of 2026-10-24.
 
-## Making things from a prompt
+## Tasks: making things from a prompt
 
 ### Text to image
 
@@ -279,7 +279,7 @@ Takes text, gives audio.
 | fal | 2 | Mirelo SFX2.0 | $0.010 per second |
 | fal | 3 | V1.1 Text to Sound Effects | $0.0018 per second |
 
-## Tools for a file you already have
+## Tools: for a file you already have
 
 ### Edit video (by prompt)
 

@@ -1,3 +1,5 @@
+import { capabilityOfExact } from "@/lib/capability"
+import { takesGiven, type Given } from "@/lib/capability/match"
 import * as React from "react"
 import { FilterBadge } from "@/components/ui/filter-badge"
 import {
@@ -39,17 +41,15 @@ import {
   UploadCloud,
 } from "lucide-react"
 import { CharacterReference, GenerationMode, MediaAsset, Project, SettingsState } from "@/types"
-import { calculateGenerationPrice } from "@/lib/pricing/pricing-calculator"
-import { ensureSchema, getFamily, getFeatures, resolveAIModel, useKeyedProviders, useListedModels, useRegistry, useSchemaStatus } from "@/lib/registry/store"
+import { ensureSchema, getFamily, getFeatures, useKeyedProviders, useListedModels, useRegistry, useSchemaStatus } from "@/lib/registry/store"
 import { enabledSet } from "@/lib/registry/enabled"
 import { isBookmarked } from "@/lib/registry/bookmarks"
 import { GROUP_LABEL, GROUP_MODALITIES, resolveGroups } from "@/lib/registry/groups"
 import { estimateRun } from "@/lib/registry/price"
 import { makerRank } from "@/lib/registry/logo-rules"
-import type { ModelRecord, ParamProperty, RegistryModality } from "@/lib/registry/types"
+import type { ModelRecord, ParamProperty, AppCategory } from "@/lib/registry/types"
 import { MAX_REPEAT, REPEAT_KEY, aspectOf, countOf, repeatOf, rowOptions, secondsOf } from "@/lib/registry/param-logic"
 import { getProviderApiKey, isLiveProviderReady } from "@/lib/providers/live-connectors"
-import { resolveModelCapabilities } from "@/lib/providers/model-capabilities"
 import { ModelLogo } from "@/components/ui/model-logo"
 import { useMoney } from "@/lib/currency/currency"
 import { AUDIO_SWITCH_KEYS, audioSwitchKey } from "@/lib/registry/canonical"
@@ -152,17 +152,17 @@ interface ModeDef {
   id: GenerationMode
   label: string
   icon: React.ElementType
-  modality: RegistryModality
+  category: AppCategory
   cta: string
   placeholder: string
 }
 
 const MODES: ModeDef[] = [
-  { id: "chat", label: "Chat", icon: MessageSquare, modality: "text", cta: "Send", placeholder: "Ask anything, edit prompts, or brainstorm" },
-  { id: "image", label: "Image", icon: ImageIcon, modality: "image", cta: "Generate", placeholder: "Describe the image you want" },
-  { id: "video", label: "Video", icon: Video, modality: "video", cta: "Generate", placeholder: "Describe the video you want" },
-  { id: "audio", label: "Audio", icon: Volume2, modality: "audio", cta: "Generate", placeholder: "Describe the sound, music or voiceover" },
-  { id: "plan", label: "Agent", icon: Wand2, modality: "text", cta: "Direct", placeholder: "Describe a story and the agent plans every beat" },
+  { id: "chat", label: "Chat", icon: MessageSquare, category: "text", cta: "Send", placeholder: "Ask anything, edit prompts, or brainstorm" },
+  { id: "image", label: "Image", icon: ImageIcon, category: "image", cta: "Generate", placeholder: "Describe the image you want" },
+  { id: "video", label: "Video", icon: Video, category: "video", cta: "Generate", placeholder: "Describe the video you want" },
+  { id: "audio", label: "Audio", icon: Volume2, category: "audio", cta: "Generate", placeholder: "Describe the sound, music or voiceover" },
+  { id: "plan", label: "Agent", icon: Wand2, category: "text", cta: "Direct", placeholder: "Describe a story and the agent plans every beat" },
 ]
 
 const PARAM_ICON: Record<string, React.ElementType> = {
@@ -505,7 +505,7 @@ export function ChatInput({
   const narrow = cardWidth < NARROW_BELOW_PX
 
   const modeDef = MODES.find((m) => m.id === mode)!
-  const modality = modeDef.modality
+  const category = modeDef.category
   const isMedia = mode === "image" || mode === "video" || mode === "audio"
   const isText = !isMedia
 
@@ -516,14 +516,14 @@ export function ChatInput({
   const record: ModelRecord | undefined = React.useMemo(() => {
     const found = records.find((r) => r.id === activeModelId)
     // A model switched off in Settings, superseded, or retired is no longer offered: another one is chosen
-    return found && found.modality === modality && (onSet.has(found.id) || autoPicked.current === found.id) ? found : undefined
-  }, [records, activeModelId, modality, onSet])
+    return found && found.category === category && (onSet.has(found.id) || autoPicked.current === found.id) ? found : undefined
+  }, [records, activeModelId, category, onSet])
 
   const pickModelFor = React.useCallback(
-    (target: RegistryModality) => {
+    (target: AppCategory) => {
       // Every current, runnable model is a candidate; a bookmarked one wins
       const on = enabledSet(listed, settings?.aiEngine.enabledChatModelIds)
-      const pool = listed.filter((r) => r.modality === target && on.has(r.id))
+      const pool = listed.filter((r) => r.category === target && on.has(r.id))
       let stored: string | null = null
       try {
         stored = localStorage.getItem(`gencraft_mode_model_${target}`)
@@ -551,8 +551,8 @@ export function ChatInput({
   )
 
   React.useEffect(() => {
-    if (!record) pickModelFor(modality)
-  }, [record, modality, pickModelFor])
+    if (!record) pickModelFor(category)
+  }, [record, category, pickModelFor])
 
   // Parameters follow the model: keep what is still valid, reset the rest
   React.useEffect(() => {
@@ -565,11 +565,8 @@ export function ChatInput({
   }, [record?.id, falKey]) // the schema loads once per model; the key only raises rate limits
   const schemaStatus = useSchemaStatus(record?.id)
 
-  const activeModel = React.useMemo(() => (record ? resolveAIModel(record.id) : undefined), [record])
-  const caps = React.useMemo(() => (activeModel ? resolveModelCapabilities(activeModel) : undefined), [activeModel])
-
   const supportsReference = isMedia && Boolean(record?.inputs.includes("image"))
-  // Live models are judged by their own schema only. The name-based guess applies to bundled legacy entries.
+  // Models are judged by their own schema only. A record without an endpoint of its own takes one picture at most.
   const isLegacy = record ? record.endpoint === record.id : false
   // What this model takes as input, read from the provider's own schema
   const cap = React.useMemo(() => (record && isMedia && !isLegacy ? refCapability(record) : undefined), [record, isMedia, isLegacy])
@@ -623,7 +620,7 @@ export function ChatInput({
   const chatVision = mode === "chat" && Boolean(record?.inputs.includes("image"))
   const referenceLimit = chatVision ? 4 : !isMedia || !record ? 0 : isLegacy ? (supportsReference ? 1 : 0) : Math.max(cap ? referenceImageLimit(cap) : 0, famCap.images)
   const hasStart = mode === "video" && (isLegacy ? supportsReference : Boolean(cap?.start) || famCap.start)
-  const hasEnd = mode === "video" && (isLegacy ? Boolean(caps?.supportsDualKeyframe) : Boolean(cap?.end) || famCap.end)
+  const hasEnd = mode === "video" && (isLegacy ? false : Boolean(cap?.end) || famCap.end)
   // What this model takes as a video or a sound to work from
   const videoOk = Boolean(cap?.sourceVideo || cap?.videos || famCap.videos)
   const audioOk = Boolean(cap?.sourceAudio || cap?.audios || famCap.audios)
@@ -653,21 +650,21 @@ ${brandBrief(brandKit)}` } : base
   // (Wan text-to-video becomes Wan image-to-video for a start frame, or reference-to-video for reference images). When the
   // version takes a start frame but no reference list, the first image becomes the start frame.
   React.useEffect(() => {
-    if (!record || !isMedia || isLegacy || (modality !== "video" && modality !== "image")) return
+    if (!record || !isMedia || isLegacy || (category !== "video" && category !== "image")) return
     const images = [...refs.map((r) => ({ name: r.name, url: r.url })), ...elements.flatMap((e) => (isReferenceCategory(e.category) ? e.imageUrls.map((u) => ({ name: e.name, url: u })) : []))]
     const need = { start: Boolean(startFrame), end: Boolean(endFrame), refs: images.length, video: Boolean(sourceVideo), audio: Boolean(sourceAudio) }
     if (!need.start && !need.end && need.refs === 0 && !need.video && !need.audio) return
+    // The one rule every screen uses: the version takes everything attached (one picture may also be its start frame)
     const covers = (r: ModelRecord) => {
-      const c = refCapability(r)
-      const takesImages = Boolean(c.images || c.elements)
-      return (
-        (!need.start || Boolean(c.start)) &&
-        (!need.end || Boolean(c.end)) &&
-        // One image can also be the start frame; several need a reference list
-        (need.refs === 0 || takesImages || (need.refs === 1 && Boolean(c.start))) &&
-        (!need.video || Boolean(c.videos || c.sourceVideo)) &&
-        (!need.audio || Boolean(c.audios || c.sourceAudio))
-      )
+      const base: Given[] = [
+        ...(need.start ? [{ kind: "image" as const, role: "start" as const }] : []),
+        ...(need.end ? [{ kind: "image" as const, role: "end" as const }] : []),
+        ...(need.video ? [{ kind: "video" as const }] : []),
+        ...(need.audio ? [{ kind: "audio" as const }] : []),
+      ]
+      const c = capabilityOfExact(r)
+      if (need.refs === 0) return takesGiven(c, base)
+      return takesGiven(c, [...base, { kind: "image", count: need.refs }]) || (need.refs === 1 && !need.start && takesGiven(c, [...base, { kind: "image", role: "start" }]))
     }
     if (covers(record)) return
     // A single image prefers a start frame, several prefer a reference list; the plainest name wins after that
@@ -786,23 +783,13 @@ ${brandBrief(brandKit)}` } : base
 
   const priceDisplay = React.useMemo(() => {
     if (!record) return "—"
-    if (record.endpoint === record.id && record.price.source === "estimate" && activeModel) {
-      const legacy = calculateGenerationPrice({
-        model: activeModel,
-        mode,
-        duration: secondsOf(values),
-        batchCount: countOf(values),
-        resolution: typeof values.resolution === "string" ? values.resolution : undefined,
-      })
-      return `~${money.format(legacy.costUsd)}`
-    }
     const est = estimateRun(record, values, { sourceVideo: Boolean(sourceVideo && videoOk), promptChars: prompt.length > 0 ? prompt.length : undefined })
     // The words say how sure the number is: "from" when the settings leave the tier open, "up to" when the model picks the length, "~" for a projection
     return est.usd === null ? "—" : `${est.upTo ? "up to " : ""}${est.from ? "from " : ""}${est.approximate || repeat > 1 ? "~" : ""}${money.format(est.usd * repeat)}`
-  }, [record, activeModel, mode, values, money, sourceVideo, prompt.length, repeat])
+  }, [record, values, money, sourceVideo, prompt.length, repeat])
 
   // How the number is worked out, for the hover on Generate ("5 s × $0.28/s")
-  const priceWorking = React.useMemo(() => (record && !(record.endpoint === record.id) ? estimateRun(record, values, { sourceVideo: Boolean(sourceVideo && videoOk), promptChars: prompt.length > 0 ? prompt.length : undefined }).breakdown : undefined), [record, values, sourceVideo, videoOk, prompt.length])
+  const priceWorking = React.useMemo(() => (record ? estimateRun(record, values, { sourceVideo: Boolean(sourceVideo && videoOk), promptChars: prompt.length > 0 ? prompt.length : undefined }).breakdown : undefined), [record, values, sourceVideo, videoOk, prompt.length])
 
   const send = React.useCallback(
     (textOverride?: string) => {
@@ -810,7 +797,7 @@ ${brandBrief(brandKit)}` } : base
       if (!text) return
       // Blocked: say why, only now that a send was tried (never while typing)
       if (!record) {
-        const nothingOn = listed.filter((r) => r.modality === modality).length === 0
+        const nothingOn = listed.filter((r) => r.category === category).length === 0
         raiseChip({ key: "input:no-model", level: "warning", kind: "input", title: nothingOn ? "Add API key" : "Choose a model", message: nothingOn ? `No ${modeDef.label.toLowerCase()} model is on yet. Add a provider key and switch a model on.` : "Pick a model to generate with.", actions: nothingOn ? ["settings"] : [], settingsTab: "providers" })
         return
       }
@@ -853,7 +840,7 @@ ${brandBrief(brandKit)}` } : base
       setIsModelSelectorOpen(false)
       setSlashOpen(false)
     },
-    [prompt, record, missingInput, onSendMessage, mode, values, activeCharacterRef, isLegacy, refs, hasStart, hasEnd, startFrame, endFrame, isMedia, composed, sourceVideo, sourceAudio, activeSkills, task, chatVision, settings?.aiEngine.improvePrompts, videoOk, audioOk, listed, modality, modeDef.label],
+    [prompt, record, missingInput, onSendMessage, mode, values, activeCharacterRef, isLegacy, refs, hasStart, hasEnd, startFrame, endFrame, isMedia, composed, sourceVideo, sourceAudio, activeSkills, task, chatVision, settings?.aiEngine.improvePrompts, videoOk, audioOk, listed, category, modeDef.label],
   )
 
   // Speech: plain dictation fills the prompt; Talk sends each phrase and speaks the reply
@@ -1174,7 +1161,7 @@ ${brandBrief(brandKit)}` } : base
       // storage unavailable: the mode just will not persist
     }
     setModeOpen(false)
-    if (def.modality !== modality) pickModelFor(def.modality)
+    if (def.category !== category) pickModelFor(def.category)
   }
 
   // Skills offered for this mode, narrowed by what was typed after the slash
@@ -1312,7 +1299,7 @@ ${brandBrief(brandKit)}` } : base
   )
 
   // Nothing to choose until a provider has a key. The pill says so and takes the user to the place to add one.
-  const noModels = !record && listed.filter((r) => r.modality === modality).length === 0
+  const noModels = !record && listed.filter((r) => r.category === category).length === 0
 
   // A chip belongs to the situation it was raised in. Change the model, the mode or anything attached and the old ones go: nothing
   // from the last model or the last run is left on screen. (A model's settings chip, "schema:", looks after itself.)
@@ -1548,16 +1535,16 @@ ${brandBrief(brandKit)}` } : base
           <ModelSelectorPopover
             compact={narrow}
             activeModelId={activeModelId}
-            modality={modality}
+            category={category}
             onSelectModel={(newId) => {
               const picked = records.find((r) => r.id === newId)
               if (picked) {
                 try {
-                  localStorage.setItem(`gencraft_mode_model_${picked.modality}`, picked.id)
+                  localStorage.setItem(`gencraft_mode_model_${picked.category}`, picked.id)
                 } catch {
                   // storage unavailable: the choice just will not persist
                 }
-                setMode((prev) => (picked.modality === "text" ? (prev === "plan" ? "plan" : "chat") : (picked.modality as GenerationMode)))
+                setMode((prev) => (picked.category === "text" ? (prev === "plan" ? "plan" : "chat") : (picked.category as GenerationMode)))
               }
               autoPicked.current = null
               onModelChange(newId)

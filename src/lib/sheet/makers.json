@@ -4,13 +4,42 @@
   {
    "id": "bytedance",
    "name": "ByteDance",
+   "aliases": [
+    "bytedance",
+    "bytedance-seed",
+    "seedance",
+    "seedream",
+    "seedvr",
+    "omnihuman"
+   ],
+   "weights": "mixed",
+   "hub": [
+    "ByteDance",
+    "ByteDance-Seed"
+   ],
+   "families": [
+    {
+     "name": "Seedance",
+     "words": [
+      "seedance"
+     ],
+     "category": "video"
+    },
+    {
+     "name": "Seedream",
+     "words": [
+      "seedream"
+     ],
+     "category": "image"
+    }
+   ],
    "models": [
     {
      "id": "bytedance/seedance-2-5/text-to-video",
      "name": "Seedance 2.5",
-     "type": "video",
-     "category": "text-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "text-to-video",
+     "action": "generate",
      "litellm": [
       "fal_ai/bytedance/seedance-2.5/text-to-video",
       "runwayml/seedance2_5"
@@ -24,9 +53,9 @@
     {
      "id": "bytedance/seedance-2-5/image-to-video",
      "name": "Seedance 2.5",
-     "type": "video",
-     "category": "image-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "image-to-video",
+     "action": "generate",
      "litellm": [
       "fal_ai/bytedance/seedance-2.5/image-to-video"
      ],
@@ -39,9 +68,9 @@
     {
      "id": "bytedance/seedance-2-5/reference-to-video",
      "name": "Seedance 2.5",
-     "type": "video",
-     "category": "reference-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "reference-to-video",
+     "action": "generate",
      "litellm": [
       "fal_ai/bytedance/seedance-2.5/reference-to-video"
      ],
@@ -54,9 +83,9 @@
     {
      "id": "bytedance/seedream-5/text-to-image",
      "name": "Seedream 5",
-     "type": "image",
-     "category": "text-to-image",
-     "job": "generate",
+     "category": "image",
+     "task": "text-to-image",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -69,9 +98,9 @@
     {
      "id": "bytedance/seedream-5/image-to-image",
      "name": "Seedream 5",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "edit",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "edit",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -86,13 +115,66 @@
   {
    "id": "alibaba",
    "name": "Alibaba",
+   "aliases": [
+    "alibaba",
+    "alibaba-cloud",
+    "wan",
+    "wan-video",
+    "wan-ai",
+    "qwen",
+    "qwen-image",
+    "tongyi"
+   ],
+   "weights": "mixed",
+   "hub": [
+    "Wan-AI",
+    "Qwen"
+   ],
+   "families": [
+    {
+     "name": "Wan",
+     "words": [
+      "wan"
+     ],
+     "category": "video"
+    },
+    {
+     "name": "Qwen-Image",
+     "words": [
+      "qwen-image"
+     ],
+     "category": "image"
+    },
+    {
+     "name": "Qwen TTS",
+     "words": [
+      "qwen3-tts",
+      "qwen-3-tts"
+     ],
+     "category": "audio"
+    },
+    {
+     "name": "Qwen",
+     "words": [
+      "qwen"
+     ],
+     "category": "text"
+    },
+    {
+     "name": "Qwen3 Embedding",
+     "words": [
+      "qwen3-embedding"
+     ],
+     "category": "embedding"
+    }
+   ],
    "models": [
     {
      "id": "alibaba/wan-3-0/text-to-video",
      "name": "Wan 3.0",
-     "type": "video",
-     "category": "text-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "text-to-video",
+     "action": "generate",
      "litellm": [
       "dashscope/wan3.0-video",
       "dashscope/wan3.0-video-prime"
@@ -107,9 +189,9 @@
     {
      "id": "alibaba/wan-3-0/image-to-video",
      "name": "Wan 3.0",
-     "type": "video",
-     "category": "image-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "image-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -121,9 +203,9 @@
     {
      "id": "alibaba/wan-3-0/reference-to-video",
      "name": "Wan 3.0",
-     "type": "video",
-     "category": "reference-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "reference-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -135,9 +217,9 @@
     {
      "id": "alibaba/qwen-image-3/text-to-image",
      "name": "Qwen Image 3",
-     "type": "image",
-     "category": "text-to-image",
-     "job": "generate",
+     "category": "image",
+     "task": "text-to-image",
+     "action": "generate",
      "litellm": [
       "dashscope/qwen-image-3.0",
       "dashscope/qwen-image-3.0-pro"
@@ -151,9 +233,9 @@
     {
      "id": "alibaba/qwen-image-3/image-to-image",
      "name": "Qwen Image 3",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "edit",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "edit",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -166,13 +248,43 @@
   {
    "id": "kuaishou",
    "name": "Kuaishou (Kling)",
+   "aliases": [
+    "kuaishou",
+    "kwaivgi",
+    "kling",
+    "kling-video",
+    "kling-image",
+    "kolors"
+   ],
+   "weights": "closed",
+   "hub": [
+    "KwaiVGI",
+    "Kwai-Kolors"
+   ],
+   "families": [
+    {
+     "name": "Kling",
+     "words": [
+      "kling-video",
+      "kling"
+     ],
+     "category": "video"
+    },
+    {
+     "name": "Kling Image",
+     "words": [
+      "kling-image"
+     ],
+     "category": "image"
+    }
+   ],
    "models": [
     {
      "id": "kuaishou/kling-v3/text-to-video",
      "name": "Kling V3",
-     "type": "video",
-     "category": "text-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "text-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -186,9 +298,9 @@
     {
      "id": "kuaishou/kling-v3/image-to-video",
      "name": "Kling V3",
-     "type": "video",
-     "category": "image-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "image-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -202,9 +314,9 @@
     {
      "id": "kuaishou/kling-v3/video-to-video/motion-transfer",
      "name": "Kling V3",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "motion-transfer",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "motion-transfer",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -216,9 +328,9 @@
     {
      "id": "kuaishou/kling-o3/reference-to-video",
      "name": "Kling O3",
-     "type": "video",
-     "category": "reference-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "reference-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -230,9 +342,9 @@
     {
      "id": "kuaishou/kling-o3/video-to-video/edit",
      "name": "Kling O3",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "edit",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "edit",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -246,13 +358,54 @@
   {
    "id": "minimax",
    "name": "MiniMax",
+   "aliases": [
+    "minimax",
+    "hailuo",
+    "minimax-music"
+   ],
+   "weights": "closed",
+   "hub": [
+    "MiniMaxAI"
+   ],
+   "families": [
+    {
+     "name": "Hailuo",
+     "words": [
+      "hailuo",
+      "h"
+     ],
+     "category": "video"
+    },
+    {
+     "name": "MiniMax Speech",
+     "words": [
+      "speech"
+     ],
+     "category": "audio"
+    },
+    {
+     "name": "MiniMax Music",
+     "words": [
+      "minimax-music",
+      "music"
+     ],
+     "category": "audio"
+    },
+    {
+     "name": "MiniMax",
+     "words": [
+      "minimax-m"
+     ],
+     "category": "text"
+    }
+   ],
    "models": [
     {
      "id": "minimax/hailuo-h3/text-to-video",
      "name": "Hailuo H3",
-     "type": "video",
-     "category": "text-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "text-to-video",
+     "action": "generate",
      "litellm": [
       "minimax/MiniMax-H3",
       "minimax/MiniMax-H3-Max"
@@ -267,9 +420,9 @@
     {
      "id": "minimax/hailuo-h3/image-to-video",
      "name": "Hailuo H3",
-     "type": "video",
-     "category": "image-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "image-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -281,9 +434,9 @@
     {
      "id": "minimax/hailuo-h3/reference-to-video",
      "name": "Hailuo H3",
-     "type": "video",
-     "category": "reference-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "reference-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -294,9 +447,9 @@
     {
      "id": "minimax/hailuo-h3/video-to-video/extend",
      "name": "Hailuo H3",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "extend",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "extend",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -308,9 +461,9 @@
     {
      "id": "minimax/hailuo-h3/video-to-video/relight",
      "name": "Hailuo H3",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "relight",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "relight",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -321,9 +474,9 @@
     {
      "id": "minimax/speech-2-8/text-to-speech",
      "name": "Speech 2.8",
-     "type": "audio",
-     "category": "text-to-speech",
-     "job": "generate",
+     "category": "audio",
+     "task": "text-to-speech",
+     "action": "generate",
      "litellm": [
       "minimax/speech-2.6-hd"
      ],
@@ -337,9 +490,9 @@
     {
      "id": "minimax/music-3/text-to-audio",
      "name": "Music 3",
-     "type": "audio",
-     "category": "text-to-audio",
-     "job": "generate",
+     "category": "audio",
+     "task": "text-to-audio",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -352,13 +505,30 @@
   {
    "id": "luma",
    "name": "Luma",
+   "aliases": [
+    "luma",
+    "lumalabs",
+    "luma-photon",
+    "ray",
+    "uni"
+   ],
+   "weights": "closed",
+   "families": [
+    {
+     "name": "Ray",
+     "words": [
+      "ray"
+     ],
+     "category": "video"
+    }
+   ],
    "models": [
     {
      "id": "luma/ray-3-2/text-to-video",
      "name": "Ray 3.2",
-     "type": "video",
-     "category": "text-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "text-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -369,9 +539,9 @@
     {
      "id": "luma/ray-3-2/image-to-video",
      "name": "Ray 3.2",
-     "type": "video",
-     "category": "image-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "image-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -382,9 +552,9 @@
     {
      "id": "luma/ray-3-2/video-to-video/edit",
      "name": "Ray 3.2",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "edit",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "edit",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -395,9 +565,9 @@
     {
      "id": "luma/ray-3-2/video-to-video/reframe",
      "name": "Ray 3.2",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "reframe",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "reframe",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -408,9 +578,9 @@
     {
      "id": "luma/uni-1/text-to-image",
      "name": "Uni-1",
-     "type": "image",
-     "category": "text-to-image",
-     "job": "generate",
+     "category": "image",
+     "task": "text-to-image",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -421,9 +591,9 @@
     {
      "id": "luma/uni-1/image-to-image",
      "name": "Uni-1",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "edit",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "edit",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -436,13 +606,46 @@
   {
    "id": "xai",
    "name": "xAI",
+   "aliases": [
+    "xai",
+    "x-ai",
+    "grok",
+    "grok-imagine"
+   ],
+   "weights": "closed",
+   "hub": [
+    "xai-org"
+   ],
+   "families": [
+    {
+     "name": "Grok Imagine Video",
+     "words": [
+      "grok-imagine-video"
+     ],
+     "category": "video"
+    },
+    {
+     "name": "Grok Imagine Image",
+     "words": [
+      "grok-imagine-image"
+     ],
+     "category": "image"
+    },
+    {
+     "name": "Grok",
+     "words": [
+      "grok"
+     ],
+     "category": "text"
+    }
+   ],
    "models": [
     {
      "id": "xai/grok-imagine-video-1-5/text-to-video",
      "name": "Grok Imagine Video 1.5",
-     "type": "video",
-     "category": "text-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "text-to-video",
+     "action": "generate",
      "litellm": [
       "xai/grok-imagine-video-1.5",
       "xai/grok-imagine-video-1.5-lite"
@@ -457,9 +660,9 @@
     {
      "id": "xai/grok-imagine-video-1-5/image-to-video",
      "name": "Grok Imagine Video 1.5",
-     "type": "video",
-     "category": "image-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "image-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -471,9 +674,9 @@
     {
      "id": "xai/grok-imagine-video-1-5/reference-to-video",
      "name": "Grok Imagine Video 1.5",
-     "type": "video",
-     "category": "reference-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "reference-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -484,9 +687,9 @@
     {
      "id": "xai/grok-imagine-image-2-0/text-to-image",
      "name": "Grok Imagine Image 2.0",
-     "type": "image",
-     "category": "text-to-image",
-     "job": "generate",
+     "category": "image",
+     "task": "text-to-image",
+     "action": "generate",
      "litellm": [
       "xai/grok-imagine-image-2.0"
      ],
@@ -499,9 +702,9 @@
     {
      "id": "xai/grok-imagine-image-2-0/image-to-image",
      "name": "Grok Imagine Image 2.0",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "edit",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "edit",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -514,13 +717,35 @@
   {
    "id": "lightricks",
    "name": "Lightricks",
+   "aliases": [
+    "lightricks",
+    "ltx",
+    "ltxv",
+    "ltx-video",
+    "ltx-2",
+    "ltx-2.3",
+    "ltx-2.5"
+   ],
+   "weights": "open",
+   "hub": [
+    "Lightricks"
+   ],
+   "families": [
+    {
+     "name": "LTX",
+     "words": [
+      "ltx"
+     ],
+     "category": "video"
+    }
+   ],
    "models": [
     {
      "id": "lightricks/ltx-2-5/text-to-video",
      "name": "LTX 2.5",
-     "type": "video",
-     "category": "text-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "text-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -532,9 +757,9 @@
     {
      "id": "lightricks/ltx-2-5/image-to-video",
      "name": "LTX 2.5",
-     "type": "video",
-     "category": "image-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "image-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -546,9 +771,9 @@
     {
      "id": "lightricks/ltx-2-5/audio-to-video",
      "name": "LTX 2.5",
-     "type": "video",
-     "category": "audio-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "audio-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -560,9 +785,9 @@
     {
      "id": "lightricks/ltx-2-3/video-to-video/reframe",
      "name": "LTX 2.3",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "reframe",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "reframe",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -575,13 +800,27 @@
   {
    "id": "vidu",
    "name": "Vidu",
+   "aliases": [
+    "vidu",
+    "shengshu"
+   ],
+   "weights": "closed",
+   "families": [
+    {
+     "name": "Vidu",
+     "words": [
+      "vidu"
+     ],
+     "category": "video"
+    }
+   ],
    "models": [
     {
      "id": "vidu/vidu-q4/image-to-video",
      "name": "Vidu Q4",
-     "type": "video",
-     "category": "image-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "image-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -592,9 +831,9 @@
     {
      "id": "vidu/vidu-q4/reference-to-video",
      "name": "Vidu Q4",
-     "type": "video",
-     "category": "reference-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "reference-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -607,13 +846,26 @@
   {
    "id": "pixverse",
    "name": "PixVerse",
+   "aliases": [
+    "pixverse"
+   ],
+   "weights": "closed",
+   "families": [
+    {
+     "name": "PixVerse",
+     "words": [
+      "pixverse"
+     ],
+     "category": "video"
+    }
+   ],
    "models": [
     {
      "id": "pixverse/pixverse-c1/text-to-video",
      "name": "PixVerse C1",
-     "type": "video",
-     "category": "text-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "text-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -624,9 +876,9 @@
     {
      "id": "pixverse/pixverse-c1/image-to-video",
      "name": "PixVerse C1",
-     "type": "video",
-     "category": "image-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "image-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -637,9 +889,9 @@
     {
      "id": "pixverse/pixverse-c1/reference-to-video",
      "name": "PixVerse C1",
-     "type": "video",
-     "category": "reference-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "reference-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -652,13 +904,78 @@
   {
    "id": "google",
    "name": "Google",
+   "aliases": [
+    "google",
+    "google-deepmind",
+    "veo",
+    "imagen",
+    "nano-banana",
+    "gemini",
+    "lyria"
+   ],
+   "weights": "closed",
+   "hub": [
+    "google"
+   ],
+   "families": [
+    {
+     "name": "Veo",
+     "words": [
+      "veo"
+     ],
+     "category": "video"
+    },
+    {
+     "name": "Gemini Omni Flash",
+     "words": [
+      "gemini-omni-flash",
+      "gemini-omni"
+     ],
+     "category": "video"
+    },
+    {
+     "name": "Nano Banana",
+     "words": [
+      "nano-banana"
+     ],
+     "category": "image"
+    },
+    {
+     "name": "Gemini TTS",
+     "words": [
+      "gemini"
+     ],
+     "category": "audio"
+    },
+    {
+     "name": "Lyria",
+     "words": [
+      "lyria"
+     ],
+     "category": "audio"
+    },
+    {
+     "name": "Gemini",
+     "words": [
+      "gemini"
+     ],
+     "category": "text"
+    },
+    {
+     "name": "Gemini Embedding",
+     "words": [
+      "gemini-embedding"
+     ],
+     "category": "embedding"
+    }
+   ],
    "models": [
     {
      "id": "google/veo-3-1/text-to-video",
      "name": "Veo 3.1",
-     "type": "video",
-     "category": "text-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "text-to-video",
+     "action": "generate",
      "litellm": [
       "gemini/veo-3.1-generate-001",
       "gemini/veo-3.1-fast-generate-001",
@@ -669,9 +986,9 @@
     {
      "id": "google/gemini-omni-flash-1-1/text-to-video",
      "name": "Gemini Omni Flash 1.1",
-     "type": "video",
-     "category": "text-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "text-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -682,9 +999,9 @@
     {
      "id": "google/gemini-omni-flash-1-1/image-to-video",
      "name": "Gemini Omni Flash 1.1",
-     "type": "video",
-     "category": "image-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "image-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -695,9 +1012,9 @@
     {
      "id": "google/gemini-omni-flash-1-1/reference-to-video",
      "name": "Gemini Omni Flash 1.1",
-     "type": "video",
-     "category": "reference-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "reference-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -708,9 +1025,9 @@
     {
      "id": "google/gemini-omni-flash-1-1/video-to-video/edit",
      "name": "Gemini Omni Flash 1.1",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "edit",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "edit",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -721,9 +1038,9 @@
     {
      "id": "google/nano-banana-2-1/text-to-image",
      "name": "Nano Banana 2.1",
-     "type": "image",
-     "category": "text-to-image",
-     "job": "generate",
+     "category": "image",
+     "task": "text-to-image",
+     "action": "generate",
      "litellm": [
       "gemini/gemini-nano-banana-2.1",
       "vertex_ai/gemini-nano-banana-2.1"
@@ -737,9 +1054,9 @@
     {
      "id": "google/nano-banana-2-1/image-to-image",
      "name": "Nano Banana 2.1",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "edit",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "edit",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -750,9 +1067,9 @@
     {
      "id": "google/gemini-3-8-tts/text-to-speech",
      "name": "Gemini 3.8 TTS",
-     "type": "audio",
-     "category": "text-to-speech",
-     "job": "generate",
+     "category": "audio",
+     "task": "text-to-speech",
+     "action": "generate",
      "litellm": [
       "gemini/gemini-3.8-flash-tts",
       "gemini/gemini-3.8-flash-lite-tts"
@@ -767,9 +1084,9 @@
     {
      "id": "google/lyria-3-5/text-to-audio",
      "name": "Lyria 3.5",
-     "type": "audio",
-     "category": "text-to-audio",
-     "job": "generate",
+     "category": "audio",
+     "task": "text-to-audio",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -782,13 +1099,46 @@
   {
    "id": "openai",
    "name": "OpenAI",
+   "aliases": [
+    "openai",
+    "gpt-image",
+    "sora",
+    "whisper"
+   ],
+   "weights": "mixed",
+   "hub": [
+    "openai"
+   ],
+   "families": [
+    {
+     "name": "GPT Image",
+     "words": [
+      "gpt-image"
+     ],
+     "category": "image"
+    },
+    {
+     "name": "GPT",
+     "words": [
+      "gpt"
+     ],
+     "category": "text"
+    },
+    {
+     "name": "OpenAI Embedding",
+     "words": [
+      "text-embedding"
+     ],
+     "category": "embedding"
+    }
+   ],
    "models": [
     {
      "id": "openai/gpt-image-2-5/text-to-image",
      "name": "GPT Image 2.5",
-     "type": "image",
-     "category": "text-to-image",
-     "job": "generate",
+     "category": "image",
+     "task": "text-to-image",
+     "action": "generate",
      "litellm": [
       "azure/gpt-image-2.5-flare",
       "azure/gpt-image-2.5-sunburst"
@@ -803,9 +1153,9 @@
     {
      "id": "openai/gpt-image-2-5/image-to-image",
      "name": "GPT Image 2.5",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "edit",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "edit",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -819,13 +1169,42 @@
   {
    "id": "bfl",
    "name": "Black Forest Labs",
+   "aliases": [
+    "bfl",
+    "black-forest-labs",
+    "blackforestlabs",
+    "flux",
+    "flux-pro",
+    "flux-2",
+    "flux-kontext"
+   ],
+   "weights": "mixed",
+   "hub": [
+    "black-forest-labs"
+   ],
+   "families": [
+    {
+     "name": "FLUX",
+     "words": [
+      "flux"
+     ],
+     "category": "image"
+    },
+    {
+     "name": "FLUX Video",
+     "words": [
+      "flux"
+     ],
+     "category": "video"
+    }
+   ],
    "models": [
     {
      "id": "bfl/flux-3/text-to-image",
      "name": "FLUX 3",
-     "type": "image",
-     "category": "text-to-image",
-     "job": "generate",
+     "category": "image",
+     "task": "text-to-image",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -837,9 +1216,9 @@
     {
      "id": "bfl/flux-3/image-to-image",
      "name": "FLUX 3",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "edit",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "edit",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -851,9 +1230,9 @@
     {
      "id": "bfl/flux-3/image-to-video",
      "name": "FLUX 3",
-     "type": "video",
-     "category": "image-to-video",
-     "job": "generate",
+     "category": "video",
+     "task": "image-to-video",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -864,9 +1243,9 @@
     {
      "id": "bfl/flux-3/video-to-video/edit",
      "name": "FLUX 3",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "edit",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "edit",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -877,9 +1256,9 @@
     {
      "id": "bfl/flux-3/video-to-video/extend",
      "name": "FLUX 3",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "extend",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "extend",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -892,13 +1271,27 @@
   {
    "id": "recraft",
    "name": "Recraft",
+   "aliases": [
+    "recraft",
+    "recraft-ai"
+   ],
+   "weights": "closed",
+   "families": [
+    {
+     "name": "Recraft",
+     "words": [
+      "recraft"
+     ],
+     "category": "image"
+    }
+   ],
    "models": [
     {
      "id": "recraft/recraft-v4-1/text-to-image",
      "name": "Recraft V4.1",
-     "type": "image",
-     "category": "text-to-image",
-     "job": "generate",
+     "category": "image",
+     "task": "text-to-image",
+     "action": "generate",
      "litellm": [
       "recraft/recraftv3"
      ],
@@ -913,13 +1306,27 @@
   {
    "id": "ideogram",
    "name": "Ideogram",
+   "aliases": [
+    "ideogram",
+    "ideogram-ai"
+   ],
+   "weights": "closed",
+   "families": [
+    {
+     "name": "Ideogram",
+     "words": [
+      "ideogram"
+     ],
+     "category": "image"
+    }
+   ],
    "models": [
     {
      "id": "ideogram/ideogram-4-5/text-to-image",
      "name": "Ideogram 4.5",
-     "type": "image",
-     "category": "text-to-image",
-     "job": "generate",
+     "category": "image",
+     "task": "text-to-image",
+     "action": "generate",
      "litellm": [
       "fal_ai/fal-ai/ideogram/v3"
      ],
@@ -932,9 +1339,9 @@
     {
      "id": "ideogram/ideogram-4-5/image-to-image",
      "name": "Ideogram 4.5",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "edit",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "edit",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -945,9 +1352,9 @@
     {
      "id": "ideogram/ideogram/image-to-image/remove-object",
      "name": "Ideogram",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "remove-object",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "remove-object",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -960,13 +1367,29 @@
   {
    "id": "krea",
    "name": "Krea",
+   "aliases": [
+    "krea"
+   ],
+   "weights": "mixed",
+   "hub": [
+    "krea"
+   ],
+   "families": [
+    {
+     "name": "Krea",
+     "words": [
+      "krea"
+     ],
+     "category": "image"
+    }
+   ],
    "models": [
     {
      "id": "krea/krea-v3/text-to-image",
      "name": "Krea V3",
-     "type": "image",
-     "category": "text-to-image",
-     "job": "generate",
+     "category": "image",
+     "task": "text-to-image",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -977,9 +1400,9 @@
     {
      "id": "krea/krea-v3/image-to-image",
      "name": "Krea V3",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "edit",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "edit",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -992,13 +1415,35 @@
   {
    "id": "elevenlabs",
    "name": "ElevenLabs",
+   "aliases": [
+    "elevenlabs",
+    "eleven",
+    "scribe"
+   ],
+   "weights": "closed",
+   "families": [
+    {
+     "name": "Eleven",
+     "words": [
+      "eleven"
+     ],
+     "category": "audio"
+    },
+    {
+     "name": "Eleven Music",
+     "words": [
+      "music"
+     ],
+     "category": "audio"
+    }
+   ],
    "models": [
     {
      "id": "elevenlabs/eleven-v4/text-to-speech",
      "name": "Eleven v4",
-     "type": "audio",
-     "category": "text-to-speech",
-     "job": "generate",
+     "category": "audio",
+     "task": "text-to-speech",
+     "action": "generate",
      "litellm": [
       "elevenlabs/eleven_v3"
      ],
@@ -1012,9 +1457,9 @@
     {
      "id": "elevenlabs/eleven-music-2-5/text-to-audio",
      "name": "Eleven Music 2.5",
-     "type": "audio",
-     "category": "text-to-audio",
-     "job": "generate",
+     "category": "audio",
+     "task": "text-to-audio",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1025,9 +1470,9 @@
     {
      "id": "elevenlabs/scribe-v2/speech-to-text/transcribe",
      "name": "Scribe v2",
-     "type": "audio",
-     "category": "speech-to-text",
-     "job": "transcribe",
+     "category": "audio",
+     "task": "speech-to-text",
+     "action": "transcribe",
      "litellm": [
       "elevenlabs/scribe_v2"
      ],
@@ -1040,9 +1485,9 @@
     {
      "id": "elevenlabs/audio-isolation/audio-to-audio/isolate-voice",
      "name": "Audio Isolation",
-     "type": "audio",
-     "category": "audio-to-audio",
-     "job": "isolate-voice",
+     "category": "audio",
+     "task": "audio-to-audio",
+     "action": "isolate-voice",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1053,9 +1498,9 @@
     {
      "id": "elevenlabs/voice-changer/audio-to-audio/voice-change",
      "name": "Voice Changer",
-     "type": "audio",
-     "category": "audio-to-audio",
-     "job": "voice-change",
+     "category": "audio",
+     "task": "audio-to-audio",
+     "action": "voice-change",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1066,9 +1511,9 @@
     {
      "id": "elevenlabs/dubbing/audio-to-video/dub",
      "name": "Dubbing",
-     "type": "video",
-     "category": "audio-to-video",
-     "job": "dub",
+     "category": "video",
+     "task": "audio-to-video",
+     "action": "dub",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1081,13 +1526,32 @@
   {
    "id": "stability",
    "name": "Stability AI",
+   "aliases": [
+    "stability",
+    "stability-ai",
+    "stable-audio",
+    "stable-diffusion"
+   ],
+   "weights": "mixed",
+   "hub": [
+    "stabilityai"
+   ],
+   "families": [
+    {
+     "name": "Stable Audio",
+     "words": [
+      "stable-audio"
+     ],
+     "category": "audio"
+    }
+   ],
    "models": [
     {
      "id": "stability/stable-audio-3/text-to-audio",
      "name": "Stable Audio 3",
-     "type": "audio",
-     "category": "text-to-audio",
-     "job": "generate",
+     "category": "audio",
+     "task": "text-to-audio",
+     "action": "generate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1102,13 +1566,18 @@
   {
    "id": "topaz",
    "name": "Topaz Labs",
+   "aliases": [
+    "topaz",
+    "topazlabs"
+   ],
+   "weights": "closed",
    "models": [
     {
      "id": "topaz/topaz-upscale/video-to-video/upscale",
      "name": "Topaz Upscale",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "upscale",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "upscale",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1120,9 +1589,9 @@
     {
      "id": "topaz/topaz-upscale/image-to-image/upscale",
      "name": "Topaz Upscale",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "upscale",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "upscale",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1135,9 +1604,9 @@
     {
      "id": "topaz/topaz-interpolate/video-to-video/interpolate",
      "name": "Topaz Interpolate",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "interpolate",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "interpolate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1148,9 +1617,9 @@
     {
      "id": "topaz/topaz-deblur/video-to-video/restore",
      "name": "Topaz Deblur",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "restore",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "restore",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1162,9 +1631,9 @@
     {
      "id": "topaz/topaz-restore/image-to-image/restore",
      "name": "Topaz Restore",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "restore",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "restore",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1178,13 +1647,21 @@
   {
    "id": "bria",
    "name": "Bria",
+   "aliases": [
+    "bria",
+    "briaai"
+   ],
+   "weights": "mixed",
+   "hub": [
+    "briaai"
+   ],
    "models": [
     {
      "id": "bria/bria-video-background-removal/video-to-video/remove-background",
      "name": "Bria Video Background Removal",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "remove-background",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "remove-background",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1196,9 +1673,9 @@
     {
      "id": "bria/bria-expand/image-to-image/fill",
      "name": "Bria Expand",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "fill",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "fill",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1211,13 +1688,19 @@
   {
    "id": "clarity",
    "name": "Clarity AI",
+   "aliases": [
+    "clarity",
+    "clarityai",
+    "crystal"
+   ],
+   "weights": "closed",
    "models": [
     {
      "id": "clarity/crystal-video-upscaler/video-to-video/upscale",
      "name": "Crystal Video Upscaler",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "upscale",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "upscale",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1228,9 +1711,9 @@
     {
      "id": "clarity/crystal-upscaler/image-to-image/upscale",
      "name": "Crystal Upscaler",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "upscale",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "upscale",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1243,13 +1726,14 @@
   {
    "id": "opensource",
    "name": "Open source",
+   "weights": "open",
    "models": [
     {
      "id": "opensource/birefnet-video/video-to-video/remove-background",
      "name": "BiRefNet video",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "remove-background",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "remove-background",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1260,9 +1744,9 @@
     {
      "id": "opensource/birefnet/image-to-image/remove-background",
      "name": "BiRefNet",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "remove-background",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "remove-background",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1273,9 +1757,9 @@
     {
      "id": "opensource/seedvr-upscale/video-to-video/upscale",
      "name": "SeedVR upscale",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "upscale",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "upscale",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1286,9 +1770,9 @@
     {
      "id": "opensource/seedvr-upscale/image-to-image/upscale",
      "name": "SeedVR upscale",
-     "type": "image",
-     "category": "image-to-image",
-     "job": "upscale",
+     "category": "image",
+     "task": "image-to-image",
+     "action": "upscale",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1299,9 +1783,9 @@
     {
      "id": "opensource/rife/video-to-video/interpolate",
      "name": "RIFE",
-     "type": "video",
-     "category": "video-to-video",
-     "job": "interpolate",
+     "category": "video",
+     "task": "video-to-video",
+     "action": "interpolate",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1312,9 +1796,9 @@
     {
      "id": "opensource/deepfilternet-3/audio-to-audio/noise-reduction",
      "name": "DeepFilterNet 3",
-     "type": "audio",
-     "category": "audio-to-audio",
-     "job": "noise-reduction",
+     "category": "audio",
+     "task": "audio-to-audio",
+     "action": "noise-reduction",
      "litellm": [],
      "hosts": {
       "fal": [
@@ -1325,13 +1809,304 @@
     {
      "id": "opensource/demucs/audio-to-audio/separate-audio",
      "name": "Demucs",
-     "type": "audio",
-     "category": "audio-to-audio",
-     "job": "separate-audio",
+     "category": "audio",
+     "task": "audio-to-audio",
+     "action": "separate-audio",
      "litellm": [],
      "hosts": {
       "fal": [
        "fal-ai/demucs"
+      ],
+      "replicate": [
+       "ryan5453/demucs"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "anthropic",
+   "name": "Anthropic",
+   "aliases": [
+    "anthropic",
+    "claude"
+   ],
+   "weights": "closed",
+   "families": [
+    {
+     "name": "Claude Opus",
+     "words": [
+      "claude-opus"
+     ],
+     "category": "text"
+    },
+    {
+     "name": "Claude Sonnet",
+     "words": [
+      "claude-sonnet"
+     ],
+     "category": "text"
+    },
+    {
+     "name": "Claude Haiku",
+     "words": [
+      "claude-haiku"
+     ],
+     "category": "text"
+    }
+   ],
+   "models": []
+  },
+  {
+   "id": "deepseek",
+   "name": "DeepSeek",
+   "aliases": [
+    "deepseek",
+    "deepseek-ai"
+   ],
+   "weights": "open",
+   "hub": [
+    "deepseek-ai"
+   ],
+   "families": [
+    {
+     "name": "DeepSeek",
+     "words": [
+      "deepseek"
+     ],
+     "category": "text"
+    }
+   ],
+   "models": []
+  },
+  {
+   "id": "moonshot",
+   "name": "Moonshot AI",
+   "aliases": [
+    "moonshotai",
+    "kimi"
+   ],
+   "weights": "open",
+   "hub": [
+    "moonshotai"
+   ],
+   "families": [
+    {
+     "name": "Kimi",
+     "words": [
+      "kimi"
+     ],
+     "category": "text"
+    }
+   ],
+   "models": []
+  },
+  {
+   "id": "zhipu",
+   "name": "Z.ai",
+   "aliases": [
+    "z-ai",
+    "zai-org",
+    "glm"
+   ],
+   "weights": "open",
+   "hub": [
+    "zai-org"
+   ],
+   "families": [
+    {
+     "name": "GLM",
+     "words": [
+      "glm"
+     ],
+     "category": "text"
+    }
+   ],
+   "models": []
+  },
+  {
+   "id": "mistral",
+   "name": "Mistral",
+   "aliases": [
+    "mistralai",
+    "mistral",
+    "voxtral"
+   ],
+   "weights": "mixed",
+   "hub": [
+    "mistralai"
+   ],
+   "families": [
+    {
+     "name": "Mistral Large",
+     "words": [
+      "mistral-large"
+     ],
+     "category": "text"
+    },
+    {
+     "name": "Voxtral TTS",
+     "words": [
+      "voxtral"
+     ],
+     "category": "audio"
+    },
+    {
+     "name": "Mistral Embed",
+     "words": [
+      "mistral-embed"
+     ],
+     "category": "embedding"
+    }
+   ],
+   "models": []
+  },
+  {
+   "id": "voyage",
+   "name": "Voyage AI",
+   "aliases": [
+    "voyageai",
+    "voyage"
+   ],
+   "weights": "closed",
+   "families": [
+    {
+     "name": "Voyage",
+     "words": [
+      "voyage"
+     ],
+     "category": "embedding"
+    }
+   ],
+   "models": []
+  },
+  {
+   "id": "baai",
+   "name": "BAAI",
+   "aliases": [
+    "baai"
+   ],
+   "weights": "open",
+   "hub": [
+    "BAAI"
+   ],
+   "families": [
+    {
+     "name": "BGE",
+     "words": [
+      "bge"
+     ],
+     "category": "embedding"
+    }
+   ],
+   "models": []
+  },
+  {
+   "id": "nvidia",
+   "name": "NVIDIA",
+   "aliases": [
+    "nvidia"
+   ],
+   "weights": "open",
+   "hub": [
+    "nvidia"
+   ],
+   "families": [
+    {
+     "name": "Nemotron Embed",
+     "words": [
+      "nemotron",
+      "embed"
+     ],
+     "category": "embedding"
+    }
+   ],
+   "models": []
+  },
+  {
+   "id": "fishaudio",
+   "name": "Fish Audio",
+   "aliases": [
+    "fish-audio",
+    "fishaudio"
+   ],
+   "weights": "mixed",
+   "hub": [
+    "fishaudio"
+   ],
+   "families": [
+    {
+     "name": "Fish Audio",
+     "words": [
+      "drama",
+      "s2"
+     ],
+     "category": "audio"
+    }
+   ],
+   "models": []
+  },
+  {
+   "id": "heygen",
+   "name": "HeyGen",
+   "aliases": [
+    "heygen"
+   ],
+   "weights": "closed",
+   "families": [],
+   "models": []
+  },
+  {
+   "id": "decart",
+   "name": "Decart",
+   "aliases": [
+    "decart"
+   ],
+   "weights": "closed",
+   "families": [],
+   "models": []
+  },
+  {
+   "id": "tencent",
+   "name": "Tencent",
+   "aliases": [
+    "tencent"
+   ],
+   "weights": "mixed",
+   "families": [],
+   "models": []
+  },
+  {
+   "id": "mirelo",
+   "name": "Mirelo",
+   "aliases": [
+    "mirelo"
+   ],
+   "weights": "closed",
+   "families": [],
+   "models": []
+  },
+  {
+   "id": "meta",
+   "name": "Meta",
+   "aliases": [
+    "meta",
+    "facebook",
+    "facebookresearch"
+   ],
+   "weights": "open",
+   "families": [],
+   "models": [
+    {
+     "id": "meta/sam-audio/audio-to-audio/separate-audio",
+     "name": "SAM Audio",
+     "category": "audio",
+     "task": "audio-to-audio",
+     "action": "separate-audio",
+     "litellm": [],
+     "hosts": {
+      "fal": [
+       "fal-ai/sam-audio/separate"
       ]
      }
     }

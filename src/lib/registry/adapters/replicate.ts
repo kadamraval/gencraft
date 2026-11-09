@@ -1,4 +1,4 @@
-import type { ModelPrice, ModelRecord, ParamProperty, ParamSchema, PriceRule, RegistryModality } from "../types"
+import type { ModelPrice, ModelRecord, ParamProperty, ParamSchema, PriceRule, AppCategory } from "../types"
 import { applyParamPolicy } from "../param-policy"
 import { summarize } from "../summary"
 import { detectSlot } from "../slots"
@@ -53,6 +53,21 @@ interface ModelObject {
   run_count?: number
   latest_version?: { id: string; created_at?: string; openapi_schema?: OpenApi }
   is_official?: boolean
+  /** The API gives these when the model has them */
+  github_url?: string | null
+  weights_url?: string | null
+  /** Read from the public page: the source and weights links its description gives */
+  weight_links?: string[]
+}
+
+/** A link to public weights or source: a Hugging Face model or a GitHub repository (not Replicate's own packaging) */
+const PUBLIC_WEIGHTS = /^https?:\/\/(huggingface\.co\/(?!datasets\/|spaces\/|docs\/|blog\/)[\w.-]+\/[\w.-]+|github\.com\/(?!replicate\/)[\w.-]+\/(?!cog-)[\w.-]+)/i
+
+/** Whether the model's weights are public, as Replicate shows it: a weights or source link means open; one of Replicate's official models without any means closed */
+export function replicateWeights(detail: Pick<ModelObject, "github_url" | "weights_url" | "weight_links" | "is_official">): "open" | "closed" | undefined {
+  const links = [detail.weights_url, detail.github_url, ...(detail.weight_links ?? [])].filter((l): l is string => Boolean(l))
+  if (links.some((l) => PUBLIC_WEIGHTS.test(l))) return "open"
+  return detail.is_official ? "closed" : undefined
 }
 
 function resolveRef(ref: string, root: OpenApi): JsonSchema | undefined {
@@ -92,10 +107,15 @@ export function outputKind(detail: ModelObject): "text" | "file" | "other" {
     return out["x-cog-array-display"] === "concatenate" || out["x-cog-array-type"] === "iterator" ? "text" : "other"
   }
   if (out.type === "string") return out.format === "uri" ? "file" : "text"
+  // Several named files at once (a stem splitter returns bass, drums, vocals and other)
+  const root = detail.latest_version!.openapi_schema!
+  const obj = out.$ref ? resolveRef(out.$ref, root) : out
+  const props = Object.values(obj?.properties ?? {}).map((p) => (p.$ref ? resolveRef(p.$ref, root) ?? p : p))
+  if (props.length > 0 && props.every((p) => p.format === "uri" || (p.anyOf ?? []).some((a) => a.format === "uri"))) return "file"
   return "other"
 }
 
-export function extractInput(detail: ModelObject, modality: RegistryModality = "image"): { params: ParamSchema; unknown: string[] } | null {
+export function extractInput(detail: ModelObject, category: AppCategory = "image"): { params: ParamSchema; unknown: string[] } | null {
   const openapi = detail.latest_version?.openapi_schema
   const input = openapi?.components?.schemas?.Input
   if (!openapi || !input) return null
@@ -106,7 +126,7 @@ export function extractInput(detail: ModelObject, modality: RegistryModality = "
     const isFile = s.format === "uri" || s.format === "data-url" || (s.type === "array" && s.items?.format === "uri")
     if (isFile) {
       // What the file is for and how many the model takes come from the model's own schema
-      const slot = detectSlot(key, { type: s.type, items: s.items ? { type: s.items.type } : undefined, maxItems: s.maxItems, description: s.description }, modality)
+      const slot = detectSlot(key, { type: s.type, items: s.items ? { type: s.items.type } : undefined, maxItems: s.maxItems, description: s.description }, category)
       const format = slot?.kind ?? inferFormat(key, s)
       if (format) properties[key] = { type: "string", title: s.title ?? key, format, ...(slot ? { slot } : {}) }
       continue
@@ -147,14 +167,14 @@ export function extractInput(detail: ModelObject, modality: RegistryModality = "
 }
 
 /** Collections worth reading, and what each kind of output they hold. */
-const COLLECTION_KIND: Array<{ match: RegExp; modality: RegistryModality; task: string }> = [
-  { match: /image-to-video|video-generation-from-image/i, modality: "video", task: "image-to-video" },
-  { match: /text-to-video|video-generation|official-video/i, modality: "video", task: "text-to-video" },
-  { match: /image-edit|edit-image|inpaint/i, modality: "image", task: "image-to-image" },
-  { match: /text-to-image|image-generation|flux|official-image/i, modality: "image", task: "text-to-image" },
-  { match: /text-to-speech|speech|voice/i, modality: "audio", task: "text-to-speech" },
-  { match: /music|sound|audio-generation|text-to-audio/i, modality: "audio", task: "text-to-audio" },
-  { match: /language|llm|chat|text-generation/i, modality: "text", task: "text" },
+const COLLECTION_KIND: Array<{ match: RegExp; category: AppCategory; task: string }> = [
+  { match: /image-to-video|video-generation-from-image/i, category: "video", task: "image-to-video" },
+  { match: /text-to-video|video-generation|official-video/i, category: "video", task: "text-to-video" },
+  { match: /image-edit|edit-image|inpaint/i, category: "image", task: "image-to-image" },
+  { match: /text-to-image|image-generation|flux|official-image/i, category: "image", task: "text-to-image" },
+  { match: /text-to-speech|speech|voice/i, category: "audio", task: "text-to-speech" },
+  { match: /music|sound|audio-generation|text-to-audio/i, category: "audio", task: "text-to-audio" },
+  { match: /language|llm|chat|text-generation/i, category: "text", task: "text" },
 ]
 const SKIP_COLLECTION = /restor|super-resolution|upscal|caption|detect|segment|embed|3d|train|ocr|classif|remove-background|depth|face-swap|nsfw/i
 
@@ -170,7 +190,7 @@ export function isToolCollection(slug: string): boolean {
 }
 
 /** What a tool model works on, from the files its own input schema takes */
-export function toolKindOf(detail: ModelObject): { modality: RegistryModality; task: string } | null {
+export function toolKindOf(detail: ModelObject): { category: AppCategory; task: string } | null {
   const openapi = detail.latest_version?.openapi_schema
   const props = openapi?.components?.schemas?.Input?.properties ?? {}
   const files = Object.entries(props)
@@ -178,12 +198,17 @@ export function toolKindOf(detail: ModelObject): { modality: RegistryModality; t
     .filter(({ s }) => s.format === "uri" || s.format === "data-url" || (s.type === "array" && s.items?.format === "uri"))
     .map(({ key }) => key)
   if (files.length === 0) return null
-  if (files.some((k) => /video/.test(k))) return { modality: "video", task: "video-to-video" }
-  if (files.some((k) => /audio|speech|voice|music|song|stem|track/.test(k))) return { modality: "audio", task: "audio-to-audio" }
-  return { modality: "image", task: "image-to-image" }
+  // A model that takes a video and makes its sound (foley, sound effects, a score) is an audio model for a video
+  if (files.some((k) => /video/.test(k)) && /foley|sfx|sound|mmaudio|music|score/.test(detail.name.toLowerCase())) return { category: "audio", task: "video-to-audio" }
+  if (files.some((k) => /video/.test(k))) return { category: "video", task: "video-to-video" }
+  if (files.some((k) => /audio|speech|voice|music|song|stem|track/.test(k))) return { category: "audio", task: "audio-to-audio" }
+  return { category: "image", task: "image-to-image" }
 }
 
-export function collectionKind(slug: string): { modality: RegistryModality; task: string } | null {
+/** A model whose own name says it changes a file (upscale, demucs, foley, motion control ...): read as a tool from its own input */
+export const TOOL_NAME = /upscal|super-?res|esrgan|seedvr|flashvsr|remove-?bg|background|rembg|matting|birefnet|interpol|rife|slow-?mo|denois|deblur|restor|codeformer|gfpgan|coloriz|ddcolor|relight|ic-light|restyle|style-?transfer|reframe|outpaint|expand|inpaint|eras|object-?remov|lip-?sync|wav2lip|latentsync|motion-?(control|transfer)|animate|dreamactor|extend|isolat|vocal|demucs|stem|separat|noise|enhance|voice-?(chang|clon|conv)|rvc|dub|transcri|whisper|speech-to-text|foley|sfx|sound-?effect|mmaudio|video-?2-?music|video-to-music|soundtrack/
+
+export function collectionKind(slug: string): { category: AppCategory; task: string } | null {
   if (SKIP_COLLECTION.test(slug)) return null
   return COLLECTION_KIND.find((c) => c.match.test(slug)) ?? null
 }
@@ -193,27 +218,27 @@ export function collectionKind(slug: string): { modality: RegistryModality; task
  * models under "official" (read as chat), so a model that returns a file there is sorted by what it says it is.
  * Video is tested first because "image-to-video" mentions both; audio before image for "voice" and "music".
  */
-export function mediaKindOf(detail: Pick<ModelObject, "name" | "description">, fields: string[] = []): { modality: RegistryModality; task: string } | null {
+export function mediaKindOf(detail: Pick<ModelObject, "name" | "description">, fields: string[] = []): { category: AppCategory; task: string } | null {
   // Tools that change a file rather than make one from a prompt are not offered here
   if (SKIP_COLLECTION.test(detail.name)) return null
   // The model's own input fields are the surest sign of all: only a voice or a lyric belongs to audio, and a length
   // together with a resolution, a frame or a sound switch belongs to video, whatever the model is called
   const has = (re: RegExp) => fields.some((k) => re.test(k))
-  if (has(/^(voice|voice_id|speaker|lyrics|lyrics_prompt|language_code|music_length_ms|seconds_total)$/)) return { modality: "audio", task: has(/^(voice|voice_id|speaker)$/) ? "text-to-speech" : "text-to-audio" }
+  if (has(/^(voice|voice_id|speaker|lyrics|lyrics_prompt|language_code|music_length_ms|seconds_total)$/)) return { category: "audio", task: has(/^(voice|voice_id|speaker)$/) ? "text-to-speech" : "text-to-audio" }
   if (fields.includes("duration") && has(/^(resolution|aspect_ratio|generate_audio|fps|start_video|start_image|first_frame|image|images)$/)) {
-    return { modality: "video", task: has(/^(image|images|start_image|first_frame|start_video)$/) ? "image-to-video" : "text-to-video" }
+    return { category: "video", task: has(/^(image|images|start_image|first_frame|start_video)$/) ? "image-to-video" : "text-to-video" }
   }
   const decide = (text: string) => {
-    if (/video|animat|motion|film|clip|[rti]2v/.test(text)) return { modality: "video" as const, task: /image-to-video|from an image|animate|i2v/.test(text) ? "image-to-video" : "text-to-video" }
-    if (/speech|tts|voice|music|song|audio|sound|lyria|dubb|vocal/.test(text)) return { modality: "audio" as const, task: /speech|tts|voice|dubb/.test(text) ? "text-to-speech" : "text-to-audio" }
-    if (/image|picture|photo|illustrat|logo|vector|svg|banana|flux|seedream|imagen|diffusion|edit/.test(text)) return { modality: "image" as const, task: "text-to-image" }
+    if (/video|animat|motion|film|clip|[rti]2v/.test(text)) return { category: "video" as const, task: /image-to-video|from an image|animate|i2v/.test(text) ? "image-to-video" : "text-to-video" }
+    if (/speech|tts|voice|music|song|audio|sound|lyria|dubb|vocal/.test(text)) return { category: "audio" as const, task: /speech|tts|voice|dubb/.test(text) ? "text-to-speech" : "text-to-audio" }
+    if (/image|picture|photo|illustrat|logo|vector|svg|banana|flux|seedream|imagen|diffusion|edit/.test(text)) return { category: "image" as const, task: "text-to-image" }
     return null
   }
   // The name is the surest sign ("lyria" is music, "flux" is images even when its description mentions video); the description settles the rest
   return decide(detail.name.toLowerCase()) ?? decide((detail.description ?? "").toLowerCase())
 }
 
-export function recordFromReplicate(detail: ModelObject, collectionKind: { modality: RegistryModality; task: string }, fetchedAt: string): ModelRecord | null {
+export function recordFromReplicate(detail: ModelObject, collectionKind: { category: AppCategory; task: string }, fetchedAt: string): ModelRecord | null {
   // The model's own output decides whether it is a language model; the collection only suggests it.
   // A file-making model under the chat collection ("official") is sorted by what it says it is.
   const out = outputKind(detail)
@@ -224,13 +249,13 @@ export function recordFromReplicate(detail: ModelObject, collectionKind: { modal
     if (!tool) return null
     collectionKind = tool
   }
-  const kind = out === "text" ? { modality: "text" as RegistryModality, task: "text" } : collectionKind.modality === "text" ? (out === "file" ? mediaKindOf(detail, Object.keys(detail.latest_version?.openapi_schema?.components?.schemas?.Input?.properties ?? {})) : null) : collectionKind
+  const kind = out === "text" ? { category: "text" as AppCategory, task: "text" } : collectionKind.category === "text" ? (out === "file" ? mediaKindOf(detail, Object.keys(detail.latest_version?.openapi_schema?.components?.schemas?.Input?.properties ?? {})) : null) : collectionKind
   if (!kind) return null
-  const extracted = extractInput(detail, kind.modality)
+  const extracted = extractInput(detail, kind.category)
   const params = extracted?.params ?? { type: "object" as const, properties: {} }
   const hasImage = Object.values(params.properties).some((p) => p.format === "image")
   // A model that takes an image but is listed under text-to-video is an image-to-video model
-  const task = kind.modality === "video" && hasImage && kind.task === "text-to-video" ? "image-to-video" : kind.task
+  const task = kind.category === "video" && hasImage && kind.task === "text-to-video" ? "image-to-video" : kind.task
   const endpoint = `${detail.owner}/${detail.name}`
   const title = detail.name
     .split("-")
@@ -243,7 +268,7 @@ export function recordFromReplicate(detail: ModelObject, collectionKind: { modal
     name: title,
     family: detail.name,
     logoKey: detail.owner,
-    modality: kind.modality,
+    category: kind.category,
     inputs: ["text", ...(["image", "video", "audio"] as const).filter((k) => Object.values(params.properties).some((p) => p.format === k))],
     params,
     price: { unit: "unknown", amount: null, source: "estimate", fetchedAt },
@@ -253,9 +278,11 @@ export function recordFromReplicate(detail: ModelObject, collectionKind: { modal
     ...(isTool ? { utility: true } : {}),
     updatedAt: detail.latest_version?.created_at,
     providerVersion: detail.latest_version?.id,
+    ...(detail.run_count !== undefined ? { runs: detail.run_count } : {}),
+    ...(replicateWeights(detail) ? { weights: replicateWeights(detail) } : {}),
   }
   const rec = withStandardParams(baseRec)
-  return { ...rec, summary: summarize(rec.modality, rec.params, `${title} ${rec.description ?? ""}`, { audioKnown: false }) }
+  return { ...rec, summary: summarize(rec.category, rec.params, `${title} ${rec.description ?? ""}`, { audioKnown: false }) }
 }
 
 export interface ReplicateFetchResult {
@@ -267,7 +294,7 @@ export interface ReplicateFetchResult {
 }
 
 /** Reads the catalog the token can see. Bounded: a few hundred models, a few requests at a time. */
-export async function fetchReplicateModels(call: ReplicateFetch, opts: { limit?: number; known?: Map<string, ModelRecord>; onProgress?: (done: number, total: number) => void; onBatch?: (records: ModelRecord[]) => void } = {}): Promise<ReplicateFetchResult> {
+export async function fetchReplicateModels(call: ReplicateFetch, opts: { limit?: number; known?: Map<string, ModelRecord>; extra?: string[]; onProgress?: (done: number, total: number) => void; onBatch?: (records: ModelRecord[]) => void } = {}): Promise<ReplicateFetchResult> {
   const perKind = opts.limit ?? 80
   const fetchedAt = new Date().toISOString()
   const json = async <T>(path: string): Promise<T> => {
@@ -280,11 +307,11 @@ export async function fetchReplicateModels(call: ReplicateFetch, opts: { limit?:
   const wanted = list.results.map((c) => ({ slug: c.slug, kind: collectionKind(c.slug) })).filter((c): c is { slug: string; kind: NonNullable<ReturnType<typeof collectionKind>> } => c.kind !== null)
   // Replicate's own hosted models (Claude, GPT, Gemini, Llama and others) sit in "official"; only chat models are taken from it
   const hasOfficial = list.results.some((c) => c.slug === "official")
-  if (hasOfficial) wanted.push({ slug: "official", kind: { modality: "text", task: "text" } })
+  if (hasOfficial) wanted.push({ slug: "official", kind: { category: "text", task: "text" } })
   // Tool collections: what each model is for is read from its own input (see toolKindOf)
-  for (const c of list.results) if (isToolCollection(c.slug) && !wanted.some((w) => w.slug === c.slug)) wanted.push({ slug: c.slug, kind: { modality: "image", task: "tool" } })
+  for (const c of list.results) if (isToolCollection(c.slug) && !wanted.some((w) => w.slug === c.slug)) wanted.push({ slug: c.slug, kind: { category: "image", task: "tool" } })
 
-  const queue = new Map<string, { model: ModelObject; kind: { modality: RegistryModality; task: string } }>()
+  const queue = new Map<string, { model: ModelObject; kind: { category: AppCategory; task: string } }>()
   for (const c of wanted) {
     try {
       const col = await json<{ models: ModelObject[] }>(`/v1/collections/${c.slug}`)
@@ -301,7 +328,12 @@ export async function fetchReplicateModels(call: ReplicateFetch, opts: { limit?:
   // The kind is decided from the model's own output and description (see mediaKindOf), like any other "official" entry
   for (const id of officialFetchList("replicate")) {
     const [owner, name] = id.split("/")
-    if (owner && name && !queue.has(id)) queue.set(id, { model: { owner, name }, kind: { modality: "text", task: "text" } })
+    if (owner && name && !queue.has(id)) queue.set(id, { model: { owner, name }, kind: { category: "text", task: "text" } })
+  }
+  // Models no collection holds (Replicate's full list names them): a tool by its name is read from its input, anything else by its output
+  for (const id of opts.extra ?? []) {
+    const [owner, name] = id.split("/")
+    if (owner && name && !queue.has(id)) queue.set(id, { model: { owner, name }, kind: TOOL_NAME.test(name.toLowerCase()) ? { category: "image", task: "tool" } : { category: "text", task: "text" } })
   }
 
   // Newest first, bounded per kind so a flood of image models cannot crowd out chat or audio
@@ -312,7 +344,7 @@ export async function fetchReplicateModels(call: ReplicateFetch, opts: { limit?:
     .sort((a, b) => isPinned(b) - isPinned(a) || (b.model.latest_version?.created_at ?? "").localeCompare(a.model.latest_version?.created_at ?? ""))
     // Chat gets more room: the "official" collection holds many media models that are dropped after their output is read
     .filter((i) => {
-      const lane = i.kind.task === "tool" ? "tool" : i.kind.modality
+      const lane = i.kind.task === "tool" ? "tool" : i.kind.category
       taken[lane] = (taken[lane] ?? 0) + 1
       return taken[lane]! <= (lane === "text" ? perKind * 2 : perKind)
     })
@@ -340,7 +372,7 @@ export async function fetchReplicateModels(call: ReplicateFetch, opts: { limit?:
           const rec = recordFromReplicate(detail, kind, fetchedAt)
           if (rec) {
             records.push(rec)
-            const ex = extractInput(detail, rec.modality)
+            const ex = extractInput(detail, rec.category)
             for (const k of ex?.unknown ?? []) unknown[k] = (unknown[k] ?? 0) + 1
           }
         } catch {
@@ -593,7 +625,14 @@ export async function runReplicate(opts: {
     await new Promise((r) => setTimeout(r, (wait + 1) * 1000))
     create = await start()
   }
-  if (!create.ok) throw new Error(`Replicate could not start the run (HTTP ${create.status}): ${(await create.text().catch(() => "")).slice(0, 240)}`)
+  let failure = create.ok ? "" : await create.text().catch(() => "")
+  // The saved version of a model can be withdrawn (a new one replaces it): the same model is then run by its own name, which uses the latest
+  if (!create.ok && create.status === 422 && version && model && /version/i.test(failure)) {
+    onStatus?.("The saved version is gone, using the latest")
+    create = await call(`/v1/models/${model}/predictions`, { method: "POST", headers, body: JSON.stringify({ input }), signal })
+    failure = create.ok ? "" : await create.text().catch(() => "")
+  }
+  if (!create.ok) throw new Error(`Replicate could not start the run (HTTP ${create.status}): ${failure.slice(0, 240)}`)
   let prediction = (await create.json()) as Prediction
   const deadline = Date.now() + (opts.timeoutMs ?? 10 * 60_000)
   while (prediction.status === "starting" || prediction.status === "processing") {
@@ -619,13 +658,13 @@ export async function runReplicate(opts: {
 }
 
 /** One model by owner/name, for a model the person adds on their own. Replicate does not say what kind of output a model makes, so the person says. */
-export async function fetchReplicateRecord(call: ReplicateFetch, id: string, modality: RegistryModality): Promise<ModelRecord> {
+export async function fetchReplicateRecord(call: ReplicateFetch, id: string, category: AppCategory): Promise<ModelRecord> {
   const path = `/v1/models/${id.trim().replace(/^\/+|\/+$/g, "")}`
   const res = await call(path)
   if (!res.ok) throw new Error(res.status === 404 ? `Replicate has no model called ${id.trim()}.` : `Replicate answered HTTP ${res.status}.`)
   const detail = (await res.json()) as ModelObject
-  const task = modality === "image" ? "text-to-image" : modality === "video" ? "text-to-video" : modality === "audio" ? "text-to-audio" : "text"
-  const record = recordFromReplicate(detail, { modality, task }, new Date().toISOString())
+  const task = category === "image" ? "text-to-image" : category === "video" ? "text-to-video" : category === "audio" ? "text-to-audio" : "text"
+  const record = recordFromReplicate(detail, { category, task }, new Date().toISOString())
   if (!record) throw new Error("This model's settings could not be read.")
   return record
 }

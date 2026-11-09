@@ -1,7 +1,5 @@
 import * as React from "react"
 import type { AIModel, ProviderType } from "@/types"
-import { getAllModels } from "@/lib/providers/catalog"
-import { resolveModelCapabilities } from "@/lib/providers/model-capabilities"
 import { attachSchema, fetchFalModels, fetchFalPricing, fetchFalSchema, NoSchemaError } from "./adapters/fal"
 import { fetchFalChatModels } from "./adapters/fal-chat"
 import { fetchOpenRouterModels } from "./adapters/openrouter"
@@ -10,11 +8,11 @@ import { PRICE_READER_DATE, fetchReplicateModels, fetchReplicatePagePrice } from
 import { fetchGeminiRecords } from "./adapters/gemini-docs"
 import { fetchFalPagePrice } from "./adapters/fal-price"
 import { computeDefaultEnabled } from "./enabled"
+import { withCategory } from "../legacy-names"
 import { appFetch, fetchText, isDesktopApp, replicateCall, replicatePageFetch } from "./net"
 import bundledJson from "./registry.snapshot.json"
-import { getKnowledgeRecords, jobsOf, subscribeKnowledge } from "../knowledge/store"
+import { getKnowledgeRecords, servesOf, subscribeKnowledge } from "../knowledge/store"
 import { isUpdateDue } from "../knowledge/update-schedule"
-import { EMPTY_SCHEMA } from "./types"
 import { REQUEST_VERSION } from "./request"
 import { applyParamChecks, onParamChecksChange } from "./param-checks"
 import { withCrossHost } from "./cross-host"
@@ -27,8 +25,9 @@ import { prevalenceOf, retier } from "./prevalence"
 import { applyLifecycle, isListed } from "./lifecycle"
 import { PROVIDER_IDS, isRunnable } from "./providers"
 import { selectWatched } from "./watchlist"
+import { topMakersOnly } from "./top-makers"
 import { readCustomModels, readModelNames, saveCustomModels, writeModelNames } from "./custom-models"
-import type { ModelRecord, ParamSchema, PriceOverride, RegistryModality, RegistrySnapshot } from "./types"
+import type { ModelRecord, PriceOverride, RegistrySnapshot } from "./types"
 
 const STORAGE_KEY = "gencraft_registry_snapshot_v2"
 const OVERLAY_KEY = "gencraft_registry_schemas_v2"
@@ -38,13 +37,13 @@ type Listener = () => void
 const listeners = new Set<Listener>()
 const bundled = bundledJson as unknown as RegistrySnapshot
 /** The models behind the AI tools (Remove background, Upscale...). They never appear in the pickers; the tools find them by endpoint. */
-const withJobs = (r: ModelRecord): ModelRecord => {
-  const jobs = jobsOf(r.id)
-  return jobs ? { ...r, jobs } : r
+const withServes = (r: ModelRecord): ModelRecord => {
+  const serves = servesOf(r.id)
+  return serves ? { ...r, serves } : r
 }
 /** Tool models: the ones the standard database lists, on every provider */
 function utilityList(): ModelRecord[] {
-  return getKnowledgeRecords().filter((r) => r.utility).map(withJobs)
+  return getKnowledgeRecords().filter((r) => r.utility).map(withServes)
 }
 let utility = utilityList()
 
@@ -101,14 +100,51 @@ let overlay: SchemaOverlay = loadOverlay()
 let custom: ModelRecord[] = readCustomModels()
 let modelNames: Record<string, string> = readModelNames()
 
+/**
+ * The standard database is where the app's image, video and audio models come from. Chat models still come from each provider's own
+ * list (the bundled copy until a key loads it live). A live list may add models and settings, but the database's facts and price win.
+ */
+let database = new Map<string, ModelRecord>()
+let databaseMedia = new Set<string>()
+function readDatabase() {
+  const all = getKnowledgeRecords().filter((r) => !r.utility)
+  database = new Map(all.map((r) => [r.id, r]))
+  databaseMedia = new Set(all.filter((r) => r.category !== "text").map((r) => r.id))
+}
+readDatabase()
+
+/** Whether the standard database gives this model a price, so no page or price list read live replaces it */
+const pricedByDatabase = (id: string) => (database.get(id)?.price.amount ?? null) !== null
+
+/** A model as the database describes it, with what a live list adds: settings the database lacks, a description, dates */
+function withDatabase(r: ModelRecord): ModelRecord {
+  const db = database.get(r.id)
+  if (!db || db === r) return r
+  const facts = Object.fromEntries(Object.entries(db).filter(([, v]) => v !== undefined)) as Partial<ModelRecord>
+  return {
+    ...r,
+    ...facts,
+    params: { ...db.params, properties: { ...r.params.properties, ...db.params.properties } },
+    price: db.price.amount !== null ? db.price : r.price,
+    description: db.description ?? r.description,
+    // The maker's abilities add to what the provider's list says (its context size stays)
+    summary: db.summary ? { ...(r.summary ?? {}), ...db.summary } : r.summary,
+    tools: db.tools ?? r.tools,
+  }
+}
+
 function applyOverlay(records: ModelRecord[]): ModelRecord[] {
-  const mapped = records.map((r) => (overlay[r.id] ? { ...r, ...overlay[r.id] } : r))
+  const have = new Set(records.map((r) => r.id))
+  const fromDatabase = [...databaseMedia].filter((id) => !have.has(id)).map((id) => database.get(id)!)
+  const mapped = [...records, ...fromDatabase].map(withDatabase).map((r) => (overlay[r.id] ? { ...r, ...overlay[r.id] } : r))
   if (custom.length === 0) return mapped
   const own = new Set(custom.map((c) => c.id))
   return [...mapped.filter((r) => !own.has(r.id)), ...custom]
 }
 
-let live: ModelRecord[] = applyOverlay(bundled.models)
+/** Where the list starts: the bundled copy keeps only chat models, image, video and audio come from the database */
+const bundledText = bundled.models.filter((r) => r.category === "text")
+let live: ModelRecord[] = applyOverlay(bundledText)
 let version = 0
 
 // What a user can see depends on which providers have a key. Without one, a provider shows nothing.
@@ -213,12 +249,15 @@ export function registrySaveFailed(): boolean {
  */
 async function hydrate(): Promise<void> {
   try {
-    const stored = await readStored()
+    const read = await readStored()
+    const stored = read ? { ...read, models: read.models.map(withCategory) } : read
     if (stored && stored.models.length > 0) {
-      if (stored.builtAt >= bundled.builtAt) live = applyOverlay(stored.models)
+      // Image, video and audio models an older version saved from the bundled list are dropped unless a provider's live list gave them
+      const kept = stored.models.filter((r) => r.category === "text" || r.custom || databaseMedia.has(r.id) || lastChecked[r.provider])
+      if (stored.builtAt >= bundled.builtAt) live = applyOverlay(kept)
       else {
-        const covered = new Set(bundled.models.map((r) => r.provider))
-        live = applyOverlay([...bundled.models, ...stored.models.filter((r) => !covered.has(r.provider))])
+        const covered = new Set(bundledText.map((r) => r.provider))
+        live = applyOverlay([...bundledText, ...kept.filter((r) => r.category !== "text" || !covered.has(r.provider))])
       }
       emit()
     }
@@ -237,9 +276,13 @@ function emit() {
   listeners.forEach((l) => l())
 }
 
-// A newer standard database changes the tool models and the jobs of every model
+// A newer standard database changes the tool models and what every model serves
 subscribeKnowledge(() => {
   utility = utilityList()
+  // Models only the old database listed leave with it
+  const before = databaseMedia
+  readDatabase()
+  live = applyOverlay(live.filter((r) => !before.has(r.id) || databaseMedia.has(r.id) || lastChecked[r.provider]))
   emit()
 })
 
@@ -362,7 +405,7 @@ export async function refreshRegistry(opts: RefreshOptions = {}): Promise<Refres
 export async function refreshMissingPrices(limit = 60): Promise<number> {
   if (!isDesktopApp()) return 0
   const on = new Set(computeDefaultEnabled(getListedModels()))
-  const targets = live.filter((r) => r.provider === "fal" && r.modality !== "text" && on.has(r.id) && r.price.amount === null).slice(0, limit)
+  const targets = live.filter((r) => r.provider === "fal" && r.category !== "text" && on.has(r.id) && r.price.amount === null && !pricedByDatabase(r.id)).slice(0, limit)
   let found = 0
   let next = 0
   await Promise.all(
@@ -505,66 +548,9 @@ export async function ensureSchema(id: string, falKey?: string): Promise<void> {
   }
 }
 
-function legacySchema(model: AIModel): ParamSchema {
-  const caps = resolveModelCapabilities(model)
-  const properties: ParamSchema["properties"] = {}
-  const isVisual = model.type === "video" || model.type === "image"
-  if (isVisual) {
-    properties.aspect_ratio = { type: "string", title: "Aspect ratio", enum: caps.supportedAspectRatios, default: caps.supportedAspectRatios[0] }
-    properties.resolution = { type: "string", title: "Resolution", enum: caps.supportedResolutions, default: caps.supportedResolutions[0] }
-  }
-  if (model.type === "video" || model.type === "audio") {
-    properties.duration = { type: "integer", title: "Duration (s)", enum: caps.supportedDurations, default: caps.supportedDurations[0] }
-  }
-  if (model.type === "image") {
-    const counts = model.supportedBatchCounts?.length ? model.supportedBatchCounts : [1, 2, 4]
-    properties.num_images = { type: "integer", title: "Images", enum: counts, default: counts[0] }
-  }
-  if (model.type === "video" && caps.supportsCameraControl) {
-    properties.camera_motion = {
-      type: "string",
-      title: "Camera",
-      enum: ["static", "pan-left", "pan-right", "zoom-in", "zoom-out", "orbit", "crane-up"],
-      default: "static",
-    }
-  }
-  return { type: "object", properties }
-}
-
-const TYPE_TO_MODALITY: Record<AIModel["type"], RegistryModality> = {
-  video: "video",
-  image: "image",
-  audio: "audio",
-  chat: "text",
-  plan: "text",
-  multimodal: "text",
-}
-
-/** Bridges the bundled catalog into registry records so the whole app reads one shape. */
-export function recordFromLegacy(model: AIModel): ModelRecord {
-  const caps = resolveModelCapabilities(model)
-  const inputs: ModelRecord["inputs"] = ["text"]
-  if (caps.supportsReferenceImage) inputs.push("image")
-  if (caps.supportsReferenceVideo) inputs.push("video")
-  return {
-    id: model.id,
-    endpoint: model.id,
-    provider: model.provider,
-    name: model.name,
-    family: model.family ?? model.name,
-    logoKey: model.family ?? model.provider,
-    modality: TYPE_TO_MODALITY[model.type],
-    inputs,
-    params: model.type === "chat" || model.type === "plan" || model.type === "multimodal" ? EMPTY_SCHEMA : legacySchema(model),
-    price: { unit: "per_run", amount: model.costNumeric, source: "estimate", fetchedAt: new Date(0).toISOString() },
-    status: "active",
-    description: model.description,
-  }
-}
-
 /** Converts a live record into the AIModel shape the generation pipeline already consumes. */
 export function toAIModel(rec: ModelRecord): AIModel {
-  const type: AIModel["type"] = rec.modality === "text" ? "chat" : rec.modality
+  const type: AIModel["type"] = rec.category === "text" ? "chat" : rec.category
   const enumOf = (key: string) => rec.params.properties[key]?.enum
   return {
     id: rec.id,
@@ -699,7 +685,7 @@ function watched(): Set<string> {
     const current = live.filter((r) => isListed(r))
     const ids = new Set(selectWatched(current).kept.map((r) => r.id))
     for (const provider of new Set(current.map((r) => r.provider))) {
-      const mine = current.filter((r) => r.provider === provider && isRunnable(r.provider, r.modality))
+      const mine = current.filter((r) => r.provider === provider && isRunnable(r.provider, r.category))
       if (mine.filter((r) => ids.has(r.id)).length >= MIN_SHOWN) continue
       for (const r of [...mine].sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? "")).slice(0, FALLBACK_SHOWN)) ids.add(r.id)
     }
@@ -714,9 +700,9 @@ export function providerCounts(provider: string): { saved: number; offered: numb
   return { saved: live.filter((r) => r.provider === provider).length, offered: getListedModels().filter((r) => r.provider === provider).length }
 }
 
-/** True when the model is one the app still offers (on the watch-list, newest of its line, or added by hand). */
+/** True when the model is one the app still offers (in the standard database, on the watch-list, newest of its line, or added by hand). */
 export function isWatchedModel(id: string): boolean {
-  return watched().has(id) || custom.some((c) => c.id === id)
+  return databaseMedia.has(id) || watched().has(id) || custom.some((c) => c.id === id)
 }
 
 /** Keeps a model the person added. It is listed whatever the watch-list says. */
@@ -749,24 +735,26 @@ export function isCustomModel(id: string): boolean {
 }
 
 export function getListedModels(now = Date.now()): ModelRecord[] {
-  return live.filter((r) => keyed.has(r.provider) && PROVIDER_IDS.includes(r.provider) && isRunnable(r.provider, r.modality) && !r.utility && (r.custom || (isListed(r, now) && watched().has(r.id)))).map(withOverride).map(withJobs)
+  // Image, video and audio models are the standard database's (and the person's own); chat models still come from the providers' lists
+  const offered = (r: ModelRecord) => (r.category === "text" ? databaseMedia.has(r.id) || watched().has(r.id) : databaseMedia.has(r.id))
+  const all = live.filter((r) => keyed.has(r.provider) && PROVIDER_IDS.includes(r.provider) && isRunnable(r.provider, r.category) && !r.utility && (r.custom || (isListed(r, now) && offered(r)))).map(withOverride).map(withServes)
+  // The top makers only, the newest five of each in each category
+  return topMakersOnly(all)
 }
 
 export function getRecord(id: string): ModelRecord | undefined {
   const r = live.find((x) => x.id === id) ?? utility.find((x) => x.id === id)
-  return r ? withJobs(withOverride(r)) : undefined
+  return r ? withServes(withOverride(r)) : undefined
 }
 
 /** Every model the AI tools can look through: the live registry and the utility models */
 export function getToolRecords(): ModelRecord[] {
   const have = new Set(live.map((r) => r.id))
-  return [...live.map(withJobs), ...utility.filter((r) => !have.has(r.id))]
+  return [...live.map(withServes), ...utility.filter((r) => !have.has(r.id))]
 }
 
-/** Resolve an AIModel for any id, including live-only models the legacy catalog has never heard of. */
+/** The AIModel shape of any model the registry or the standard database knows; undefined for an id neither knows. */
 export function resolveAIModel(id: string): AIModel | undefined {
-  const legacy = getAllModels().find((m) => m.id === id)
-  if (legacy) return legacy
   const rec = live.find((r) => r.id === id) ?? utility.find((r) => r.id === id)
   return rec ? toAIModel(rec) : undefined
 }
@@ -862,7 +850,7 @@ export async function unlockProvider(provider: string, key: string): Promise<voi
       emit()
       // Prices come from each model's page, read for every model so none is left blank
       {
-        const targets = live.filter((r) => r.provider === "replicate" && (r.price.amount === null || (r.price.source === "scraped" && r.price.fetchedAt < PRICE_READER_DATE)))
+        const targets = live.filter((r) => r.provider === "replicate" && !pricedByDatabase(r.id) && (r.price.amount === null || (r.price.source === "scraped" && r.price.fetchedAt < PRICE_READER_DATE)))
         let next = 0
         let done = 0
         await Promise.all(
@@ -885,7 +873,7 @@ export async function unlockProvider(provider: string, key: string): Promise<voi
       markChecked(provider)
       setUnlock(provider, { state: "done", count: live.filter((r) => r.provider === "replicate").length, message: `${result.records.length} models loaded${result.unchanged > 0 ? `, ${result.records.length - result.unchanged} new or updated` : ""}${(() => {
           const mine = live.filter((r) => r.provider === "replicate")
-          const n = (m: string) => mine.filter((r) => r.modality === m).length
+          const n = (m: string) => mine.filter((r) => r.category === m).length
           return ` (${n("text")} chat, ${n("image")} image, ${n("video")} video, ${n("audio")} audio) · ${mine.filter((r) => r.price.amount !== null).length} with prices`
         })()}` })
       return
@@ -903,7 +891,7 @@ export async function unlockProvider(provider: string, key: string): Promise<voi
 
     if (provider === "fal") {
       setUnlock(provider, { state: "loading", message: "Reading prices with your key" })
-      const missing = live.filter((r) => r.provider === "fal" && isListed(r) && r.price.amount === null)
+      const missing = live.filter((r) => r.provider === "fal" && isListed(r) && r.price.amount === null && !pricedByDatabase(r.id))
       if (missing.length > 0) {
         try {
           const priced = await fetchFalPricing(missing, key)

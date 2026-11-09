@@ -19,16 +19,18 @@ import type { ModelRecord, RefSummary } from "./types"
 const TASK_WORDS = new Set(["t2v", "i2v", "r2v", "v2v", "reference", "videoedit", "img2vid", "txt2vid"])
 
 /** The model with its task taken out of the name. The same for all of a provider's versions of one model. */
-export function familyKey(record: Pick<ModelRecord, "endpoint" | "provider" | "modality">): string {
+export function familyKey(record: Pick<ModelRecord, "endpoint" | "provider" | "category" | "versionId">): string {
+  // The standard database says which one model an endpoint is: all its task endpoints and quality tiers are one family
+  if (record.versionId) return `${record.provider}|${record.category}|${record.versionId}`
   const words = tokensOf(record.endpoint.replace(/[/_]/g, " ")).filter((t) => !TASK_WORDS.has(t))
-  return `${record.provider}|${record.modality}|${[...new Set(words)].sort().join(" ")}`
+  return `${record.provider}|${record.category}|${[...new Set(words)].sort().join(" ")}`
 }
 
 /** Editing a file is a different job from making one, so it does not lend its settings to the model's rows. */
 const EDITS = new Set<Task>(["video-edit", "audio-edit"])
 /** Some providers file an editing model under a making task, so its name is read as well ("wan-2.7-videoedit") */
 const EDIT_NAME = /(^|[/-])(video-?edit|edit-video|v2v)($|[/-])/i
-export const isEditTask = (record: Pick<ModelRecord, "modality" | "task" | "endpoint">): boolean => EDITS.has(taskOf(record)) || (record.modality !== "image" && EDIT_NAME.test(record.endpoint))
+export const isEditTask = (record: Pick<ModelRecord, "category" | "task" | "endpoint">): boolean => EDITS.has(taskOf(record)) || (record.category !== "image" && EDIT_NAME.test(record.endpoint))
 
 /** The model's versions at one provider, including this one: the same model made for the other tasks. */
 export function familyOf(record: ModelRecord, pool: ModelRecord[]): ModelRecord[] {
@@ -69,3 +71,36 @@ export const familyHasMultiShot = (members: ModelRecord[]): boolean => members.s
 
 /** True when any version in the family lets the person choose a seed. */
 export const familyHasSeed = (members: ModelRecord[]): boolean => members.some((m) => "seed" in m.params.properties)
+
+/** Tiers in the order a row stands for them: the model as published, then its best quality */
+const TIER_ORDER = ["", "pro", "4k", "master", "standard", "std"]
+
+/**
+ * One row per model version, for the pickers. A version's text, image, reference and edit endpoints and its quality tiers are one model,
+ * so a provider shows it once. The row is the endpoint that works from words alone at the version's own quality; the others stay its
+ * family, which the composer switches to when a file needs them. Records the standard database does not know are kept as they are.
+ */
+export function versionRows(list: ModelRecord[]): ModelRecord[] {
+  const rank = (r: ModelRecord) => [Number(isEditTask(r)), Number(Boolean(r.task) && !r.task!.startsWith("text-to")), Math.max(0, TIER_ORDER.indexOf(r.tier ?? "")), r.endpoint.length]
+  const better = (a: ModelRecord, b: ModelRecord) => {
+    const x = rank(a)
+    const y = rank(b)
+    for (let i = 0; i < x.length; i++) if (x[i] !== y[i]) return x[i]! < y[i]!
+    return false
+  }
+  const held = new Map<string, number>()
+  const out: ModelRecord[] = []
+  for (const r of list) {
+    if (!r.versionId) {
+      out.push(r)
+      continue
+    }
+    const key = familyKey(r)
+    const at = held.get(key)
+    if (at === undefined) {
+      held.set(key, out.length)
+      out.push(r)
+    } else if (better(r, out[at]!)) out[at] = r
+  }
+  return out
+}

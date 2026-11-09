@@ -1,17 +1,25 @@
 import { AiToolPanel } from "@/components/ai-tools/ai-tool-panel"
 import { useToolHost } from "@/components/ai-tools/tool-host"
 import { downloadMedia } from "@/lib/library/download"
+import { useEditSession } from "@/components/editor/media-editor"
+import { PicturePopup } from "./picture-popup"
+import { makeGif, saveFrame } from "@/lib/media/export-helpers"
 import * as React from "react"
+import { createPortal } from "react-dom"
+import { closeWindow, inDesktopApp, minimizeWindow, toggleMaximizeWindow } from "@/lib/window"
 import {
   X,
+  Minus,
+  Square,
   Info,
   Edit3,
-  MessageSquare,
   Copy,
   Check,
   Share2,
   MoreHorizontal,
   Download,
+  Camera,
+  Film,
   Heart,
   RotateCw,
   Sparkles,
@@ -41,7 +49,6 @@ import {
   ArrowRight,
   PictureInPicture,
   Sliders,
-  Send,
   Eye,
   EyeOff,
   CheckCircle2,
@@ -79,6 +86,8 @@ export interface DetailMediaItem {
   createdAt?: string
   authorName?: string
   authorAvatar?: string
+  /** What the run cost, as the Library shows it */
+  cost?: string
   status?: "completed" | "generating" | "failed"
   activity?: "generated" | "uploaded" | "liked" | "downloaded"
   error?: string
@@ -99,6 +108,8 @@ interface MediaDetailModalProps {
   editActions?: EditAction[]
   /** Starts one of those actions: the video goes to the composer with the model that does it */
   onEdit?: (item: DetailMediaItem, action: EditAction) => void
+  /** Deletes the item (the Library asks first) */
+  onDelete?: (item: DetailMediaItem) => void
 }
 
 interface DecomposedLayer {
@@ -109,21 +120,31 @@ interface DecomposedLayer {
   thumbnailUrl: string
 }
 
-export function MediaDetailModal({
+/** Mounts the popup only while it is open, so its hooks (the edit session among them) always run in the same order and start fresh for each item */
+export function MediaDetailModal(props: MediaDetailModalProps) {
+  if (!props.open || !props.item) return null
+  return <MediaDetailModalBody key={props.item.id} {...props} />
+}
+
+function MediaDetailModalBody({
   item,
-  open,
   onClose,
   onTurnToVideo,
   onRecreate,
   onUseAsReference,
   editActions = [],
   onEdit,
+  onDelete,
 }: MediaDetailModalProps) {
-  if (!open || !item) return null
+  if (!item) return null
 
   // Tabs: 'info' | 'edit' | 'comments'
-  const [activeTab, setActiveTab] = React.useState<"info" | "edit" | "comments">("info")
+  const [activeTab, setActiveTab] = React.useState<"info" | "edit">("info")
   const toolHost = useToolHost()
+  // A picture's Edit tab: versions, zoom, the bar below the picture and the options on the right, all inside this popup
+  const session = useEditSession(item, toolHost)
+  const pictureEdit = item.type === "image" && Boolean(item.url) && Boolean(toolHost)
+  const [pictureTab, setPictureTab] = React.useState<"details" | "edit">("details")
   const [isCopied, setIsCopied] = React.useState(false)
   const [isLiked, setIsLiked] = React.useState(item.activity === "liked")
   const [showFullPrompt, setShowFullPrompt] = React.useState(false)
@@ -137,6 +158,42 @@ export function MediaDetailModal({
   const [isMuted, setIsMuted] = React.useState(false)
   const [isFullscreen, setIsFullscreen] = React.useState(false)
   const videoRef = React.useRef<HTMLVideoElement>(null)
+  const [clipBusy, setClipBusy] = React.useState<"frame" | "gif" | null>(null)
+  // A still at the playhead, or three seconds from it as a GIF; the result goes to the Library like any other
+  const clipJob = async (kind: "frame" | "gif") => {
+    if (!item?.url || !toolHost) return
+    setClipBusy(kind)
+    try {
+      const at = videoRef.current?.currentTime ?? 0
+      const blob = kind === "frame" ? await saveFrame(item.url, at) : await makeGif(item.url, at)
+      const url = URL.createObjectURL(blob)
+      toolHost.onAssets([
+        {
+          id: `${kind}-${Date.now()}`,
+          batchId: `${kind}-${Date.now()}`,
+          type: "image",
+          title: `${kind === "frame" ? "Frame" : "GIF"}: ${item.title}`,
+          prompt: item.prompt ?? "",
+          url,
+          thumbnailUrl: url,
+          aspectRatio: item.aspectRatio ?? "16:9",
+          model: kind === "frame" ? "Save frame" : "Make GIF",
+          provider: "device" as never,
+          createdAt: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          status: "completed",
+          source: "generated",
+          cost: "",
+          params: { from: item.title, at },
+        },
+      ])
+      setEditFeedbackMessage(kind === "frame" ? "Frame saved to your Library." : "GIF saved to your Library.")
+    } catch (e) {
+      setEditFeedbackMessage(e instanceof Error ? e.message : "That did not work.")
+    } finally {
+      setClipBusy(null)
+      setTimeout(() => setEditFeedbackMessage(null), 5000)
+    }
+  }
 
   // Image zoom and canvas states
   const [zoomLevel, setZoomLevel] = React.useState<number>(100)
@@ -303,18 +360,43 @@ export function MediaDetailModal({
   }
 
   const authorName = item.authorName || "You"
-  const authorAvatar = item.authorAvatar || "/author_avatar.png"
 
-  return (
-    /* TRUE FULL POPUP: Edge-to-edge covering the entire viewport */
+  if (pictureEdit) {
+    return createPortal(
+      <PicturePopup item={item} session={session} tab={pictureTab} onTab={setPictureTab} onClose={onClose} onTurnToVideo={onTurnToVideo} onRecreate={onRecreate} onUseAsReference={onUseAsReference} onDelete={onDelete} />,
+      document.body,
+    )
+  }
+
+  // The popup covers the whole window, the app's top bar included: it is drawn on the page itself, above everything, with its own strip
+  // for moving the window and the window buttons
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 w-screen h-screen pt-12 bg-background text-foreground flex flex-col md:flex-row overflow-hidden select-none animate-fade-in"
+      className="fixed inset-0 z-[60] w-screen h-screen bg-background text-foreground flex flex-col md:flex-row overflow-hidden select-none animate-fade-in"
       onClick={(e) => e.stopPropagation()}
     >
+      <div data-tauri-drag-region className="absolute inset-x-0 top-0 z-50 flex h-8 items-center justify-end gap-1 px-2">
+        <Button type="button" variant="ghost" onClick={onClose} className="h-6 w-6 p-0 text-muted-foreground" title="Close" aria-label="Close popup">
+          <X className="h-3.5 w-3.5" />
+        </Button>
+        {inDesktopApp() && (
+          <div className="ml-1 flex items-center gap-0.5 border-l border-border/60 pl-1.5">
+            <Button type="button" variant="ghost" onClick={minimizeWindow} className="h-6 w-6 p-0 text-muted-foreground" title="Minimize" aria-label="Minimize">
+              <Minus className="h-3 w-3" />
+            </Button>
+            <Button type="button" variant="ghost" onClick={toggleMaximizeWindow} className="h-6 w-6 p-0 text-muted-foreground" title="Maximize" aria-label="Maximize">
+              <Square className="h-2.5 w-2.5" />
+            </Button>
+            <Button type="button" variant="ghost" onClick={closeWindow} className="h-6 w-6 p-0 text-muted-foreground" title="Close the app" aria-label="Close the app">
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
+        )}
+      </div>
       {/* ======================================================== */}
       {/* LEFT / CENTER: MEDIA CANVAS & CONTROLS                   */}
       {/* ======================================================== */}
-      <div className="flex-1 relative flex flex-col justify-between items-center bg-background/60 overflow-hidden p-4 md:p-6 min-h-0">
+      <div className="flex-1 relative flex flex-col justify-between items-center bg-background/60 overflow-hidden p-4 pt-10 md:p-6 md:pt-10 min-h-0">
         {/* Top Feedback / Processing Toast */}
         {editFeedbackMessage && (
           <div className="absolute top-4 z-40 bg-card text-card-foreground border border-border px-4 py-2 rounded-xl shadow-xl animate-fade-in flex items-center gap-2 text-xs font-medium">
@@ -746,38 +828,10 @@ export function MediaDetailModal({
       {/* ======================================================== */}
       {/* RIGHT SIDEBAR: PROMPT, DETAILS, ACTIONS, CAPABILITIES    */}
       {/* ======================================================== */}
-      <div className="w-full md:w-96 lg:w-96 shrink-0 h-full bg-card border-t md:border-t-0 md:border-l border-border flex flex-col justify-between p-5 overflow-y-auto">
+      <div className="w-full md:w-96 lg:w-96 shrink-0 h-full bg-card border-t md:border-t-0 md:border-l border-border flex flex-col justify-between p-5 pt-10 overflow-y-auto">
         <div className="space-y-4">
-          {/* 1. Header: Author Avatar + Name + Close Button */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-full overflow-hidden bg-secondary border border-border flex items-center justify-center shrink-0">
-                <img
-                  src={authorAvatar}
-                  alt="Author"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div>
-                <div className="text-xs font-semibold text-foreground">
-                  {authorName}
-                </div>
-                <div className="text-xs text-muted-foreground">Author</div>
-              </div>
-            </div>
-
-            <Button variant="ghost"
-              type="button"
-              onClick={onClose}
-              className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer"
-              title="Close"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-
           {/* 2. Segmented Tab Switcher: [ Info | Edit | Comments ] */}
-          <div className="grid grid-cols-3 gap-1 bg-secondary/60 p-1 rounded-xl border border-border/40">
+          <div className="grid grid-cols-2 gap-1 bg-secondary/60 p-1 rounded-xl border border-border/40">
             <Button variant="ghost"
               type="button"
               onClick={() => {
@@ -807,21 +861,6 @@ export function MediaDetailModal({
               <span>Edit</span>
             </Button>
 
-            <Button variant="ghost"
-              type="button"
-              onClick={() => {
-                setActiveTab("comments")
-                setSelectedToolId(null)
-              }}
-              className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                activeTab === "comments"
-                  ? "bg-card text-foreground font-semibold shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <MessageSquare className="h-3.5 w-3.5" />
-              <span>Comments</span>
-            </Button>
           </div>
 
           {/* ==================================================== */}
@@ -912,30 +951,25 @@ export function MediaDetailModal({
 
                 {detailsOpen && (
                   <div className="space-y-1.5 text-xs animate-fade-in">
-                    <div className="flex items-center justify-between py-1">
-                      <span className="text-muted-foreground">Model</span>
-                      <span className="font-mono text-foreground font-medium">
-                        {item.model || "Unknown"}
-                      </span>
-                    </div>
-                    {item.quality && (
-                      <div className="flex items-center justify-between py-1">
-                        <span className="text-muted-foreground">Quality</span>
-                        <span className="font-mono text-foreground font-medium">{item.quality}</span>
-                      </div>
-                    )}
-                    {item.bitrate && (
-                      <div className="flex items-center justify-between py-1">
-                        <span className="text-muted-foreground">Bitrate</span>
-                        <span className="font-mono text-foreground font-medium">{item.bitrate}</span>
-                      </div>
-                    )}
-                    {(item.size || item.aspectRatio) && (
-                      <div className="flex items-center justify-between py-1">
-                        <span className="text-muted-foreground">Size</span>
-                        <span className="font-mono text-foreground font-medium">{item.size || item.aspectRatio}</span>
-                      </div>
-                    )}
+                    {(
+                      [
+                        ["Author", authorName],
+                        ["Model", item.model || "Unknown"],
+                        ["Provider", item.provider],
+                        ["Cost", item.cost],
+                        ["Quality", item.quality],
+                        ["Bitrate", item.bitrate],
+                        ["Size", item.size || item.aspectRatio],
+                        ["Length", item.duration ? `${Math.round(item.duration)} s` : undefined],
+                      ] as Array<[string, string | undefined]>
+                    )
+                      .filter(([, v]) => Boolean(v))
+                      .map(([label, value]) => (
+                        <div key={label} className="flex items-center justify-between py-1">
+                          <span className="text-muted-foreground">{label}</span>
+                          <span className="font-mono text-foreground font-medium">{value}</span>
+                        </div>
+                      ))}
                     <div className="flex items-center justify-between py-1">
                       <span className="text-muted-foreground">Created</span>
                       <span className="font-mono text-muted-foreground text-xs">
@@ -963,7 +997,7 @@ export function MediaDetailModal({
                       className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
                     >
                       <ChevronLeft className="h-3.5 w-3.5" />
-                      <span>All Tools</span>
+                      <span>All edits</span>
                     </Button>
                     <span className="text-xs font-mono text-muted-foreground uppercase font-semibold">
                       {item.model || "Neural Model"}
@@ -1477,38 +1511,6 @@ export function MediaDetailModal({
           {/* ==================================================== */}
           {/* TAB 3: COMMENTS                                      */}
           {/* ==================================================== */}
-          {activeTab === "comments" && (
-            <div className="space-y-3 animate-fade-in text-xs">
-              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Production Notes
-              </div>
-              <div className="space-y-2.5">
-                <div className="bg-secondary/40 p-3 rounded-xl border border-border space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-foreground">Director AI</span>
-                    <span className="text-xs text-muted-foreground">2h ago</span>
-                  </div>
-                  <p className="text-muted-foreground text-xs leading-relaxed">
-                    Subject lighting and wardrobe continuity verified across camera angles. Ready for sequence generation.
-                  </p>
-                </div>
-              </div>
-
-              <div className="pt-2 flex gap-2">
-                <Input
-                  type="text"
-                  placeholder="Add comment..."
-                  className="flex-1 bg-secondary/60 text-xs px-3 py-2 rounded-xl border border-border text-foreground placeholder:text-muted-foreground"
-                />
-                <Button variant="ghost"
-                  type="button"
-                  className="px-3 py-2 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 cursor-pointer transition-colors"
-                >
-                  <Send className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* ==================================================== */}
@@ -1593,6 +1595,45 @@ export function MediaDetailModal({
             </>
           )}
 
+          {/* A still or a short GIF from this clip, made in the app with no model; saved to the Library */}
+          {item.type === "video" && item.url && toolHost && (
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <Button
+                variant="ghost"
+                type="button"
+                disabled={clipBusy !== null}
+                onClick={() => void clipJob("frame")}
+                className="h-9 rounded-xl border border-border/60 bg-secondary text-xs font-medium text-secondary-foreground hover:bg-secondary/80"
+              >
+                <Camera className="h-3.5 w-3.5" />
+                <span>{clipBusy === "frame" ? "Saving…" : "Save frame"}</span>
+              </Button>
+              <Button
+                variant="ghost"
+                type="button"
+                disabled={clipBusy !== null}
+                onClick={() => void clipJob("gif")}
+                className="h-9 rounded-xl border border-border/60 bg-secondary text-xs font-medium text-secondary-foreground hover:bg-secondary/80"
+              >
+                <Film className="h-3.5 w-3.5" />
+                <span>{clipBusy === "gif" ? "Making…" : "Make GIF"}</span>
+              </Button>
+            </div>
+          )}
+
+          {/* The clip in the timeline editor: cut, trim and finish it */}
+          {item.type === "video" && item.url && toolHost?.onOpenInVideoEdit && (
+            <Button
+              variant="ghost"
+              type="button"
+              onClick={() => toolHost.onOpenInVideoEdit!({ url: item.url, name: item.title, seconds: videoRef.current?.duration || item.duration })}
+              className="h-9 w-full rounded-xl border border-border/60 bg-secondary text-xs font-medium text-secondary-foreground hover:bg-secondary/80"
+            >
+              <Scissors className="h-3.5 w-3.5" />
+              <span>Open in Video Edit</span>
+            </Button>
+          )}
+
           {/* BOTTOM UTILITY ROW: Download, Heart, Share, More (Our Design Tokens) */}
           <div className="flex items-center gap-2 pt-1">
             <Button variant="ghost"
@@ -1648,6 +1689,7 @@ export function MediaDetailModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

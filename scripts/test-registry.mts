@@ -77,7 +77,7 @@ function check(label: string, ok: boolean, detail?: unknown) {
   check("version order", compareVersions([2, 6], [3]) < 0 && compareVersions([1, 1], [1]) > 0)
 
   const rec = (id: string, name: string, extra: Partial<ModelRecord> = {}): ModelRecord => ({
-    id: `fal/${id}`, endpoint: id, provider: "fal", route: "aggregator", name, family: id, logoKey: "fal", modality: "video",
+    id: `fal/${id}`, endpoint: id, provider: "fal", route: "aggregator", name, family: id, logoKey: "fal", category: "video",
     inputs: ["text"], params: { type: "object", properties: {} }, price: { unit: "unknown", amount: null, source: "estimate", fetchedAt: "" },
     status: "active", task: "text-to-video", ...extra,
   })
@@ -183,11 +183,11 @@ function check(label: string, ok: boolean, detail?: unknown) {
   const text = mapOpenRouterModel({ id: "anthropic/claude-haiku-5.5", name: "Anthropic: Claude Haiku 5.5", architecture: { input_modalities: ["text"], output_modalities: ["text"] }, pricing: { prompt: "0.0000001", completion: "0.0000005" } }, "")
   check("openrouter speech and transcription models are read as audio, with the voice list and the audio input", () => {
   const tts = mapOpenRouterModel({ id: "mistralai/voxtral-mini-tts-3-0", name: "Mistral: Voxtral TTS 3", architecture: { input_modalities: ["text"], output_modalities: ["speech"] }, pricing: { prompt: "0.000013", completion: "0" }, supported_voices: ["a", "b"] } as never, "")
-  assert.equal(tts?.modality, "audio")
+  assert.equal(tts?.category, "audio")
   assert.equal(tts?.task, "text-to-speech")
   assert.deepEqual(tts?.params.properties.voice?.enum, ["a", "b"])
   const stt = mapOpenRouterModel({ id: "mistralai/voxtral-mini-transcribe-3-0", name: "Mistral: Voxtral Mini Transcribe 3", architecture: { input_modalities: ["audio"], output_modalities: ["transcription"] }, pricing: { prompt: "0.0000666667", completion: "0" } } as never, "")
-  assert.equal(stt?.modality, "audio")
+  assert.equal(stt?.category, "audio")
   assert.equal(stt?.task, "speech-to-text")
   assert.equal(stt?.params.properties.audio?.format, "audio")
 })
@@ -204,7 +204,7 @@ check("openrouter text: input and output per 1M", text?.price.unit === "per_1m_t
   if (tokens) check("image token cost is left open, not guessed", estimateRun(tokens, {}).usd === null)
 
   const mixed = mapOpenRouterModel({ id: "google/nano-banana-2.1", name: "Google: Nano Banana 2.1", architecture: { input_modalities: ["text", "image"], output_modalities: ["image", "text"] }, pricing: { prompt: "0.0000015", completion: "0.0000075", image_output: "0.00003" } }, "")
-  check("openrouter: a model that outputs images is an image model", mixed?.modality === "image" && Math.abs((mixed.price.amount ?? 0) - 30) < 1e-9, mixed?.price)
+  check("openrouter: a model that outputs images is an image model", mixed?.category === "image" && Math.abs((mixed.price.amount ?? 0) - 30) < 1e-9, mixed?.price)
 
   const router = mapOpenRouterModel({ id: "openrouter/auto", name: "Auto Router", architecture: { input_modalities: ["text"], output_modalities: ["text", "image"] }, pricing: { prompt: "-1", completion: "-1" } }, "")
   check("openrouter: routers have no price and are skipped", router === null)
@@ -282,11 +282,11 @@ check("openrouter text: input and output per 1M", text?.price.unit === "per_1m_t
   const image = { ...llm, name: "some-image", latest_version: { ...llm.latest_version, openapi_schema: { components: { schemas: { Input: { type: "object", properties: {} }, Output: { type: "string", format: "uri" } } } } } }
   check("replicate output: concatenated text is a language model", outputKind(llm) === "text")
   check("replicate output: uri is a file", outputKind(image) === "file")
-  const rec = recordFromReplicate(llm, { modality: "image", task: "text-to-image" }, "2026-01-01T00:00:00Z")
-  check("replicate: a language model in any collection becomes a chat model", rec?.modality === "text" && rec.id === "replicate/meta/meta-llama-3-70b-instruct", rec)
-  const filed = recordFromReplicate(image, { modality: "text", task: "text" }, "x")
-  check("replicate: a media model in the chat collection is not a chat model, it is sorted by what it says it is", filed?.modality === "image", filed?.modality)
-  check("replicate: a media model that says nothing about itself is left out", recordFromReplicate({ ...image, name: "thing", description: "A useful model" }, { modality: "text", task: "text" }, "x") === null)
+  const rec = recordFromReplicate(llm, { category: "image", task: "text-to-image" }, "2026-01-01T00:00:00Z")
+  check("replicate: a language model in any collection becomes a chat model", rec?.category === "text" && rec.id === "replicate/meta/meta-llama-3-70b-instruct", rec)
+  const filed = recordFromReplicate(image, { category: "text", task: "text" }, "x")
+  check("replicate: a media model in the chat collection is not a chat model, it is sorted by what it says it is", filed?.category === "image", filed?.category)
+  check("replicate: a media model that says nothing about itself is left out", recordFromReplicate({ ...image, name: "thing", description: "A useful model" }, { category: "text", task: "text" }, "x") === null)
 
   const tokens = parseReplicatePrice(
     `{"billingConfig": {"current_tiers": [{"prices": [{"metric": "input_token_count", "price": "$0.65", "title": "per million input tokens"}, {"metric": "output_token_count", "price": "$2.75", "title": "per million output tokens"}]}]}}`,
@@ -393,15 +393,15 @@ check("openrouter text: input and output per 1M", text?.price.unit === "per_1m_t
 }
 
 // tasks: the three video tasks are told apart
-check("tasks: image-to-video, reference-to-video and text-to-video are told apart", taskOf({ modality: "video", task: "image-to-video", endpoint: "a/b/image-to-video" }) === "image-to-video" && taskOf({ modality: "video", task: "text-to-video", endpoint: "alibaba/wan-3.0/reference-to-video" }) === "reference-to-video" && taskOf({ modality: "video", task: "text-to-video", endpoint: "a/b/text-to-video" }) === "text-to-video")
+check("tasks: image-to-video, reference-to-video and text-to-video are told apart", taskOf({ category: "video", task: "image-to-video", endpoint: "a/b/image-to-video" }) === "image-to-video" && taskOf({ category: "video", task: "text-to-video", endpoint: "alibaba/wan-3.0/reference-to-video" }) === "reference-to-video" && taskOf({ category: "video", task: "text-to-video", endpoint: "a/b/text-to-video" }) === "text-to-video")
 
 // watch-list: only supported makers, newest first, one model offered by two providers counts once
 {
-  const rec = (id: string, provider: string, modality: ModelRecord["modality"], version?: number[], updatedAt?: string) => ({ id: `${provider}/${id}`, endpoint: id, provider, modality, version, updatedAt }) as unknown as ModelRecord
-  check("watch-list: Wan, Kling, Claude and FLUX endpoints are recognised", lineOf({ endpoint: "wan/v2.6/image-to-video", modality: "video" })?.id === "wan" && lineOf({ endpoint: "fal-ai/kling-video/v3/pro/text-to-video", modality: "video" })?.id === "kling" && lineOf({ endpoint: "anthropic/claude-sonnet-5.5", modality: "text" })?.id === "chat-anthropic" && lineOf({ endpoint: "fal-ai/flux-2-pro", modality: "image" })?.id === "flux")
-  check("watch-list: a LoRA adapter or batch copy is not a model of the line", lineOf({ endpoint: "fal-ai/wan-t2v-lora", modality: "video" }) === undefined && lineOf({ endpoint: "openai/gpt-6.1-sol:batch", modality: "text" }) === undefined)
-  check("watch-list: an unknown maker is left out", lineOf({ endpoint: "fal-ai/some-new-thing/text-to-video", modality: "video" }) === undefined)
-  check("watch-list: the same line in another kind of output does not match", lineOf({ endpoint: "wan/v2.6/image-to-video", modality: "image" })?.id !== "wan")
+  const rec = (id: string, provider: string, category: ModelRecord["category"], version?: number[], updatedAt?: string) => ({ id: `${provider}/${id}`, endpoint: id, provider, category, version, updatedAt }) as unknown as ModelRecord
+  check("watch-list: Wan, Kling, Claude and FLUX endpoints are recognised", lineOf({ endpoint: "wan/v2.6/image-to-video", category: "video" })?.id === "wan" && lineOf({ endpoint: "fal-ai/kling-video/v3/pro/text-to-video", category: "video" })?.id === "kling" && lineOf({ endpoint: "anthropic/claude-sonnet-5.5", category: "text" })?.id === "chat-anthropic" && lineOf({ endpoint: "fal-ai/flux-2-pro", category: "image" })?.id === "flux")
+  check("watch-list: a LoRA adapter or batch copy is not a model of the line", lineOf({ endpoint: "fal-ai/wan-t2v-lora", category: "video" }) === undefined && lineOf({ endpoint: "openai/gpt-6.1-sol:batch", category: "text" }) === undefined)
+  check("watch-list: an unknown maker is left out", lineOf({ endpoint: "fal-ai/some-new-thing/text-to-video", category: "video" }) === undefined)
+  check("watch-list: the same line in another kind of output does not match", lineOf({ endpoint: "wan/v2.6/image-to-video", category: "image" })?.id !== "wan")
   const pool = [rec("wan/v2.5/text-to-video", "fal", "video"), rec("wan/v2.7/text-to-video", "fal", "video"), rec("wan/v2.6/text-to-video", "fal", "video"), rec("fal-ai/other/text-to-video", "fal", "video")]
   const picked = selectWatched(pool)
   check("watch-list: newest version of a line comes first and strangers are reported", picked.kept[0]!.endpoint === "wan/v2.7/text-to-video" && picked.unmatched.length === 1, picked.kept.map((r) => r.endpoint))
@@ -453,22 +453,24 @@ check("license: a One Year key runs out after its last day, a Lifetime key never
 // picker badges: what the row shows under a model name, most important first, and nothing that is not known
 {
   const { rowChips, splitChips } = await import("../src/lib/registry/summary.ts")
-  const base = (snapshotJson as unknown as { models: ModelRecord[] }).models.find((m) => m.modality === "video")!
+  const base = (snapshotJson as unknown as { models: ModelRecord[] }).models.find((m) => m.category === "video")!
   const props = (extra: Record<string, unknown>) => ({ ...base.params, properties: { ...base.params.properties, ...extra } }) as ModelRecord["params"]
   const refs = (over: Record<string, unknown>) => ({ start: false, end: false, images: 0, videos: 0, audios: 0, elements: false, stated: true, ...over })
   const full = rowChips({ ...base, summary: { maxResolution: "4K", maxSeconds: 15, audio: true, refs: refs({ start: true, end: true, images: 9, videos: 3, audios: 3 }) } as ModelRecord["summary"], params: props({ resolution: { type: "string", enum: ["480p", "1080p", "4k"] }, duration: { type: "number", enum: [5, 10, 15] } }) })
-  check("chips: exact and in order of importance", full.slice(0, 5).join("|") === "Start/End|9 refs|480p-4K|5-15s|Audio" && full.slice(5).join("|") === "Video refs|Audio refs|Seed", full)
+  check("chips: exact and in order of importance", full.slice(0, 5).join("|") === "Start frame|End frame|References|480p-4K|5-15s" && full.slice(5).join("|") === "With audio|Video in|Audio in|Seed|Enhance realism", full)
   check("chips: no task label and no No audio chip", !full.some((c) => /image|text|no audio/i.test(c)))
   const { shown, more } = splitChips(full)
-  check("chips: five stay on the row and the rest wait behind +N", shown.length === 5 && more.length === 3 && splitChips(shown).more.length === 0)
+  check("chips: five stay on the row and the rest wait behind +N", shown.length === 5 && more.length === 5 && splitChips(shown).more.length === 0)
   const one = rowChips({ ...base, summary: { maxResolution: "1080p", refs: refs({ start: true }) } as ModelRecord["summary"], params: props({ resolution: { type: "string", enum: ["1080p"] }, duration: { type: "number", enum: [8] } }) })
-  check("chips: one size and one length show as they are", one.join("|") === "Start|1080p|8s|Seed", one)
+  check("chips: one size and one length show as they are", one.join("|") === "Start frame|1080p|8s|Seed|Enhance realism", one)
   const top = rowChips({ ...base, summary: { maxSeconds: 30 } as ModelRecord["summary"], params: { type: "object", properties: { duration: { type: "number", maximum: 30 } } } as ModelRecord["params"] })
   check("chips: only a top length reads Up to", top.join("|") === "Up to 30s", top)
+  const settings = rowChips({ ...base, summary: undefined, params: props({ aspect_ratio: { type: "string" }, quality: { type: "string" }, output_format: { type: "string" }, image_url: { type: "string", format: "image" }, style_strength: { type: "number" } }) })
+  check("chips: settings show for any model, common first, the model's own next, plumbing last", settings.join("|") === "Seed|Resolution|Aspect|Quality|Enhance realism|Style strength|Output format", settings)
   const none = rowChips({ ...base, summary: undefined, params: { type: "object", properties: {} } })
   check("chips: nothing is shown for what is not known, and no run time before the first run", none.length === 0, none)
   const plain = rowChips({ ...base, summary: { refs: refs({ images: 1, stated: false }) } as ModelRecord["summary"], params: { type: "object", properties: {} } })
-  check("chips: an unstated reference limit reads Refs", plain.join("|") === "Refs", plain)
+  check("chips: reference pictures read References", plain.join("|") === "References", plain)
 }
 
 console.log(failed === 0 ? `all ${passed} checks passed` : `${failed} failed, ${passed} passed`)

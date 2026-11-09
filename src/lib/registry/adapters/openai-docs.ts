@@ -1,4 +1,4 @@
-import type { ModelRecord, ParamSchema, RegistryModality } from "../types"
+import type { ModelRecord, ParamSchema, AppCategory } from "../types"
 import { withReferenceSlot } from "../ref-limits"
 import { isOutdatedDescription } from "../lifecycle"
 import { summarize } from "../summary"
@@ -186,23 +186,23 @@ const TTS_PARAMS = (id: string): ParamSchema => {
 const EXCLUDE_NAME =
   /codex|cyber|daybreak|computer-use|search|deep-research|realtime|live|moderation|embedding|oss|babbage|davinci|translate|diarize|audio-preview|^gpt-audio|chat-latest|chatgpt|-chat|text-moderation/i
 
-function priceFor(modality: RegistryModality, d: OpenAIDetail, id: string, pricing: Map<string, string[]>): ModelRecord["price"] | null {
+function priceFor(category: AppCategory, d: OpenAIDetail, id: string, pricing: Map<string, string[]>): ModelRecord["price"] | null {
   const fetchedAt = new Date().toISOString()
   const find = (group: RegExp, metric: RegExp) => d.prices.find((p) => group.test(p.group) && metric.test(p.metric))
-  if (modality === "text") {
+  if (category === "text") {
     const input = find(/text/i, /^input$/i)
     const output = find(/text/i, /^output$/i)
     const cached = find(/text/i, /cached/i)
     if (input && output) return { unit: "per_1m_tokens", amount: input.amount, outputAmount: output.amount, ...(cached ? { cachedAmount: cached.amount } : {}), source: "scraped", fetchedAt }
   }
-  if (modality === "image") {
+  if (category === "image") {
     const out = find(/image/i, /^output$/i)
     if (out) return { unit: "per_1m_tokens", amount: out.amount, source: "scraped", fetchedAt }
     // Some model pages carry no price block; the pricing page has "| id | Image | input | cached | output |"
     const row = dollars(pricing.get(`${id}|image`)?.[2])
     if (row !== null) return { unit: "per_1m_tokens", amount: row, source: "scraped", fetchedAt }
   }
-  if (modality === "audio") {
+  if (category === "audio") {
     const minute = d.prices.find((p) => /minute/.test(p.unit))
     if (minute) return { unit: "per_minute", amount: minute.amount, source: "scraped", fetchedAt }
     const chars = d.prices.find((p) => /character/.test(p.unit)) ?? null
@@ -258,22 +258,22 @@ export function buildOpenAIRecords(
       continue
     }
     const e = detail.endpoints
-    let modality: RegistryModality | null = null
-    if (e["image generation"]) modality = "image"
-    else if (e["videos"]) modality = "video"
-    else if (e["speech generation"] || e["transcription"]) modality = "audio"
-    else if (e["responses"] || e["chat completions"]) modality = "text"
-    if (!modality) {
+    let category: AppCategory | null = null
+    if (e["image generation"]) category = "image"
+    else if (e["videos"]) category = "video"
+    else if (e["speech generation"] || e["transcription"]) category = "audio"
+    else if (e["responses"] || e["chat completions"]) category = "text"
+    if (!category) {
       skipped.push(item.id)
       continue
     }
 
     const transcribes = Boolean(e["transcription"]) && !e["speech generation"]
     const premium = /2\.5/.test(item.id)
-    const params: ParamSchema = modality === "image" ? IMAGE_PARAMS(premium) : modality === "audio" ? (transcribes ? TRANSCRIBE_PARAMS : TTS_PARAMS(item.id)) : { type: "object", properties: {} }
+    const params: ParamSchema = category === "image" ? IMAGE_PARAMS(premium) : category === "audio" ? (transcribes ? TRANSCRIBE_PARAMS : TTS_PARAMS(item.id)) : { type: "object", properties: {} }
     const dep = retire.get(item.id)
-    const summary = { ...summarize(modality, params, item.description), contextTokens: detail.contextTokens }
-    if (modality === "image") summary.maxResolution = "4K"
+    const summary = { ...summarize(category, params, item.description), contextTokens: detail.contextTokens }
+    if (category === "image") summary.maxResolution = "4K"
 
     records.push(withReferenceSlot({
       id: `openai/${item.id}`,
@@ -283,10 +283,10 @@ export function buildOpenAIRecords(
       family: item.id,
       logoKey: "openai",
       maker: "OpenAI",
-      modality,
+      category,
       inputs: detail.inputs.filter((i): i is "text" | "image" | "video" | "audio" => ["text", "image", "video", "audio"].includes(i)),
       params,
-      price: (transcribes ? transcriptionPrice(detail, fetchedAt) : undefined) ?? priceFor(modality, detail, item.id, pricing) ?? { unit: "unknown", amount: null, source: "estimate", fetchedAt },
+      price: (transcribes ? transcriptionPrice(detail, fetchedAt) : undefined) ?? priceFor(category, detail, item.id, pricing) ?? { unit: "unknown", amount: null, source: "estimate", fetchedAt },
       status: "active",
       description: item.description,
       retiresAt: dep?.shutdown,
@@ -294,7 +294,7 @@ export function buildOpenAIRecords(
       outdated: isOutdatedDescription(item.description),
       summary,
       updatedAt: detail.knowledgeCutoff ? new Date(detail.knowledgeCutoff).toISOString() : undefined,
-      task: modality === "image" ? "text-to-image" : modality === "audio" ? (transcribes ? "speech-to-text" : "text-to-speech") : undefined,
+      task: category === "image" ? "text-to-image" : category === "audio" ? (transcribes ? "speech-to-text" : "text-to-speech") : undefined,
     }))
   }
   return { records, skipped }

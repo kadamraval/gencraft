@@ -138,8 +138,8 @@ export function StoryOverview({ story, onUpdate, onOpenTab }: Props) {
   const [pickVideo, setPickVideo] = React.useState(false)
   const [chooseKind, setChooseKind] = React.useState<string | null>(null)
   const costTotal = spend.totalCostUsd
-  const videoShare = costTotal > 0 ? (spend.modalities.video.costUsd / costTotal) * 100 : 0
-  const costShown = costView === "video" ? spend.modalities.video.costUsd : costView === "image" ? spend.modalities.image.costUsd : costTotal
+  const videoShare = costTotal > 0 ? (spend.categories.video.costUsd / costTotal) * 100 : 0
+  const costShown = costView === "video" ? spend.categories.video.costUsd : costView === "image" ? spend.categories.image.costUsd : costTotal
 
   return (
     <div className="flex-1 overflow-y-auto no-scrollbar animate-fade-in">
@@ -300,11 +300,11 @@ export function StoryOverview({ story, onUpdate, onOpenTab }: Props) {
               <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-foreground/70" aria-hidden="true" />
-                  Video {money(spend.modalities.video.costUsd)}
+                  Video {money(spend.categories.video.costUsd)}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-foreground/30" aria-hidden="true" />
-                  Image {money(spend.modalities.image.costUsd)}
+                  Image {money(spend.categories.image.costUsd)}
                 </span>
               </div>
             </Section>

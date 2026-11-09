@@ -17,8 +17,8 @@ const check = (name: string, ok: boolean, extra = "") => {
   console.log(`${ok ? "PASS" : "FAIL"}  ${name} ${ok ? "" : extra}`)
   if (!ok) fails++
 }
-const rec = (endpoint: string, name: string, modality: ModelRecord["modality"] = "video", props: ModelRecord["params"]["properties"] = {}) =>
-  ({ id: `x/${endpoint}`, endpoint, name, modality, provider: "fal", params: { type: "object", properties: props } }) as ModelRecord
+const rec = (endpoint: string, name: string, category: ModelRecord["category"] = "video", props: ModelRecord["params"]["properties"] = {}) =>
+  ({ id: `x/${endpoint}`, endpoint, name, category, provider: "fal", params: { type: "object", properties: props } }) as ModelRecord
 
 // Profile matching: version numbers identical, variants kept apart
 check("2.5 matches its profile", profileFor(rec("bytedance/seedance-2.5/text-to-video", "Seedance 2.5 Text to Video"))?.id === "seedance-2.5")
@@ -146,7 +146,7 @@ check("hailuo 10 s is 768P", applyRules(hl.rules, sel({ values: { resolution: "1
 check("hailuo recipe puts the camera in a bracket", hl.recipe.shape!({ prompt: "slow push in on a cat", selection: sel() }) === "[Push in] slow push in on a cat")
 
 // Image and speech profiles
-const imgId = (endpoint: string, name: string, modality: ModelRecord["modality"] = "image") => profileFor(rec(endpoint, name, modality))?.id
+const imgId = (endpoint: string, name: string, category: ModelRecord["category"] = "image") => profileFor(rec(endpoint, name, category))?.id
 check("nano banana 2.1 and its edit", imgId("google/nano-banana-2.1", "Nano Banana 2.1") === "nano-banana-2.1" && imgId("google/nano-banana-2.1/edit", "Nano Banana 2.1 Edit") === "nano-banana-2.1")
 check("nano banana 2 and Pro are not 2.1", imgId("fal-ai/nano-banana-pro/edit", "Nano Banana Pro") === undefined && imgId("google/nano-banana-2-lite", "Nano Banana 2 Lite") === undefined)
 check("gpt image 2.5 sunburst", imgId("openai/gpt-image-2.5/sunburst/text-to-image", "GPT Image 2.5 Sunburst Text to Image") === "gpt-image-2.5")

@@ -18,14 +18,14 @@ const READ_ON = "2026-10-09"
 export const OFFICIAL_REFERENCE_LIMITS: OfficialLimit[] = [
   {
     // "You can provide up to 16 images." (GPT image models, image edit)
-    test: (r) => r.provider === "openai" && r.modality === "image" && /gpt-image/i.test(r.endpoint),
+    test: (r) => r.provider === "openai" && r.category === "image" && /gpt-image/i.test(r.endpoint),
     images: 16,
     source: "https://developers.openai.com/api/reference/python/resources/images/methods/edit",
     readOn: READ_ON,
   },
   {
     // "Mix up to 14 reference images to produce the final image." (Gemini image models)
-    test: (r) => r.modality === "image" && /gemini.*image|nano-banana/i.test(`${r.endpoint} ${r.name}`) && ["gemini", "openrouter"].includes(r.provider),
+    test: (r) => r.category === "image" && /gemini.*image|nano-banana/i.test(`${r.endpoint} ${r.name}`) && ["gemini", "openrouter"].includes(r.provider),
     images: 14,
     source: "https://ai.google.dev/gemini-api/docs/image-generation",
     readOn: READ_ON,
@@ -41,7 +41,7 @@ export function officialReferenceLimit(r: ModelRecord): OfficialLimit | undefine
  * The limit is the official one when the maker states it, otherwise it stays unstated (one image is used).
  */
 export function withReferenceSlot(rec: ModelRecord): ModelRecord {
-  if (rec.modality !== "image" || !rec.inputs.includes("image")) return rec
+  if (rec.category !== "image" || !rec.inputs.includes("image")) return rec
   if (Object.values(rec.params.properties).some((p) => p.slot)) return rec
   const official = officialReferenceLimit(rec)
   const slot: RefSlot = { kind: "image", role: "reference", list: true, max: official?.images ?? null }

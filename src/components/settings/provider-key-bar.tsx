@@ -39,10 +39,12 @@ interface Props {
   provider: Provider
   settings: SettingsState
   onSave: (settings: SettingsState) => void
+  /** Inside Settings the provider tab above already names the provider and shows its dot, so only the key row is drawn */
+  embedded?: boolean
 }
 
 /** One compact row: which provider, whether it is connected, the key, and a single Save that verifies and loads models. */
-export function ProviderKeyBar({ provider, settings, onSave }: Props) {
+export function ProviderKeyBar({ provider, settings, onSave, embedded = false }: Props) {
   useRegistry() // re-renders when key status or loading progress changes
   const saved = (settings.aiEngine[provider.keyField] as string | undefined) ?? ""
   const [draft, setDraft] = React.useState(saved)
@@ -123,7 +125,8 @@ export function ProviderKeyBar({ provider, settings, onSave }: Props) {
   const checkedAt = getLastChecked(provider.id)
 
   return (
-    <div className="space-y-2 rounded-xl border border-border/70 bg-card p-3">
+    <div className={cn("space-y-2", !embedded && "rounded-xl border border-border/70 bg-card p-3")}>
+      {!embedded && (
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
           <ModelLogo provider={provider.id} size={16} />
@@ -137,6 +140,7 @@ export function ProviderKeyBar({ provider, settings, onSave }: Props) {
           Get a key <ExternalLink className="h-3 w-3" />
         </a>
       </div>
+      )}
 
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
@@ -171,6 +175,18 @@ export function ProviderKeyBar({ provider, settings, onSave }: Props) {
               </Button>
             </TooltipTrigger>
             <TooltipContent>{`Check the live catalog and prices again${checkedAt ? ` · last checked ${ago(checkedAt)}, next ${until(nextCheckAt(provider.id))}` : ""}`}</TooltipContent>
+          </Tooltip>
+        )}
+        {embedded && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button type="button" variant="ghost" size="icon" asChild>
+                <a href={provider.keyUrl} target="_blank" rel="noopener noreferrer" aria-label="Get a key">
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Get a key</TooltipContent>
           </Tooltip>
         )}
       </div>

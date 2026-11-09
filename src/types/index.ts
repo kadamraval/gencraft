@@ -174,13 +174,13 @@ export interface ChatMessage {
   assets?: MediaAsset[]
 }
 
-export type GroupModality = "text" | "image" | "video" | "audio"
+export type GroupCategory = "text" | "image" | "video" | "audio"
 
 export interface ModelGroup {
   id: string
   name: string
   /** One model per kind of output, with the default options to use for it */
-  models: Partial<Record<GroupModality, { modelId: string; params?: Record<string, unknown> }>>
+  models: Partial<Record<GroupCategory, { modelId: string; params?: Record<string, unknown> }>>
   /** Roles beyond the four above that the person set by hand; the others follow the level automatically */
   extra?: Partial<Record<"image-edit" | "video-edit" | "speech" | "music" | "stt", string>>
   /** A model the person chose by hand for one AI tool, by tool id */

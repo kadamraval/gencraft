@@ -983,35 +983,35 @@ export function TitleBar({
               {/* Multi-segment mini distribution bar */}
               <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden flex border border-border/40">
                 <div
-                  style={{ width: `${hoverOverview.modalities.text.percentage}%` }}
+                  style={{ width: `${hoverOverview.categories.text.percentage}%` }}
                   className="h-full bg-purple-500 first:rounded-l-full last:rounded-r-full transition-all"
                 />
                 <div
-                  style={{ width: `${hoverOverview.modalities.image.percentage}%` }}
+                  style={{ width: `${hoverOverview.categories.image.percentage}%` }}
                   className="h-full bg-sky-500 first:rounded-l-full last:rounded-r-full transition-all"
                 />
                 <div
-                  style={{ width: `${hoverOverview.modalities.video.percentage}%` }}
+                  style={{ width: `${hoverOverview.categories.video.percentage}%` }}
                   className="h-full bg-emerald-500 first:rounded-l-full last:rounded-r-full transition-all"
                 />
                 <div
-                  style={{ width: `${hoverOverview.modalities.audio.percentage}%` }}
+                  style={{ width: `${hoverOverview.categories.audio.percentage}%` }}
                   className="h-full bg-pink-500 first:rounded-l-full last:rounded-r-full transition-all"
                 />
                 <div
-                  style={{ width: `${hoverOverview.modalities.embedded.percentage}%` }}
+                  style={{ width: `${hoverOverview.categories.embedding.percentage}%` }}
                   className="h-full bg-amber-500 first:rounded-l-full last:rounded-r-full transition-all"
                 />
               </div>
 
-              {/* Row 3+: Modality Breakdown */}
+              {/* Row 3+: Category Breakdown */}
               <div className="space-y-1.5 pt-0.5">
                 {[
-                  { label: "Text", stat: hoverOverview.modalities.text, dotClass: "bg-purple-500" },
-                  { label: "Image", stat: hoverOverview.modalities.image, dotClass: "bg-sky-500" },
-                  { label: "Video", stat: hoverOverview.modalities.video, dotClass: "bg-emerald-500" },
-                  { label: "Audio", stat: hoverOverview.modalities.audio, dotClass: "bg-pink-500" },
-                  { label: "Embeded", stat: hoverOverview.modalities.embedded, dotClass: "bg-amber-500" },
+                  { label: "Text", stat: hoverOverview.categories.text, dotClass: "bg-purple-500" },
+                  { label: "Image", stat: hoverOverview.categories.image, dotClass: "bg-sky-500" },
+                  { label: "Video", stat: hoverOverview.categories.video, dotClass: "bg-emerald-500" },
+                  { label: "Audio", stat: hoverOverview.categories.audio, dotClass: "bg-pink-500" },
+                  { label: "Embedding", stat: hoverOverview.categories.embedding, dotClass: "bg-amber-500" },
                 ].map((m) => (
                   <div key={m.label} className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">

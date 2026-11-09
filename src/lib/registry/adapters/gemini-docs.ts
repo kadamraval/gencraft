@@ -1,4 +1,4 @@
-import type { ModelRecord, ParamSchema, RegistryModality } from "../types"
+import type { ModelRecord, ParamSchema, AppCategory } from "../types"
 import { withReferenceSlot } from "../ref-limits"
 import { isOutdatedDescription } from "../lifecycle"
 import { geminiImageParams, geminiOmniParams, geminiSpeechParams, geminiTranscribeParams } from "./gemini-params"
@@ -120,7 +120,7 @@ export function parsePricing(md: string, now = Date.now()): Map<string, GeminiPr
   return out
 }
 
-type Kind = RegistryModality | null
+type Kind = AppCategory | null
 
 /** Which cards are creative or chat models the app can use. Live, translate, transcribe and embedding are not. */
 export function classify(id: string): Kind {
@@ -153,8 +153,8 @@ export function buildGeminiRecords(
   const records: ModelRecord[] = []
   const skipped: string[] = []
   for (const card of cards) {
-    const modality = classify(card.id)
-    if (!modality) {
+    const category = classify(card.id)
+    if (!category) {
       skipped.push(card.id)
       continue
     }
@@ -164,7 +164,7 @@ export function buildGeminiRecords(
     const code = [...videoSeconds.keys()].find((k) => k.replace(/-\d+(?:\.\d+)*(?=-)/, "") === card.id) ?? card.id
     const perSecond = videoSeconds.get(code)
     const perMinute = minutes.get(code)
-    const transcribes = modality === "audio" && /transcribe/.test(card.id)
+    const transcribes = category === "audio" && /transcribe/.test(card.id)
     records.push(withReferenceSlot({
       id: `gemini/${code}`,
       endpoint: code,
@@ -173,12 +173,12 @@ export function buildGeminiRecords(
       family: card.id,
       logoKey: "gemini",
       maker: "Google",
-      modality,
-      inputs: modality === "text" || modality === "image" ? ["text", "image"] : modality === "video" ? ["text", "image", "video", "audio"] : ["text"],
-      params: modality === "image" ? geminiImageParams(card.id) : transcribes ? geminiTranscribeParams() : modality === "audio" && /tts/.test(card.id) ? geminiSpeechParams() : modality === "video" && /omni/.test(card.id) ? geminiOmniParams() : NO_PARAMS,
+      category,
+      inputs: category === "text" || category === "image" ? ["text", "image"] : category === "video" ? ["text", "image", "video", "audio"] : ["text"],
+      params: category === "image" ? geminiImageParams(card.id) : transcribes ? geminiTranscribeParams() : category === "audio" && /tts/.test(card.id) ? geminiSpeechParams() : category === "video" && /omni/.test(card.id) ? geminiOmniParams() : NO_PARAMS,
       price: transcribes && perMinute !== undefined
         ? { unit: "per_minute", amount: perMinute, source: "scraped", fetchedAt }
-        : modality === "video" && perSecond !== undefined
+        : category === "video" && perSecond !== undefined
         ? { unit: "per_second", amount: perSecond, source: "scraped", fetchedAt }
         : p
         ? { unit: "per_1m_tokens", amount: p.input, outputAmount: p.output, source: "scraped", fetchedAt }
@@ -188,7 +188,7 @@ export function buildGeminiRecords(
       retiresAt: d?.shutdown,
       outdated: isOutdatedDescription(card.description),
       updatedAt: d?.released,
-      task: modality === "image" ? "text-to-image" : modality === "audio" ? (transcribes ? "speech-to-text" : "text-to-speech") : modality === "video" ? "text-to-video" : undefined,
+      task: category === "image" ? "text-to-image" : category === "audio" ? (transcribes ? "speech-to-text" : "text-to-speech") : category === "video" ? "text-to-video" : undefined,
     }))
   }
   return { records, skipped }

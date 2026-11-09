@@ -1,6 +1,6 @@
 import { estimateRun } from "./price"
 import { shortlistRank } from "./shortlist"
-import { taskOf } from "./tasks"
+import { capabilityOfExact, type Does } from "@/lib/capability"
 import type { ModelRecord } from "./types"
 
 /**
@@ -34,24 +34,25 @@ export function filesTaken(r: ModelRecord): Set<"image" | "video" | "audio"> {
 
 export function rolesOf(r: ModelRecord): Role[] {
   if (r.status === "deprecated" || r.utility) return []
-  const files = filesTaken(r)
+  // Read from the model's capability, the one description every screen uses
+  const c = capabilityOfExact(r)
   const roles: Role[] = []
-  if (r.modality === "text") {
+  const does = (d: Does) => c.does.includes(d)
+  if (r.category === "text") {
     roles.push("text")
-    if (files.has("audio")) roles.push("stt")
+    if (c.abilities.includes("audio-in")) roles.push("stt")
     return roles
   }
-  const task = taskOf(r)
-  if (r.modality === "image") {
-    if (task === "text-to-image") roles.push("image")
-    if (task === "image-edit" || (task === "text-to-image" && files.has("image"))) roles.push("image-edit")
-  } else if (r.modality === "video") {
-    if (task === "text-to-video" || task === "image-to-video" || task === "reference-to-video") roles.push("video")
-    if (task === "video-edit" || files.has("video")) roles.push("video-edit")
+  if (r.category === "image") {
+    if (does("make")) roles.push("image")
+    if (does("edit")) roles.push("image-edit")
+  } else if (r.category === "video") {
+    if (does("make")) roles.push("video")
+    if (does("edit") || c.takes.some((t) => t.kind === "video" && t.role === "source")) roles.push("video-edit")
   } else {
-    if (task === "speech") roles.push("speech")
-    if (task === "transcription") roles.push("stt")
-    if (task === "audio-generation") roles.push("music")
+    if (does("speech")) roles.push("speech")
+    if (does("transcribe")) roles.push("stt")
+    if (does("music") || does("sfx") || (does("make") && !does("speech"))) roles.push("music")
   }
   return roles
 }
@@ -60,7 +61,7 @@ export const hasRole = (r: ModelRecord, role: Role): boolean => rolesOf(r).inclu
 
 export type Tier = "low" | "medium" | "high"
 
-const priceOf = (r: ModelRecord): number | null => (r.modality === "text" ? r.price.amount : estimateRun(r, {}).usd)
+const priceOf = (r: ModelRecord): number | null => (r.category === "text" ? r.price.amount : estimateRun(r, {}).usd)
 
 const versionScore = (r: ModelRecord) => (r.version?.[0] ?? 0) * 1000 + (r.version?.[1] ?? 0)
 
@@ -68,8 +69,8 @@ const versionScore = (r: ModelRecord) => (r.version?.[0] ?? 0) * 1000 + (r.versi
  * Where the standard database ranks a model of its own list (the makers and models we chose), 1 being the first choice for a job on its
  * provider. Undefined for a model the database holds only as a backup, or does not hold at all.
  */
-export function packRankOf(r: Pick<ModelRecord, "jobs">): number | undefined {
-  const own = (r.jobs ?? []).filter((j) => j.role === "model")
+export function packRankOf(r: Pick<ModelRecord, "serves">): number | undefined {
+  const own = (r.serves ?? []).filter((j) => j.role === "model")
   return own.length > 0 ? Math.min(...own.map((j) => j.rank)) : undefined
 }
 

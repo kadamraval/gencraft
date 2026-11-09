@@ -2,6 +2,19 @@
 
 Release notes are added at the top by the `/release` flow, newest first. Commit messages start with `feat`, `fix`, `docs`, `chore` and so on; a `!` after the type marks a breaking change.
 
+## v0.1.0-beta.5 (2026-11-10)
+
+Beta. Features may change and some things are rough: please report problems at https://github.com/kadamraval/gencraft/issues.
+
+### New
+- One capability rule across the studio: Edit and Video Edit apps, a full-screen picture editor, and top-makers ranking.
+- One model database read by the whole app, one model selector everywhere, and AI tools across every provider.
+- Pricing page with centered Lifetime plan, six-box PIN, unified onboarding shell, and licence settings placed above updates.
+
+### Fixed
+- Updated `rustls` to `0.23.46` for Dependabot security alerts.
+- Fixed `gifenc` ESM import compatibility in Node test runners.
+
 ## v0.1.0-beta.4 (2026-10-25)
 
 Beta. Features may change and some things are rough: please report problems at https://github.com/kadamraval/gencraft/issues.

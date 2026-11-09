@@ -1,4 +1,5 @@
 import assert from "node:assert/strict"
+import { readFileSync } from "node:fs"
 import packJson from "../src/lib/knowledge/pack.json" with { type: "json" }
 import { recordsFromPack } from "../src/lib/knowledge/pack-to-registry.ts"
 import type { KnowledgePack } from "../src/lib/knowledge/schema.ts"
@@ -22,7 +23,7 @@ const check = (name: string, fn: () => void) => {
 }
 
 const ctx = (over: Partial<MatchContext> = {}): MatchContext => ({ records: utility, listed: [], keyed: new Set(["fal"]), runnable: () => true, ...over })
-const audioRecord = (endpoint: string, task: string): ModelRecord => ({ id: `fal/${endpoint}`, endpoint, provider: "fal", name: endpoint, family: endpoint, logoKey: "fal", modality: "audio", inputs: ["text"], params: { type: "object", properties: {} }, price: { unit: "per_run", amount: 0.1, source: "api", fetchedAt: "" }, status: "active", task })
+const audioRecord = (endpoint: string, task: string, serves?: string): ModelRecord => ({ id: `fal/${endpoint}`, endpoint, provider: "fal", name: endpoint, family: endpoint, logoKey: "fal", category: "audio", inputs: ["text"], params: { type: "object", properties: {} }, price: { unit: "per_run", amount: 0.1, source: "api", fetchedAt: "" }, status: "active", task, serves: serves ? [{ id: serves, rank: 1 }] : undefined })
 
 check("every tool has a unique id, and every model tool says how it is done", () => {
   const ids = CATALOG.map((t) => t.id)
@@ -34,7 +35,7 @@ check("every tool has a unique id, and every model tool says how it is done", ()
 })
 
 /** The pack's own models for a tool, best first (what the app offers) */
-const modelsOf = (id: string) => utility.filter((r) => r.jobs?.some((j) => j.id === id)).sort((x, y) => (x.jobs!.find((j) => j.id === id)!.rank) - (y.jobs!.find((j) => j.id === id)!.rank))
+const modelsOf = (id: string) => utility.filter((r) => r.serves?.some((j) => j.id === id)).sort((x, y) => (x.serves!.find((j) => j.id === id)!.rank) - (y.serves!.find((j) => j.id === id)!.rank))
 
 check("every tool the database has models for lists them with real parameters, and the options are settings they have", () => {
   let tools = 0
@@ -56,7 +57,11 @@ check("every tool the database has models for lists them with real parameters, a
 check("with a fal key, video tools are ready; without one they say what to add", () => {
   const keyed = toolsFor({ kind: "video", surface: "edit" }, ctx())
   assert.equal(keyed.find((o) => o.spec.id === "video-remove-background")?.status.state, "ready")
-  assert.ok(keyed.find((o) => o.spec.id === "video-upscale")!.candidates.length >= 3)
+  // every fal model the database ranks for the job, and nothing found by its name
+  // the models made for the job come first; models that edit clips by words follow, told the job in a sentence
+  const ups = keyed.find((o) => o.spec.id === "video-upscale")!.candidates.map((c) => c.id)
+  const made = modelsOf("video-upscale").filter((m) => m.provider === "fal").map((m) => m.id)
+  assert.deepEqual(ups.slice(0, made.length).sort(), made.sort())
   const bare = toolsFor({ kind: "video", surface: "edit" }, ctx({ keyed: new Set() }))
   const st = bare.find((o) => o.spec.id === "video-remove-background")!.status
   assert.equal(st.state, "needs-model")
@@ -80,8 +85,8 @@ check("cut tools belong to Story/Edit and the agent only, and need no model", ()
   assert.equal(toolsFor({ kind: "video", surface: "edit" }, ctx()).some((o) => o.spec.kind === "cut"), false)
 })
 
-check("text to speech, music and sound effects come from the audio models the person switched on, by task", () => {
-  const listed = [audioRecord("elevenlabs/tts/eleven-v4", "text-to-speech"), audioRecord("elevenlabs/music/v2.5", "text-to-audio"), audioRecord("fal-ai/elevenlabs/sound-effects/v2", "text-to-audio")]
+check("text to speech, music and sound effects come from the audio models the person switched on, by what the database says they do", () => {
+  const listed = [audioRecord("elevenlabs/tts/eleven-v4", "text-to-speech"), audioRecord("elevenlabs/music/v2.5", "text-to-audio", "audio-text-to-music"), audioRecord("fal-ai/elevenlabs/sound-effects/v2", "text-to-audio", "audio-text-to-sfx"), audioRecord("someone/unlisted-music", "text-to-audio")]
   const offers = toolsFor({ kind: "audio", surface: "create" }, ctx({ listed }))
   assert.equal(offers.find((o) => o.spec.id === "audio-text-to-speech")?.candidates[0]?.endpoint, "elevenlabs/tts/eleven-v4")
   assert.equal(offers.find((o) => o.spec.id === "audio-text-to-music")?.candidates[0]?.endpoint, "elevenlabs/music/v2.5")
@@ -108,7 +113,9 @@ check("featured tools for the task row are ready ones in their order", () => {
   assert.deepEqual(row, [...row].sort((a, b) => (toolById(a)!.featured ?? 0) - (toolById(b)!.featured ?? 0)))
 })
 
-const rec = (endpoint: string) => utility.find((r) => r.endpoint === endpoint)!
+// Real fal tool models with their published parameters: the tests below are about naming options, not about which models the grid picks
+const fixture = (JSON.parse(readFileSync("scripts/fixtures/tool-models.json", "utf8")) as { models: ModelRecord[] }).models
+const rec = (endpoint: string) => fixture.find((r) => r.endpoint === endpoint) ?? utility.find((r) => r.endpoint === endpoint)!
 
 check("options go to the name each model uses, and settings a model does not have are left out", () => {
   const up = toolById("video-upscale")!
@@ -135,7 +142,7 @@ check("a choice the model does not list is not sent, and a required setting is n
 check("a language list is the model's own, and a language is always chosen", () => {
   const dub = toolById("video-dub")!
   const lang = dub.options![0]!
-  const model: ModelRecord = { ...audioRecord("someone/dub", "dubbing"), modality: "video", params: { type: "object", properties: { output_language: { type: "string", enum: ["Spanish", "French", "German"] } as never } } }
+  const model: ModelRecord = { ...audioRecord("someone/dub", "dubbing"), category: "video", params: { type: "object", properties: { output_language: { type: "string", enum: ["Spanish", "French", "German"] } as never } } }
   const choices = choicesFor(lang, model).map((c) => c.value)
   assert.deepEqual(choices, ["Spanish", "French", "German"])
   assert.equal(paramsFor(dub, model, {}).params.output_language, "Spanish")
@@ -156,18 +163,23 @@ check("the price follows the length of the clip", () => {
   assert.ok(two !== null && Math.abs(two - 1.0) < 0.01)
 })
 
-check("a model from another provider is found by what it does, and only when its provider has a key", () => {
+check("a model is a candidate because the database ranks it for the job, not because of its name, and only when its provider has a key", () => {
   const replicateRec = (endpoint: string, description: string): ModelRecord => ({
-    id: `replicate/${endpoint}`, endpoint, provider: "replicate", name: endpoint, family: endpoint, logoKey: "replicate", modality: "video",
+    id: `replicate/${endpoint}`, endpoint, provider: "replicate", name: endpoint, family: endpoint, logoKey: "replicate", category: "video",
     inputs: ["video"], description, params: { type: "object", properties: { video: { type: "string", format: "video" } as never } }, price: { unit: "per_run", amount: 0.05, source: "api", fetchedAt: "" }, status: "active",
   })
-  const rembg = replicateRec("someone/video-background-remover", "Removes the background from a video")
-  const textToVideo: ModelRecord = { ...replicateRec("someone/cool-video", "Makes video from text"), inputs: ["text"], params: { type: "object", properties: {} } }
-  const withRep = ctx({ records: [rembg, textToVideo], keyed: new Set(["replicate"]) })
+  const ranked = { ...replicateRec("bria/matting", "Video matting"), serves: [{ id: "video-remove-background", rank: 1 }] }
+  const named = replicateRec("bria/video-background-remover", "Removes the background from a video")
+  const textToVideo: ModelRecord = { ...replicateRec("bria/cool-video", "Makes video from text"), inputs: ["text"], params: { type: "object", properties: {} } }
+  const withRep = ctx({ records: [ranked, named, textToVideo], keyed: new Set(["replicate"]) })
   const offer = toolsFor({ kind: "video", surface: "edit" }, withRep).find((o) => o.spec.id === "video-remove-background")!
   assert.equal(offer.status.state, "ready")
-  assert.equal(offer.candidates[0]?.endpoint, "someone/video-background-remover")
-  assert.ok(!offer.candidates.some((c) => c.endpoint === "someone/cool-video"))
+  assert.deepEqual(offer.candidates.map((c) => c.endpoint), ["bria/matting"])
+  // a model that only says so in its name is under Show all, with the other models that take a video
+  assert.ok(offer.more.some((c) => c.endpoint === "bria/video-background-remover"))
+  assert.ok(!offer.more.some((c) => c.endpoint === "bria/cool-video"))
+  const unkeyed = toolsFor({ kind: "video", surface: "edit" }, ctx({ records: [ranked], keyed: new Set(["fal"]) })).find((o) => o.spec.id === "video-remove-background")!
+  assert.ok(!unkeyed.candidates.some((c) => c.endpoint === "bria/matting"))
   // keys but no model that does it: says model, not key
   const none = toolsFor({ kind: "video", surface: "edit" }, ctx({ records: [], keyed: new Set(["replicate"]) })).find((o) => o.spec.id === "video-colorize")!
   assert.equal(none.status.state === "needs-model" && none.status.missing, "model")

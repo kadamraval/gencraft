@@ -70,5 +70,6 @@ export function toDetailItem(a: MediaAsset): DetailMediaItem {
     log: a.log,
     params: a.params,
     provider: a.provider,
+    cost: a.cost,
   }
 }

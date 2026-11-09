@@ -37,23 +37,23 @@ export function GeneralSettings({ settings, onChange }: Props) {
 
   return (
     <div className="space-y-2">
-      {/* Who you are and how the app looks: always visible, not in the accordion */}
+      {/* Who you are, how the app looks, updates, and how prices are shown: always visible, not in the accordion */}
       <div className="space-y-2 rounded-xl border border-border bg-card p-4">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
           <ProfileCard settings={settings} onChange={onChange} />
           <AppearanceCard />
         </div>
+        <AppUpdateSettings />
+        <ModelUpdateSettings />
         <Line title="Country and currency" hint="Only changes how prices are shown">
           <RegionCurrencyControls />
         </Line>
       </div>
 
     <Accordion type="single" collapsible className="space-y-2">
-      <Section id="models" title="Models">
+      {/* Create and Apps choose their own models; the Agent has no picker, so its models are set here, per level */}
+      <Section id="models" title="Agent Model">
         <ModelsSection settings={settings} onChange={onChange} />
-      </Section>
-
-      <Section id="chat" title="Chat & Agent">
         <div className="space-y-2 rounded-xl border border-border bg-secondary px-4 py-3">
           <div>
             <p className="text-xs font-semibold text-foreground">About you</p>
@@ -92,13 +92,8 @@ export function GeneralSettings({ settings, onChange }: Props) {
         <RunLimitLines settings={settings} onChange={onChange} />
       </Section>
 
-      <Section id="model-updates" title="Updates">
-        <AppUpdateSettings />
-        <ModelUpdateSettings />
-      </Section>
-
       <Section id="setup" title="Welcome setup">
-        <Line title="Run setup again" hint="Choose Free or Paid, then profile, first project, provider keys, a drive and the save folder. The app reloads.">
+        <Line title="Run setup again" hint="Sign up, PIN, pricing and the quick setup. The app reloads.">
           <Button
             type="button"
             size="sm"
@@ -125,6 +120,7 @@ export function GeneralSettings({ settings, onChange }: Props) {
       <Section id="license" title="License">
         <LicenseCard />
       </Section>
+
     </Accordion>
     </div>
   )

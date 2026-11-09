@@ -38,8 +38,8 @@ function scripted(turns: Turn[], seen: string[] = []) {
   })
 }
 
-const rec = (id: string, modality: "image" | "video" | "audio" | "text", inputs: Array<"text" | "image">, props: ModelRecord["params"]["properties"]): ModelRecord =>
-  ({ id, endpoint: id, provider: "fal", name: id, family: "x", logoKey: "x", modality, inputs, params: { type: "object", properties: props }, price: { unit: "per_image", amount: 0.04, source: "api", fetchedAt: "" }, status: "active" }) as ModelRecord
+const rec = (id: string, category: "image" | "video" | "audio" | "text", inputs: Array<"text" | "image">, props: ModelRecord["params"]["properties"]): ModelRecord =>
+  ({ id, endpoint: id, provider: "fal", name: id, family: "x", logoKey: "x", category, inputs, params: { type: "object", properties: props }, price: { unit: "per_image", amount: 0.04, source: "api", fetchedAt: "" }, status: "active" }) as ModelRecord
 const multi = rec("fal/multi", "image", ["text", "image"], { image_urls: { type: "array", slot: { role: "reference", kind: "image", list: true, max: 3 } } as never })
 const pool = [multi]
 

@@ -16,7 +16,7 @@ const YES = "Yes"
 const NO = "No"
 
 export const PLAN_ROWS: PlanRow[] = [
-  { main: "Projects", sub: "", free: `${FREE_LIMITS.projects} project`, paid: "Unlimited" },
+  { main: "Projects", sub: "How many", free: `${FREE_LIMITS.projects} project`, paid: "Unlimited" },
   { main: "Create & Edit", sub: "Chat, Image, Video, Audio", free: YES, paid: YES },
   { main: "Story", sub: "Script, Cast, Beats, Edit", free: YES, paid: YES },
   { main: "Agents", sub: "Plan", free: NO, paid: YES },
@@ -41,4 +41,21 @@ export const PRICES = {
 } as const
 
 /** The features the plan card names when it says what Free is missing */
-export const FREE_MISSING = [FEATURE_NAMES.agent, FEATURE_NAMES.connectors, FEATURE_NAMES.buildApps, "Email support"]
+export const FREE_MISSING = [FEATURE_NAMES.agent, FEATURE_NAMES.connectors, FEATURE_NAMES.buildApps.replace("Building", "building"), "email support"]
+
+/** The short lists on the pricing cards. The full table above is the detail; these are what a person scans first. */
+export const FREE_POINTS = [
+  `${FREE_LIMITS.projects} project`,
+  "Create & Edit: Chat, Image, Video, Audio",
+  "Story, Elements, Library, Brand",
+  "Run built-in Apps",
+  "Help guide",
+]
+
+export const PAID_EXTRAS = [
+  "Unlimited projects",
+  "Agents: Plan, Batch Create & Edit, Skills",
+  "Connectors: Google Drive, Dropbox, Pinterest",
+  "Build your own Apps",
+  "Email support",
+]

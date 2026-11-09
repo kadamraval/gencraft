@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Download, Maximize2, Mic, Minimize2, Square, Clapperboard, Upload } from "lucide-react"
+import { Download, FileText, Maximize2, Mic, Minimize2, Square, Clapperboard, Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useDictation } from "@/components/composer/use-dictation"
@@ -15,6 +15,7 @@ export function ScriptRail({
   full,
   onToggleFull,
   onDownload,
+  onPdf,
   onUpload,
   onBreak,
   breakNote,
@@ -22,6 +23,8 @@ export function ScriptRail({
   full: boolean
   onToggleFull: () => void
   onDownload: () => void
+  /** Prints the script; the print window saves it as a PDF */
+  onPdf?: () => void
   onUpload: () => void
   /** Missing when there is no script to break yet */
   onBreak?: () => void
@@ -41,7 +44,8 @@ export function ScriptRail({
   )
   return (
     <div className="absolute right-3 top-1/2 z-20 flex -translate-y-1/2 flex-col gap-1 rounded-xl border border-border/60 bg-card/90 p-1 opacity-0 shadow-md transition-opacity focus-within:opacity-100 group-hover/script:opacity-100">
-      {item("Download", <Download className="h-4 w-4" />, onDownload)}
+      {item("Download", <Download className="h-4 w-4" />, onDownload, "Download as Fountain")}
+      {onPdf && item("Export PDF", <FileText className="h-4 w-4" />, onPdf, "Export PDF")}
       {item("Upload", <Upload className="h-4 w-4" />, onUpload)}
       {item("Scene break", <Clapperboard className="h-4 w-4" />, onBreak, onBreak ? "Break into scenes: a scene for each heading, a beat for each thing we see" : breakNote)}
       {item(full ? "Leave full screen" : "Full screen writing", full ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />, onToggleFull)}

@@ -1,4 +1,4 @@
-import type { Category, CatalogSource, Fact, PriceValue } from "../types"
+import type { ProviderTask, CatalogSource, Fact, PriceValue } from "../types"
 
 /**
  * LiteLLM's community price and mode file, read into facts. Each entry is one provider route: `fal_ai/bytedance/seedance-2.5/text-to-video`
@@ -43,7 +43,7 @@ export interface LitellmEntry {
   [k: string]: unknown
 }
 
-const MODE_CATEGORY: Record<string, Category | undefined> = {
+const MODE_CATEGORY: Record<string, ProviderTask | undefined> = {
   image_generation: "text-to-image",
   image_edit: "image-to-image",
   audio_speech: "text-to-speech",
@@ -97,14 +97,14 @@ export function parseLitellm(file: Record<string, LitellmEntry>, keys?: Iterable
     const { host, endpoint } = splitKey(key, e.litellm_provider)
     const base = { host, endpoint, source: "litellm", confidence: "community" as const, via: key }
     const category = MODE_CATEGORY[e.mode]
-    if (category) facts.push({ ...base, field: "category", value: category })
+    if (category) facts.push({ ...base, field: "task", value: category })
     // A video entry names its category in the last segment when it says one
     else if (e.mode === "video_generation") {
       const tail = /(text|image|reference|video)-to-video$/.exec(key)?.[0]
-      if (tail) facts.push({ ...base, field: "category", value: tail })
+      if (tail) facts.push({ ...base, field: "task", value: tail })
     }
     const typeVal = e.mode === "chat" ? "text" : e.mode.startsWith("image") ? "image" : e.mode.startsWith("video") ? "video" : "audio"
-    facts.push({ ...base, field: "type", value: typeVal })
+    facts.push({ ...base, field: "category", value: typeVal })
     const price = priceOfEntry(e)
     if (price) facts.push({ ...base, field: "price", value: price })
     if (typeof e.deprecation_date === "string" && /^\d{4}-\d{2}-\d{2}/.test(e.deprecation_date)) {

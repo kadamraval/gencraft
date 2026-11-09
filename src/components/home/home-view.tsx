@@ -243,7 +243,7 @@ export function HomeView(props: Props) {
 
           <Tutorials onGo={go} />
 
-          <FormCard icon={Wand2} title="AI tools" hint="Everything in the studio" bare>
+          <FormCard icon={Wand2} title="Everything in the studio" hint="Create, Edit and apps" bare>
             <div className="grid grid-cols-4 gap-2 p-3">
               {TOOLS.map((t) => (
                 <Button key={t.id} type="button" variant="ghost" onClick={() => go(t.to)} className="flex h-auto flex-col items-start justify-start gap-2 whitespace-normal rounded-xl border border-border/60 bg-secondary/20 p-3 text-left font-normal hover:bg-secondary/50">

@@ -1,5 +1,5 @@
 import type { ModelRecord } from "./types"
-import { falRunFetch, providerFetch, replicateCall } from "./net"
+import { appFetch, falRunFetch, providerFetch, replicateCall } from "./net"
 import { FAL_CHAT_BASE } from "./adapters/fal-chat"
 import {
   geminiAudio,
@@ -43,6 +43,7 @@ export interface DirectRun {
     images: string[]
     groups?: string[][]
     startFrameUrl?: string
+    maskUrl?: string
     endFrameUrl?: string
     sourceVideoUrl?: string
     sourceAudioUrl?: string
@@ -75,7 +76,7 @@ export const DIRECT_PROVIDERS = ["openai", "openrouter", "gemini", "replicate"] 
 
 export function isDirectRecord(r: ModelRecord | undefined): r is ModelRecord {
   // fal is direct for its chat models only; its pictures, video and sound go through its own queue
-  const provider = r?.provider === "fal" ? r.modality === "text" : (DIRECT_PROVIDERS as readonly string[]).includes(r?.provider ?? "")
+  const provider = r?.provider === "fal" ? r.category === "text" : (DIRECT_PROVIDERS as readonly string[]).includes(r?.provider ?? "")
   return Boolean(r) && provider && r!.endpoint !== r!.id
 }
 
@@ -88,6 +89,18 @@ async function failFrom(provider: string, res: Response): Promise<never> {
  * Providers cannot open a blob: address from this machine, so an attached file is sent inside the request.
  * Web addresses and data addresses pass through untouched.
  */
+/** Gemini reads a picture only as data inside the request, so a web address is fetched and turned into one */
+export async function toDataUrl(url: string): Promise<string> {
+  if (url.startsWith("data:")) return url
+  const blob = await (await (url.startsWith("blob:") ? fetch(url) : appFetch(url))).blob()
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(blob)
+  })
+}
+
 export async function toInlineUrl(url: string | undefined): Promise<string | undefined> {
   if (!url || /^(https?:|data:)/.test(url)) return url
   const blob = await (await fetch(url)).blob()
@@ -211,13 +224,24 @@ async function openrouterImages_(run: DirectRun, refs: string[]): Promise<Direct
 }
 
 async function openrouterVideo(run: DirectRun): Promise<DirectResult> {
-  const refs = await Promise.all((run.references?.images ?? []).map((u) => toInlineUrl(u) as Promise<string>))
-  const startRef = run.references?.startFrameUrl ? [(await toInlineUrl(run.references.startFrameUrl))!] : refs
+  const r = run.references
+  const inline = async (u: string | undefined) => (u ? ((await toInlineUrl(u)) as string) : undefined)
+  const images = await Promise.all((r?.images ?? []).map((u) => toInlineUrl(u) as Promise<string>))
+  const cap = refCapability(run.record)
+  // A model with a start frame and no reference list takes the first picture as its start frame
+  const startFromImages = !r?.startFrameUrl && !cap.images && cap.start && images.length > 0
+  const files = {
+    start: (await inline(r?.startFrameUrl)) ?? (startFromImages ? images[0] : undefined),
+    end: await inline(r?.endFrameUrl),
+    images: startFromImages ? images.slice(1) : images,
+    videos: r?.sourceVideoUrl ? [(await inline(r.sourceVideoUrl))!] : [],
+    audios: r?.sourceAudioUrl ? [(await inline(r.sourceAudioUrl))!] : [],
+  }
   const headers = { Authorization: `Bearer ${run.apiKey.trim()}`, "Content-Type": "application/json", "X-Title": "Gencraft" }
   const res = await fetch("https://openrouter.ai/api/v1/videos", {
     method: "POST",
     headers,
-    body: JSON.stringify(openrouterVideoBody(run.record, run.prompt, run.params, startRef)),
+    body: JSON.stringify(openrouterVideoBody(run.record, run.prompt, run.params, files)),
     signal: run.signal,
   })
   if (!res.ok) await failFrom("openrouter", res)
@@ -238,12 +262,22 @@ async function openrouterVideo(run: DirectRun): Promise<DirectResult> {
   return { videoUrl: finalUrl, raw: job }
 }
 
+/** A sound as OpenRouter's input_audio part: its bytes in base64 and its format */
+async function soundPart(url: string | undefined): Promise<{ data: string; format: string } | undefined> {
+  if (!url) return undefined
+  const inline = (await toInlineUrl(url)) as string
+  const m = /^data:audio\/([\w.+-]+);base64,(.*)$/s.exec(inline)
+  if (!m) return undefined
+  const format = m[1]!.replace(/^mpeg$/, "mp3").replace(/^x-wav$/, "wav")
+  return { data: m[2]!, format }
+}
+
 async function openrouterAudio(run: DirectRun): Promise<DirectResult> {
   const headers = { Authorization: `Bearer ${run.apiKey.trim()}`, "Content-Type": "application/json", "X-Title": "Gencraft" }
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers,
-    body: JSON.stringify(openrouterAudioBody(run.record, run.prompt, run.params)),
+    body: JSON.stringify(openrouterAudioBody(run.record, run.prompt, run.params, await soundPart(run.references?.sourceAudioUrl))),
     signal: run.signal,
   })
   if (!res.ok) await failFrom("openrouter", res)
@@ -257,9 +291,9 @@ async function openrouterAudio(run: DirectRun): Promise<DirectResult> {
 }
 
 async function openrouter(run: DirectRun): Promise<DirectResult> {
-  if (run.record.modality === "video") return openrouterVideo(run)
-  if (run.record.modality === "audio") return openrouterAudio(run)
-  const wantsImage = run.record.modality === "image"
+  if (run.record.category === "video") return openrouterVideo(run)
+  if (run.record.category === "audio") return openrouterAudio(run)
+  const wantsImage = run.record.category === "image"
   const refs = await Promise.all((run.references?.images ?? []).map((u) => toInlineUrl(u) as Promise<string>))
   if (wantsImage) {
     const viaImages = await openrouterImages_(run, refs)
@@ -326,7 +360,7 @@ async function geminiInteraction(run: DirectRun, body: Record<string, unknown>):
 }
 
 async function geminiImage(run: DirectRun): Promise<DirectResult> {
-  const refs = await Promise.all((run.references?.images ?? []).map((u) => toInlineUrl(u) as Promise<string>))
+  const refs = await Promise.all((run.references?.images ?? []).map((u) => toDataUrl(u)))
   const json = await geminiInteraction(run, geminiImageBody(run.record, run.prompt, run.params, refs))
   const imageUrls = geminiImages(json)
   if (imageUrls.length === 0) throw new DirectRunError("gemini", "Gemini returned no image")
@@ -400,6 +434,7 @@ async function replicateRun(run: DirectRun): Promise<DirectResult> {
     groups,
     sourceVideo: await inline(r?.sourceVideoUrl),
     sourceAudio: await inline(r?.sourceAudioUrl),
+    mask: await inline(r?.maskUrl),
     videos: r?.sourceVideoUrl ? [(await inline(r.sourceVideoUrl))!] : undefined,
     audios: r?.sourceAudioUrl ? [(await inline(r.sourceAudioUrl))!] : undefined,
   })
@@ -432,7 +467,7 @@ async function replicateRun(run: DirectRun): Promise<DirectResult> {
 Request sent to ${record.endpoint}: ${sent}`)
     }
   }
-  if (record.modality === "text") {
+  if (record.category === "text") {
     if (!out.text) {
       const raw = out.raw as { output?: unknown; logs?: string | null }
       const got = raw.output === null || raw.output === undefined ? "nothing" : JSON.stringify(raw.output).slice(0, 120)
@@ -442,8 +477,8 @@ Request sent to ${record.endpoint}: ${sent}`)
     return { text: out.text, raw: out.raw }
   }
   if (out.urls.length === 0) throw new DirectRunError("replicate", "Replicate finished but returned no file")
-  if (record.modality === "image") return { imageUrls: out.urls, raw: out.raw }
-  if (record.modality === "video") return { videoUrl: out.urls[0], raw: out.raw }
+  if (record.category === "image") return { imageUrls: out.urls, raw: out.raw }
+  if (record.category === "video") return { videoUrl: out.urls[0], raw: out.raw }
   return { audioUrl: out.urls[0], raw: out.raw }
 }
 
@@ -451,24 +486,24 @@ export async function runDirect(source: DirectRun): Promise<DirectResult> {
   // Translate any OpenAI-standard parameter aliases into the model's own schema before shaping
   const translatedParams = translateParamsToModelSchema(source.record, source.params)
   // The maker's rules, defaults and prompt syntax apply to every provider, not only the ones with a queue runner
-  const shaped = source.record.modality === "text" || source.record.provider === "replicate" ? undefined : shapeRun(source.record, source.prompt, translatedParams, filesFrom(source.references), undefined, true)
+  const shaped = source.record.category === "text" || source.record.provider === "replicate" ? undefined : shapeRun(source.record, source.prompt, translatedParams, filesFrom(source.references), undefined, true)
   const run: DirectRun = shaped ? { ...source, prompt: shaped.prompt, params: shaped.params } : { ...source, params: translatedParams }
-  const { provider, modality } = run.record
-  if (provider === "fal" && modality === "text") return falChat(run)
+  const { provider, category } = run.record
+  if (provider === "fal" && category === "text") return falChat(run)
   if (provider === "gemini") {
-    if (modality === "image") return geminiImage(run)
-    if (modality === "audio") return geminiSpeech(run)
-    if (modality === "video") return geminiVideo(run)
-    if (modality === "text") return geminiText(run)
+    if (category === "image") return geminiImage(run)
+    if (category === "audio") return geminiSpeech(run)
+    if (category === "video") return geminiVideo(run)
+    if (category === "text") return geminiText(run)
   }
   if (provider === "openai") {
-    if (modality === "text") return openaiText(run)
-    if (modality === "image") return openaiImage(run)
-    if (modality === "audio") return openaiSpeech(run)
-    if (modality === "video") return openaiVideo(run)
+    if (category === "text") return openaiText(run)
+    if (category === "image") return openaiImage(run)
+    if (category === "audio") return openaiSpeech(run)
+    if (category === "video") return openaiVideo(run)
   }
   if (provider === "openrouter") return openrouter(run)
   if (provider === "replicate") return replicateRun(run)
-  throw new DirectRunError(provider, `${provider} ${modality} generation is not available in this build yet`)
+  throw new DirectRunError(provider, `${provider} ${category} generation is not available in this build yet`)
 }
 

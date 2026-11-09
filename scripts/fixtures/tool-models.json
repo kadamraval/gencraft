@@ -1,0 +1,848 @@
+{
+ "about": "Real fal tool models with the parameters fal publishes, read 2026-10-26, for scripts/test-ai-tools.mts",
+ "models": [
+  {
+   "id": "fal/topaz/upscale/video/generative",
+   "endpoint": "topaz/upscale/video/generative",
+   "provider": "fal",
+   "name": "Topaz Upscale Video Generative",
+   "family": "upscale",
+   "logoKey": "topaz",
+   "category": "video",
+   "inputs": [
+    "text",
+    "image"
+   ],
+   "params": {
+    "type": "object",
+    "properties": {
+     "video_url": {
+      "type": "string",
+      "title": "Video Url",
+      "format": "video",
+      "slot": {
+       "kind": "video",
+       "role": "source",
+       "list": false,
+       "max": 1
+      }
+     },
+     "softness": {
+      "type": "number",
+      "title": "Softness",
+      "description": "How much softening the model applies to the output, from 1 (sharpest) to 5 (softest). Starlight Precise 2.6 only; leave unset for Topaz's default.",
+      "minimum": 1,
+      "maximum": 5,
+      "tier": "advanced"
+     },
+     "H264_output": {
+      "type": "boolean",
+      "title": "H264 Output",
+      "description": "Whether to use H264 codec for output video. Default is H265.",
+      "default": false,
+      "tier": "advanced"
+     },
+     "upscale_factor": {
+      "type": "number",
+      "title": "Upscale Factor",
+      "description": "Factor to upscale the video by (e.g. 2.0 doubles width and height)",
+      "default": 2,
+      "minimum": 1,
+      "maximum": 4,
+      "tier": "unique"
+     },
+     "target_fps": {
+      "type": "integer",
+      "title": "Target Fps",
+      "description": "Target FPS for the output. Frame interpolation is enabled only when this differs from the source FPS.",
+      "minimum": 16,
+      "maximum": 60,
+      "tier": "advanced"
+     }
+    },
+    "required": [
+     "video_url"
+    ],
+    "safety": {
+     "key": "enable_safety_checker",
+     "kind": "enable"
+    },
+    "request": {
+     "promptKey": "prompt",
+     "fixed": {},
+     "blockers": [],
+     "v": 5
+    }
+   },
+   "price": {
+    "unit": "per_second",
+    "amount": 0.12,
+    "source": "scraped",
+    "fetchedAt": "2026-10-25T21:29:40.620Z"
+   },
+   "status": "active",
+   "description": "Professional generative video upscaling powered by Topaz Labs. Starlight models rebuild detail that is not in the source, with Fast variants at half the price. Best for low-quality, compressed or archive footage.",
+   "featured": false,
+   "task": "video-to-video",
+   "updatedAt": "2026-09-05T01:07:15.958Z",
+   "utility": true
+  },
+  {
+   "id": "fal/fal-ai/flashvsr/upscale/video",
+   "endpoint": "fal-ai/flashvsr/upscale/video",
+   "provider": "fal",
+   "name": "Flashvsr",
+   "family": "flashvsr",
+   "logoKey": "fal-ai",
+   "category": "video",
+   "inputs": [
+    "text",
+    "image"
+   ],
+   "params": {
+    "type": "object",
+    "properties": {
+     "output_format": {
+      "type": "string",
+      "title": "Output Format",
+      "description": "The format of the output video.",
+      "enum": [
+       "X264 (.mp4)",
+       "VP9 (.webm)",
+       "PRORES4444 (.mov)",
+       "GIF (.gif)"
+      ],
+      "default": "X264 (.mp4)",
+      "tier": "technical"
+     },
+     "color_fix": {
+      "type": "boolean",
+      "title": "Color Fix",
+      "description": "Color correction enabled.",
+      "default": true,
+      "tier": "advanced"
+     },
+     "upscale_factor": {
+      "type": "number",
+      "title": "Upscale Factor",
+      "description": "Upscaling factor to be used.",
+      "default": 2,
+      "minimum": 1,
+      "maximum": 4,
+      "tier": "unique"
+     },
+     "seed": {
+      "type": "integer",
+      "title": "Seed",
+      "description": "The random seed used for the generation process.",
+      "tier": "advanced"
+     },
+     "preserve_audio": {
+      "type": "boolean",
+      "title": "Preserve Audio",
+      "description": "Copy the original audio tracks into the upscaled video using FFmpeg when possible.",
+      "default": false,
+      "tier": "advanced"
+     },
+     "quality": {
+      "type": "integer",
+      "title": "Quality",
+      "description": "Quality level for tile blending (0-100). Controls overlap between tiles to prevent grid artifacts. Higher values provide better quality with more overlap. Recommended: 70-85 for high-res videos, 50-70 for faster processing.",
+      "default": 70,
+      "minimum": 0,
+      "maximum": 100,
+      "tier": "common"
+     },
+     "video_url": {
+      "type": "string",
+      "title": "Video Url",
+      "format": "video",
+      "slot": {
+       "kind": "video",
+       "role": "source",
+       "list": false,
+       "max": 1
+      }
+     },
+     "acceleration": {
+      "type": "string",
+      "title": "Acceleration",
+      "description": "Acceleration mode for VAE decoding. Options: regular (best quality), high (balanced), full (fastest). More accerleation means longer duration videos can be processed too.",
+      "enum": [
+       "regular",
+       "high",
+       "full"
+      ],
+      "default": "regular",
+      "tier": "technical"
+     },
+     "output_quality": {
+      "type": "string",
+      "title": "Output Quality",
+      "description": "The quality of the output video.",
+      "enum": [
+       "low",
+       "medium",
+       "high",
+       "maximum"
+      ],
+      "default": "high",
+      "tier": "technical"
+     },
+     "output_write_mode": {
+      "type": "string",
+      "title": "Output Write Mode",
+      "description": "The write mode of the output video.",
+      "enum": [
+       "fast",
+       "balanced",
+       "small"
+      ],
+      "default": "balanced",
+      "tier": "advanced"
+     }
+    },
+    "required": [
+     "video_url"
+    ],
+    "safety": {
+     "key": "enable_safety_checker",
+     "kind": "enable"
+    },
+    "request": {
+     "promptKey": "prompt",
+     "fixed": {},
+     "blockers": [],
+     "v": 5
+    }
+   },
+   "price": {
+    "unit": "per_megapixel",
+    "amount": 0.0005,
+    "source": "scraped",
+    "fetchedAt": "2026-10-25T21:29:40.620Z"
+   },
+   "status": "active",
+   "description": "Upscale your videos using FlashVSR with the fastest speeds!",
+   "featured": false,
+   "task": "video-to-video",
+   "updatedAt": "2026-10-20T22:31:07.660Z",
+   "utility": true
+  },
+  {
+   "id": "fal/topaz/interpolate/video",
+   "endpoint": "topaz/interpolate/video",
+   "provider": "fal",
+   "name": "Topaz Interpolate Video",
+   "family": "interpolate",
+   "logoKey": "topaz",
+   "category": "video",
+   "inputs": [
+    "text",
+    "image"
+   ],
+   "params": {
+    "type": "object",
+    "properties": {
+     "slowdown_factor": {
+      "type": "integer",
+      "title": "Slowdown Factor",
+      "description": "Slow-motion factor: 2 makes the output twice as long at the target FPS (2x slow motion), up to 8x. 1 keeps the original speed. The extra generated frames are billed like interpolated frames.",
+      "default": 1,
+      "minimum": 1,
+      "maximum": 8,
+      "tier": "advanced"
+     },
+     "H264_output": {
+      "type": "boolean",
+      "title": "H264 Output",
+      "description": "Whether to use H264 codec for output video. Default is H265.",
+      "default": false,
+      "tier": "advanced"
+     },
+     "video_url": {
+      "type": "string",
+      "title": "Video Url",
+      "format": "video",
+      "slot": {
+       "kind": "video",
+       "role": "source",
+       "list": false,
+       "max": 1
+      }
+     },
+     "target_fps": {
+      "type": "integer",
+      "title": "Target Fps",
+      "description": "Target frames per second for the interpolated output.",
+      "default": 60,
+      "minimum": 16,
+      "maximum": 120,
+      "tier": "advanced"
+     }
+    },
+    "required": [
+     "video_url"
+    ],
+    "safety": {
+     "key": "enable_safety_checker",
+     "kind": "enable"
+    },
+    "request": {
+     "promptKey": "prompt",
+     "fixed": {},
+     "blockers": [],
+     "v": 5
+    }
+   },
+   "price": {
+    "unit": "per_second",
+    "amount": 0.03,
+    "source": "scraped",
+    "fetchedAt": "2026-10-25T21:29:40.620Z"
+   },
+   "status": "active",
+   "description": "Professional frame interpolation powered by Topaz Labs. Apollo, Chronos and Aion retime footage up to 120 fps, from smooth motion to extreme slow motion. Best for fluid 60fps output and slow-motion effects.",
+   "featured": false,
+   "task": "video-to-video",
+   "updatedAt": "2026-09-05T01:07:15.958Z",
+   "utility": true
+  },
+  {
+   "id": "fal/fal-ai/rife/video",
+   "endpoint": "fal-ai/rife/video",
+   "provider": "fal",
+   "name": "RIFE",
+   "family": "rife",
+   "logoKey": "fal-ai",
+   "category": "video",
+   "inputs": [
+    "text",
+    "image"
+   ],
+   "params": {
+    "type": "object",
+    "properties": {
+     "num_frames": {
+      "type": "integer",
+      "title": "Number of Frames",
+      "description": "The number of frames to generate between the input video frames.",
+      "default": 1,
+      "minimum": 1,
+      "maximum": 4,
+      "tier": "technical"
+     },
+     "loop": {
+      "type": "boolean",
+      "title": "Loop",
+      "description": "If True, the final frame will be looped back to the first frame to create a seamless loop. If False, the final frame will not loop back.",
+      "default": false,
+      "tier": "unique"
+     },
+     "use_calculated_fps": {
+      "type": "boolean",
+      "title": "Use Calculated FPS",
+      "description": "If True, the function will use the calculated FPS of the input video multiplied by the number of frames to determine the output FPS. If False, the passed FPS will be used.",
+      "default": true,
+      "tier": "advanced"
+     },
+     "fps": {
+      "type": "integer",
+      "title": "Frames Per Second",
+      "description": "Frames per second for the output video. Only applicable if use_calculated_fps is False.",
+      "default": 8,
+      "minimum": 1,
+      "maximum": 60,
+      "tier": "technical"
+     },
+     "video_url": {
+      "type": "string",
+      "title": "Video URL",
+      "format": "video",
+      "slot": {
+       "kind": "video",
+       "role": "source",
+       "list": false,
+       "max": 1
+      }
+     },
+     "use_scene_detection": {
+      "type": "boolean",
+      "title": "Use Scene Detection",
+      "description": "If True, the input video will be split into scenes before interpolation. This removes smear frames between scenes, but can result in false positives if the scene detection is not accurate. If False, the entire video will be treated as a single scene.",
+      "default": false,
+      "tier": "advanced"
+     }
+    },
+    "required": [
+     "video_url"
+    ],
+    "request": {
+     "promptKey": "prompt",
+     "fixed": {},
+     "blockers": [],
+     "v": 5
+    }
+   },
+   "price": {
+    "unit": "per_run",
+    "amount": null,
+    "computeSecond": 0.0013,
+    "source": "scraped",
+    "fetchedAt": "2026-10-25T21:29:40.620Z"
+   },
+   "status": "active",
+   "description": "Interpolate videos with RIFE - Real-Time Intermediate Flow Estimation",
+   "featured": false,
+   "task": "video-to-video",
+   "updatedAt": "2026-04-21T17:54:09.243Z",
+   "utility": true
+  },
+  {
+   "id": "fal/luma/agent/ray/v3.2/reframe",
+   "endpoint": "luma/agent/ray/v3.2/reframe",
+   "provider": "fal",
+   "name": "Luma Ray 3.2 Reframe",
+   "family": "agent",
+   "logoKey": "luma",
+   "category": "video",
+   "inputs": [
+    "text",
+    "image"
+   ],
+   "params": {
+    "type": "object",
+    "properties": {
+     "video_url": {
+      "type": "string",
+      "title": "Video Url",
+      "format": "video",
+      "slot": {
+       "kind": "video",
+       "role": "source",
+       "list": false,
+       "max": 1
+      }
+     },
+     "aspect_ratio": {
+      "type": "string",
+      "title": "Aspect Ratio",
+      "description": "Target aspect ratio for the reframed video.",
+      "enum": [
+       "3:4",
+       "4:3",
+       "1:1",
+       "9:16",
+       "16:9",
+       "21:9"
+      ],
+      "tier": "common"
+     },
+     "duration": {
+      "type": "string",
+      "title": "Duration",
+      "description": "Duration of the reframed video. Defaults to matching the source video's duration; set explicitly to 5s or 10s to override.",
+      "enum": [
+       "5s",
+       "10s"
+      ],
+      "tier": "common"
+     },
+     "resolution": {
+      "type": "string",
+      "title": "Resolution",
+      "description": "Resolution of the reframed video. Higher resolutions cost more.",
+      "enum": [
+       "540p",
+       "720p",
+       "1080p"
+      ],
+      "default": "540p",
+      "tier": "common"
+     }
+    },
+    "required": [
+     "video_url",
+     "aspect_ratio"
+    ],
+    "safety": {
+     "key": "enable_safety_checker",
+     "kind": "enable"
+    },
+    "request": {
+     "promptKey": "prompt",
+     "fixed": {},
+     "blockers": [],
+     "v": 5
+    }
+   },
+   "price": {
+    "unit": "per_second",
+    "amount": 0.06,
+    "rules": [
+     {
+      "when": {
+       "resolution": "540p"
+      },
+      "amount": 0.06
+     },
+     {
+      "when": {
+       "resolution": "720p"
+      },
+      "amount": 0.12
+     },
+     {
+      "when": {
+       "resolution": "1080p"
+      },
+      "amount": 0.36
+     }
+    ],
+    "source": "scraped",
+    "fetchedAt": "2026-10-25T21:29:40.620Z"
+   },
+   "status": "active",
+   "description": "Luma Ray 3.2 reframes an existing video into a new aspect ratio guided by a text prompt, preserving the original footage frame-for-frame while controlling resolution and outpainting the surrounding canvas.",
+   "featured": false,
+   "task": "video-to-video",
+   "updatedAt": "2026-10-20T22:39:13.546Z",
+   "utility": true
+  },
+  {
+   "id": "fal/fal-ai/ltx-2.3/reframe",
+   "endpoint": "fal-ai/ltx-2.3/reframe",
+   "provider": "fal",
+   "name": "Ltx 2.3 ",
+   "family": "ltx-2.3",
+   "logoKey": "fal-ai",
+   "category": "video",
+   "inputs": [
+    "text",
+    "image"
+   ],
+   "params": {
+    "type": "object",
+    "properties": {
+     "aspect_ratio": {
+      "type": "string",
+      "title": "Aspect Ratio",
+      "description": "The target aspect ratio to reframe the video to.",
+      "enum": [
+       "1:1",
+       "4:5",
+       "5:4",
+       "9:16",
+       "16:9"
+      ],
+      "default": "16:9",
+      "tier": "common"
+     },
+     "resolution": {
+      "type": "string",
+      "title": "Resolution",
+      "description": "The target output resolution tier. Combined with the aspect ratio to determine the output size.",
+      "enum": [
+       "720p",
+       "1080p"
+      ],
+      "default": "1080p",
+      "tier": "common"
+     },
+     "video_url": {
+      "type": "string",
+      "title": "Video URL",
+      "format": "video",
+      "slot": {
+       "kind": "video",
+       "role": "source",
+       "list": false,
+       "max": 1
+      }
+     }
+    },
+    "required": [
+     "video_url"
+    ],
+    "safety": {
+     "key": "enable_safety_checker",
+     "kind": "enable"
+    },
+    "request": {
+     "promptKey": "prompt",
+     "fixed": {},
+     "blockers": [],
+     "v": 5
+    }
+   },
+   "price": {
+    "unit": "per_second",
+    "amount": 0.1,
+    "rules": [
+     {
+      "when": {
+       "resolution": "720p"
+      },
+      "amount": 0.1
+     },
+     {
+      "when": {
+       "resolution": "1080p"
+      },
+      "amount": 0.2
+     }
+    ],
+    "source": "scraped",
+    "fetchedAt": "2026-10-25T21:29:40.620Z"
+   },
+   "status": "active",
+   "description": " LTX-2.3 Reframe converts your videos to any aspect ratio without destructive cropping. It intelligently recenters the original footage and generatively fills the newly exposed areas with content that seamlessly matches the scene, so the result looks like it was shot natively in the target format. Turn landscape footage into vertical 9:16 for social, square 1:1 for feeds, or anything in between. Supports videos up to 60 seconds, with 720p and 1080p outputs across 1:1, 4:5, 5:4, 9:16 and 16:9.",
+   "featured": false,
+   "task": "video-to-video",
+   "updatedAt": "2026-10-20T22:34:12.126Z",
+   "utility": true
+  },
+  {
+   "id": "fal/fal-ai/seedvr/upscale/video",
+   "endpoint": "fal-ai/seedvr/upscale/video",
+   "provider": "fal",
+   "name": "SeedVR2",
+   "family": "seedvr",
+   "logoKey": "fal-ai",
+   "category": "video",
+   "inputs": [
+    "text",
+    "image"
+   ],
+   "params": {
+    "type": "object",
+    "properties": {
+     "output_quality": {
+      "type": "string",
+      "title": "Output Quality",
+      "description": "The quality of the output video.",
+      "enum": [
+       "low",
+       "medium",
+       "high",
+       "maximum"
+      ],
+      "default": "high",
+      "tier": "technical"
+     },
+     "seed": {
+      "type": "integer",
+      "title": "Seed",
+      "description": "The random seed used for the generation process.",
+      "tier": "advanced"
+     },
+     "upscale_factor": {
+      "type": "number",
+      "title": "Upscale Factor",
+      "description": "Upscaling factor to be used. Will multiply the dimensions with this factor when `upscale_mode` is `factor`.",
+      "default": 2,
+      "minimum": 1,
+      "maximum": 10,
+      "tier": "unique"
+     },
+     "output_write_mode": {
+      "type": "string",
+      "title": "Output Write Mode",
+      "description": "The write mode of the output video.",
+      "enum": [
+       "fast",
+       "balanced",
+       "small"
+      ],
+      "default": "balanced",
+      "tier": "advanced"
+     },
+     "upscale_mode": {
+      "type": "string",
+      "title": "Upscale Mode",
+      "description": "The mode to use for the upscale. If 'target', the upscale factor will be calculated based on the target resolution. If 'factor', the upscale factor will be used directly.",
+      "enum": [
+       "target",
+       "factor"
+      ],
+      "default": "factor",
+      "tier": "advanced"
+     },
+     "target_resolution": {
+      "type": "string",
+      "title": "Target Resolution",
+      "description": "The target resolution to upscale to when `upscale_mode` is `target`.",
+      "enum": [
+       "720p",
+       "1080p",
+       "1440p",
+       "2160p"
+      ],
+      "default": "1080p",
+      "tier": "advanced"
+     },
+     "output_format": {
+      "type": "string",
+      "title": "Output Format",
+      "description": "The format of the output video.",
+      "enum": [
+       "X264 (.mp4)",
+       "VP9 (.webm)",
+       "PRORES4444 (.mov)",
+       "GIF (.gif)"
+      ],
+      "default": "X264 (.mp4)",
+      "tier": "technical"
+     },
+     "video_url": {
+      "type": "string",
+      "title": "Video Url",
+      "format": "video",
+      "slot": {
+       "kind": "video",
+       "role": "source",
+       "list": false,
+       "max": 1
+      }
+     },
+     "noise_scale": {
+      "type": "number",
+      "title": "Noise Scale",
+      "description": "The noise scale to use for the generation process.",
+      "default": 0.1,
+      "minimum": 0,
+      "maximum": 1,
+      "tier": "advanced"
+     }
+    },
+    "required": [
+     "video_url"
+    ],
+    "safety": {
+     "key": "enable_safety_checker",
+     "kind": "enable"
+    },
+    "request": {
+     "promptKey": "prompt",
+     "fixed": {},
+     "blockers": [],
+     "v": 5
+    }
+   },
+   "price": {
+    "unit": "per_megapixel",
+    "amount": 0.001,
+    "source": "scraped",
+    "fetchedAt": "2026-10-25T21:29:40.620Z"
+   },
+   "status": "active",
+   "description": "Upscale your videos using SeedVR2 with temporal consistency!",
+   "featured": false,
+   "task": "video-to-video",
+   "updatedAt": "2026-10-20T22:36:40.012Z",
+   "utility": true
+  },
+  {
+   "id": "fal/bria/video/background-removal/v3",
+   "endpoint": "bria/video/background-removal/v3",
+   "provider": "fal",
+   "name": "Bria's VRMBG 3.0",
+   "family": "video",
+   "logoKey": "bria",
+   "category": "video",
+   "inputs": [
+    "text",
+    "image"
+   ],
+   "params": {
+    "type": "object",
+    "properties": {
+     "auto_zoom": {
+      "type": "boolean",
+      "title": "Auto Zoom",
+      "description": "If true, crop the output to the smallest rectangle the subject stays inside for the whole video.",
+      "default": false,
+      "tier": "advanced"
+     },
+     "preserve_audio": {
+      "type": "boolean",
+      "title": "Preserve Audio",
+      "description": "If true, audio will be preserved in the output video.",
+      "default": true,
+      "tier": "advanced"
+     },
+     "video_url": {
+      "type": "string",
+      "title": "Video Url",
+      "format": "video",
+      "slot": {
+       "kind": "video",
+       "role": "source",
+       "list": false,
+       "max": 1
+      }
+     },
+     "background_color": {
+      "type": "string",
+      "title": "Background Color",
+      "description": "Background color. Options: Transparent, Black, White, Gray, Red, Green, Blue, Yellow, Cyan, Magenta, Orange.",
+      "enum": [
+       "Transparent",
+       "Black",
+       "White",
+       "Gray",
+       "Red",
+       "Green",
+       "Blue",
+       "Yellow",
+       "Cyan",
+       "Magenta",
+       "Orange"
+      ],
+      "default": "Black",
+      "tier": "advanced"
+     },
+     "output_container_and_codec": {
+      "type": "string",
+      "title": "Output Container And Codec",
+      "description": "Output container and codec. Options: mp4_h265, mp4_h264, webm_vp9, mov_h265, mov_proresks, mkv_h265, mkv_h264, mkv_vp9, gif.",
+      "enum": [
+       "mp4_h265",
+       "mp4_h264",
+       "webm_vp9",
+       "mov_h265",
+       "mov_proresks",
+       "mkv_h265",
+       "mkv_h264",
+       "mkv_vp9",
+       "gif"
+      ],
+      "default": "webm_vp9",
+      "tier": "advanced"
+     }
+    },
+    "required": [
+     "video_url"
+    ],
+    "request": {
+     "promptKey": "prompt",
+     "fixed": {},
+     "blockers": [],
+     "v": 5
+    }
+   },
+   "price": {
+    "unit": "per_second",
+    "amount": 0.05,
+    "source": "scraped",
+    "fetchedAt": "2026-10-25T21:29:40.620Z"
+   },
+   "status": "active",
+   "description": "Remove backgrounds from any video with Bria's VRMBG 3.0. Fast, accurate background removal across talking heads, podcasts, product videos, commercials, and cinematic footage.",
+   "featured": false,
+   "task": "video-to-video",
+   "updatedAt": "2026-09-01T13:08:05.720Z",
+   "utility": true
+  }
+ ]
+}
