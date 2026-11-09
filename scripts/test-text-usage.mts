@@ -19,7 +19,7 @@ const check = (name: string, ok: boolean, extra: unknown = "") => {
 const near = (a: number, b: number) => Math.abs(a - b) < 1e-9
 
 const rec = (id: string, price: ModelRecord["price"]): ModelRecord =>
-  ({ id, endpoint: id, provider: "openai", name: id, family: "x", logoKey: "x", modality: "text", inputs: ["text"], params: { type: "object", properties: {} }, price, status: "active" }) as ModelRecord
+  ({ id, endpoint: id, provider: "openai", name: id, family: "x", logoKey: "x", category: "text", inputs: ["text"], params: { type: "object", properties: {} }, price, status: "active" }) as ModelRecord
 const priced = rec("openai/gpt-x", { unit: "per_1m_tokens", amount: 2.5, outputAmount: 10, cachedAmount: 1.25, source: "scraped", fetchedAt: "" })
 const noCachedRate = rec("openai/gpt-y", { unit: "per_1m_tokens", amount: 2.5, outputAmount: 10, source: "scraped", fetchedAt: "" })
 const unpriced = rec("openai/gpt-z", { unit: "unknown", amount: null, source: "estimate", fetchedAt: "" })

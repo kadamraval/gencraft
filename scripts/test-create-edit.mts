@@ -19,8 +19,8 @@ const check = (name: string, ok: boolean, extra = "") => {
   console.log(`${ok ? "PASS" : "FAIL"}  ${name} ${ok ? "" : extra}`)
   if (!ok) fails++
 }
-const rec = (endpoint: string, name: string, modality: ModelRecord["modality"] = "video", props: ModelRecord["params"]["properties"] = {}) =>
-  ({ id: `x/${endpoint}`, endpoint, name, modality, provider: "fal", params: { type: "object", properties: props } }) as ModelRecord
+const rec = (endpoint: string, name: string, category: ModelRecord["category"] = "video", props: ModelRecord["params"]["properties"] = {}) =>
+  ({ id: `x/${endpoint}`, endpoint, name, category, provider: "fal", params: { type: "object", properties: props } }) as ModelRecord
 
 // Shots switch: the host's own yes/no switch under either spelling, or the app's own for a maker that writes shots in the prompt
 check("multi_shots (native) is the switch", shotsSwitch(rec("wan/2.6", "Wan 2.6", "video", { multi_shots: { type: "boolean" } }))?.key === "multi_shots")
@@ -98,19 +98,19 @@ check("edit actions: a model's own edit endpoint beats a task inside another mod
 check("edit actions: no upscale, background removal or relight is ever offered", editActionsFor(everything, on(...everything)).every((a) => ["edit", "extend", "lip-sync", "motion-transfer"].includes(a.kind)))
 
 // Quiet prompt improvement: only what is missing, only for a short prompt, the person's words untouched
-const short = enhancePrompt("a knight at dusk", { modality: "image" })
+const short = enhancePrompt("a knight at dusk", { category: "image" })
 check("enhance: a short prompt gets the missing camera and style, not the light it already has", short.added.join() === "camera,style" && !short.added.includes("light"), JSON.stringify(short))
 check("enhance: the person's words come first, unchanged", short.prompt.startsWith("a knight at dusk."))
 check("enhance: the original is kept as written", keepsOriginal("a knight at dusk", short.prompt))
-check("enhance: nothing added to a prompt that already says it all", enhancePrompt("a knight at dusk, soft rim light, close-up, cinematic film still", { modality: "image" }).added.length === 0)
-check("enhance: a detailed prompt is left alone", enhancePrompt(Array.from({ length: 30 }, (_, i) => `word${i}`).join(" "), { modality: "image" }).prompt.split(" ").length === 30)
-check("enhance: video also gets motion", enhancePrompt("a knight", { modality: "video" }).added.includes("motion"))
-check("enhance: shots on lines are left alone", enhancePrompt("4s A knight rides.\nHe reaches a gate.", { modality: "video" }).added.length === 0)
-check("enhance: a mention or tagged reference is left alone", enhancePrompt("@Aria walks", { modality: "video" }).added.length === 0 && enhancePrompt("Image 1 walks", { modality: "video" }).added.length === 0)
-check("enhance: text that must appear is left alone", enhancePrompt('a sign that says "OPEN"', { modality: "image" }).added.length === 0)
-check("enhance: attached files, tasks and a native enhancer switch it off", enhancePrompt("a knight", { modality: "image", hasFiles: true }).added.length === 0 && enhancePrompt("a knight", { modality: "video", hasTask: true }).added.length === 0 && enhancePrompt("a knight", { modality: "image", nativeOn: true }).added.length === 0)
-check("enhance: audio and text are never touched", enhancePrompt("a calm voice", { modality: "audio" }).added.length === 0 && enhancePrompt("hi", { modality: "text" }).added.length === 0)
-check("enhance: off means off", enhancePrompt("a knight", { modality: "image", off: true }).added.length === 0)
+check("enhance: nothing added to a prompt that already says it all", enhancePrompt("a knight at dusk, soft rim light, close-up, cinematic film still", { category: "image" }).added.length === 0)
+check("enhance: a detailed prompt is left alone", enhancePrompt(Array.from({ length: 30 }, (_, i) => `word${i}`).join(" "), { category: "image" }).prompt.split(" ").length === 30)
+check("enhance: video also gets motion", enhancePrompt("a knight", { category: "video" }).added.includes("motion"))
+check("enhance: shots on lines are left alone", enhancePrompt("4s A knight rides.\nHe reaches a gate.", { category: "video" }).added.length === 0)
+check("enhance: a mention or tagged reference is left alone", enhancePrompt("@Aria walks", { category: "video" }).added.length === 0 && enhancePrompt("Image 1 walks", { category: "video" }).added.length === 0)
+check("enhance: text that must appear is left alone", enhancePrompt('a sign that says "OPEN"', { category: "image" }).added.length === 0)
+check("enhance: attached files, tasks and a native enhancer switch it off", enhancePrompt("a knight", { category: "image", hasFiles: true }).added.length === 0 && enhancePrompt("a knight", { category: "video", hasTask: true }).added.length === 0 && enhancePrompt("a knight", { category: "image", nativeOn: true }).added.length === 0)
+check("enhance: audio and text are never touched", enhancePrompt("a calm voice", { category: "audio" }).added.length === 0 && enhancePrompt("hi", { category: "text" }).added.length === 0)
+check("enhance: off means off", enhancePrompt("a knight", { category: "image", off: true }).added.length === 0)
 
 const imageHost = rec("fal-ai/some-image", "Some Image", "image", { seed: { type: "integer", default: 5555 } })
 const preview = shapeRun(imageHost, "a knight", { seed: 5555 })

@@ -20,15 +20,15 @@ const check = (name: string, fn: () => void) => {
 }
 
 const rec = (id: string, over: Partial<ModelRecord>): ModelRecord => ({
-  id: `p/${id}`, endpoint: id, provider: "p", name: id, family: id, logoKey: "p", modality: "image", inputs: ["text"], params: { type: "object", properties: {} },
+  id: `p/${id}`, endpoint: id, provider: "p", name: id, family: id, logoKey: "p", category: "image", inputs: ["text"], params: { type: "object", properties: {} },
   price: { unit: "per_run", amount: 0.05, source: "api", fetchedAt: "" }, status: "active", ...over,
 })
 const withFile = (kind: "image" | "video" | "audio") => ({ type: "object" as const, properties: { f: { type: "string", format: kind } as never } })
 
 check("the standard database's own models come first: its rank beats featured, and a backup does not count as its own", () => {
   const plain = rec("plain", { task: "text-to-image", featured: true })
-  const mine = rec("mine", { task: "text-to-image", jobs: [{ id: "text-to-image", rank: 1, role: "model" }] })
-  const backup = rec("backup", { task: "text-to-image", jobs: [{ id: "text-to-image", rank: 1, role: "substitute" }] })
+  const mine = rec("mine", { task: "text-to-image", serves: [{ id: "text-to-image", rank: 1, role: "model" }] })
+  const backup = rec("backup", { task: "text-to-image", serves: [{ id: "text-to-image", rank: 1, role: "substitute" }] })
   assert.equal(packRankOf(mine), 1)
   assert.equal(packRankOf(backup), undefined)
   assert.equal(pickByTier([plain, mine], "high")?.endpoint, "mine")
@@ -37,7 +37,7 @@ check("the standard database's own models come first: its rank beats featured, a
 
 check("the default model for a kind of output is the database's first choice on that provider", () => {
   const a = rec("a", { task: "text-to-image" })
-  const b = rec("b", { task: "text-to-image", jobs: [{ id: "text-to-image", rank: 1, role: "model" }] })
+  const b = rec("b", { task: "text-to-image", serves: [{ id: "text-to-image", rank: 1, role: "model" }] })
   const ids = computeDefaultEnabled([a, b])
   assert.equal(ids.filter((i) => i === b.id).length, 1)
   assert.equal(ids[0], b.id)
@@ -51,15 +51,15 @@ check("a picture model that only takes a prompt is Image; one that takes a pictu
 })
 
 check("video models: making is Video, taking a video file is Video edit", () => {
-  assert.deepEqual(rolesOf(rec("t2v", { modality: "video", task: "text-to-video" })), ["video"])
-  assert.deepEqual(rolesOf(rec("v2v", { modality: "video", task: "video-to-video", inputs: ["text", "video"], params: withFile("video") })), ["video-edit"])
+  assert.deepEqual(rolesOf(rec("t2v", { category: "video", task: "text-to-video" })), ["video"])
+  assert.deepEqual(rolesOf(rec("v2v", { category: "video", task: "video-to-video", inputs: ["text", "video"], params: withFile("video") })), ["video-edit"])
 })
 
 check("speech, music and speech to text come from the task and the file taken", () => {
-  assert.deepEqual(rolesOf(rec("tts", { modality: "audio", task: "text-to-speech" })), ["speech"])
-  assert.deepEqual(rolesOf(rec("mus", { modality: "audio", task: "text-to-audio" })), ["music"])
-  assert.deepEqual(rolesOf(rec("chat", { modality: "text", inputs: ["text", "audio"] })), ["text", "stt"])
-  assert.deepEqual(rolesOf(rec("chat2", { modality: "text" })), ["text"])
+  assert.deepEqual(rolesOf(rec("tts", { category: "audio", task: "text-to-speech" })), ["speech"])
+  assert.deepEqual(rolesOf(rec("mus", { category: "audio", task: "text-to-audio" })), ["music"])
+  assert.deepEqual(rolesOf(rec("chat", { category: "text", inputs: ["text", "audio"] })), ["text", "stt"])
+  assert.deepEqual(rolesOf(rec("chat2", { category: "text" })), ["text"])
 })
 
 check("a retired model has no role", () => {
@@ -87,8 +87,8 @@ check("a bookmarked model wins a tie in price", () => {
 check("a role the person did not set follows the level; one set by hand keeps their model", () => {
   const listed = [rec("g1", { task: "text-to-image", price: { unit: "per_run", amount: 0.01, source: "api", fetchedAt: "" } }), rec("g2", { task: "text-to-image", price: { unit: "per_run", amount: 0.4, source: "api", fetchedAt: "" }, featured: true })]
   const edits = [
-    rec("e1", { task: "image-to-image", inputs: ["image"], params: withFile("image"), price: { unit: "per_run", amount: 0.02, source: "api", fetchedAt: "" } }),
-    rec("e2", { task: "image-to-image", inputs: ["image"], params: withFile("image"), price: { unit: "per_run", amount: 0.3, source: "api", fetchedAt: "" }, featured: true }),
+    rec("e1", { task: "image-to-image", inputs: ["text", "image"], params: withFile("image"), price: { unit: "per_run", amount: 0.02, source: "api", fetchedAt: "" } }),
+    rec("e2", { task: "image-to-image", inputs: ["text", "image"], params: withFile("image"), price: { unit: "per_run", amount: 0.3, source: "api", fetchedAt: "" }, featured: true }),
   ]
   const all = [...listed, ...edits]
   const groups = resolveGroups(undefined, all)
@@ -102,7 +102,7 @@ check("a role the person did not set follows the level; one set by hand keeps th
   assert.equal(groupModelForTool(low, "video-upscale", edits)?.endpoint, "e1")
   assert.equal(groupModelForTool({ ...high, tools: { "video-upscale": "gone" } }, "video-upscale", edits)?.endpoint, "e2")
   // new models count straight away: nothing to assign
-  const later = [...all, rec("e0", { task: "image-to-image", inputs: ["image"], params: withFile("image"), price: { unit: "per_run", amount: 0.001, source: "api", fetchedAt: "" } })]
+  const later = [...all, rec("e0", { task: "image-to-image", inputs: ["text", "image"], params: withFile("image"), price: { unit: "per_run", amount: 0.001, source: "api", fetchedAt: "" } })]
   assert.equal(groupModelFor(resolveGroups(undefined, later).find((g) => g.id === "low"), "image-edit", later)?.endpoint, "e0")
 })
 
@@ -114,20 +114,24 @@ check("Replicate tool collections are read, and each model's own input decides w
   assert.ok(isToolCollection("super-resolution") && isToolCollection("remove-backgrounds") && isToolCollection("video-editing"))
   assert.ok(!isToolCollection("text-to-image") && !isToolCollection("official"))
   const detail = (name: string, input: Record<string, unknown>) =>
-    ({ owner: "acme", name, description: "Removes the background from a video", latest_version: { id: "v1", openapi_schema: { components: { schemas: { Input: { type: "object", properties: input }, Output: { type: "string", format: "uri" } } } } } }) as never
-  const video = recordFromReplicate(detail("video-background-remover", { video: { type: "string", format: "uri" } }), { modality: "image", task: "tool" }, "")
+    ({ owner: "bria", name, description: "Removes the background from a video", latest_version: { id: "v1", openapi_schema: { components: { schemas: { Input: { type: "object", properties: input }, Output: { type: "string", format: "uri" } } } } } }) as never
+  const video = recordFromReplicate(detail("video-background-remover", { video: { type: "string", format: "uri" } }), { category: "image", task: "tool" }, "")
   assert.ok(video)
-  assert.equal(video!.modality, "video")
+  assert.equal(video!.category, "video")
   assert.equal(video!.utility, true)
   assert.deepEqual(rolesOf(video!), [], "a tool model is never offered to make something with")
-  const sound = recordFromReplicate(detail("splitter", { audio: { type: "string", format: "uri" } }), { modality: "image", task: "tool" }, "")
-  assert.equal(sound!.modality, "audio")
-  const none = recordFromReplicate(detail("nothing", { prompt: { type: "string" } }), { modality: "image", task: "tool" }, "")
+  const sound = recordFromReplicate(detail("splitter", { audio: { type: "string", format: "uri" } }), { category: "image", task: "tool" }, "")
+  assert.equal(sound!.category, "audio")
+  const none = recordFromReplicate(detail("nothing", { prompt: { type: "string" } }), { category: "image", task: "tool" }, "")
   assert.equal(none, null)
-  // and the tool matcher finds it with a Replicate key only
-  const offer = statusOf(toolById("video-remove-background")!, { records: [video!], listed: [], keyed: new Set(["replicate"]), runnable: () => true })
+  // the tool matcher offers it with a Replicate key once the database ranks it for the job; before that it is only under Show all
+  const tool = toolById("video-remove-background")!
+  const unranked = statusOf(tool, { records: [video!], listed: [], keyed: new Set(["replicate"]), runnable: () => true })
+  assert.deepEqual(unranked.candidates, [])
+  assert.equal(unranked.more[0]?.endpoint, "bria/video-background-remover")
+  const offer = statusOf(tool, { records: [{ ...video!, serves: [{ id: tool.id, rank: 1 }] }], listed: [], keyed: new Set(["replicate"]), runnable: () => true })
   assert.equal(offer.status.state, "ready")
-  assert.equal(offer.candidates[0]?.endpoint, "acme/video-background-remover")
+  assert.equal(offer.candidates[0]?.endpoint, "bria/video-background-remover")
 })
 
 console.log(`\n${passed} passed`)

@@ -2,7 +2,7 @@
  "builtAt": "2026-10-23T08:16:28.741Z",
  "entries": [
   {
-   "modality": "image",
+   "category": "image",
    "rank": 1,
    "name": "GPT Image 2.5 Sunburst (max)",
    "maker": "OpenAI",
@@ -10,7 +10,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 2,
    "name": "GPT Image 2.5 Flare (max)",
    "maker": "OpenAI",
@@ -18,7 +18,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 3,
    "name": "GPT Image 2 (high)",
    "maker": "OpenAI",
@@ -26,7 +26,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 4,
    "name": "Nano Banana 2.1",
    "maker": "Google",
@@ -34,7 +34,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 5,
    "name": "MAI-Image-2.6",
    "maker": "Microsoft AI",
@@ -42,7 +42,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 6,
    "name": "Grok Imagine Image 2.0",
    "maker": "SpaceXAI",
@@ -50,7 +50,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 7,
    "name": "Nano Banana 2 (Gemini 3.1 Flash Image)",
    "maker": "Google",
@@ -58,7 +58,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 8,
    "name": "Muse Image",
    "maker": "Meta",
@@ -66,7 +66,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 9,
    "name": "GPT Image 1.5 (high)",
    "maker": "OpenAI",
@@ -74,7 +74,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 10,
    "name": "MAI-Image-2.6-Flash",
    "maker": "Microsoft AI",
@@ -82,7 +82,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 11,
    "name": "Nano Banana Pro (Gemini 3 Pro Image)",
    "maker": "Google",
@@ -90,7 +90,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 12,
    "name": "MAI-Image-2.5",
    "maker": "Microsoft AI",
@@ -98,7 +98,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 13,
    "name": "FLUX 3 Image",
    "maker": "Black Forest Labs",
@@ -106,7 +106,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 14,
    "name": "MAI-Image-2.5-Pro",
    "maker": "Microsoft AI",
@@ -114,7 +114,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 15,
    "name": "Nano Banana 2 Lite (Gemini 3.1 Flash Lite Image)",
    "maker": "Google",
@@ -122,7 +122,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 16,
    "name": "Seedream 5.0 Pro",
    "maker": "ByteDance Seed",
@@ -130,7 +130,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 17,
    "name": "Qwen-Image-3.0-Pro",
    "maker": "Alibaba",
@@ -138,7 +138,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 18,
    "name": "Qwen-Image-3.0",
    "maker": "Alibaba",
@@ -146,7 +146,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 19,
    "name": "Qwen-Image-2.1-Pro",
    "maker": "Alibaba",
@@ -154,7 +154,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 20,
    "name": "grok-imagine-image-quality",
    "maker": "SpaceXAI",
@@ -162,7 +162,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 21,
    "name": "FLUX 3 Image Klein",
    "maker": "Black Forest Labs",
@@ -172,7 +172,7 @@
    "license": "other"
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 22,
    "name": "Qwen-Image-2.1",
    "maker": "Alibaba",
@@ -182,7 +182,7 @@
    "license": "other"
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 23,
    "name": "Fibo 2.0",
    "maker": "Bria",
@@ -192,7 +192,7 @@
    "license": "other"
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 24,
    "name": "Krea 2 Large",
    "maker": "Krea",
@@ -200,7 +200,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 25,
    "name": "Qwen Image 2.0 Pro (2026-04-22)",
    "maker": "Alibaba",
@@ -208,7 +208,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 26,
    "name": "MAI-Image-2.5-Flash",
    "maker": "Microsoft AI",
@@ -216,7 +216,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 27,
    "name": "Qwen-Image-2.1-Turbo",
    "maker": "Alibaba",
@@ -224,7 +224,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 28,
    "name": "Wan 2.6 Image",
    "maker": "Alibaba",
@@ -232,7 +232,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 29,
    "name": "Recraft V4.1 Utility",
    "maker": "Recraft",
@@ -240,7 +240,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 30,
    "name": "Seedream 4.5",
    "maker": "ByteDance Seed",
@@ -248,7 +248,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 31,
    "name": "FLUX.2 [flex]",
    "maker": "Black Forest Labs",
@@ -256,7 +256,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 32,
    "name": "Ideogram 4.0 (Quality)",
    "maker": "Ideogram",
@@ -264,7 +264,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 33,
    "name": "Luma UNI 1 Max",
    "maker": "Luma Labs",
@@ -272,7 +272,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 34,
    "name": "grok-imagine-image",
    "maker": "SpaceXAI",
@@ -280,7 +280,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 35,
    "name": "FLUX.2 [max]",
    "maker": "Black Forest Labs",
@@ -288,7 +288,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 36,
    "name": "Krea 2 Medium Turbo",
    "maker": "Krea",
@@ -296,7 +296,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 37,
    "name": "Recraft V4.1 Utility Pro",
    "maker": "Recraft",
@@ -304,7 +304,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 38,
    "name": "HiDream-O1-Image-1.5",
    "maker": "HiDream",
@@ -312,7 +312,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 39,
    "name": "Seedream 5.0 Lite",
    "maker": "ByteDance Seed",
@@ -320,7 +320,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 40,
    "name": "Ideogram 4.5 (High)",
    "maker": "Ideogram",
@@ -328,7 +328,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 41,
    "name": "Wan2.6 Text to Image",
    "maker": "Alibaba",
@@ -336,7 +336,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 42,
    "name": "GPT Image 1 (high)",
    "maker": "OpenAI",
@@ -344,7 +344,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 43,
    "name": "Krea 2 Medium",
    "maker": "Krea",
@@ -352,7 +352,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 44,
    "name": "FLUX.2 [pro]",
    "maker": "Black Forest Labs",
@@ -360,7 +360,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 45,
    "name": "Ideogram 4.0",
    "maker": "Ideogram",
@@ -368,7 +368,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 46,
    "name": "FLUX.2 [dev]",
    "maker": "Black Forest Labs",
@@ -378,7 +378,7 @@
    "license": "other"
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 47,
    "name": "Ming-Image-0.1-Design",
    "maker": "InclusionAI",
@@ -388,7 +388,7 @@
    "license": "mit"
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 48,
    "name": "P-Image-Ideogram (High)",
    "maker": "Pruna AI",
@@ -396,7 +396,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 49,
    "name": "FLUX.2 [dev] Turbo",
    "maker": "Fal",
@@ -406,7 +406,7 @@
    "license": "other"
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 50,
    "name": "Cosmos3-Super-Text2Image (agentic)",
    "maker": "NVIDIA",
@@ -416,7 +416,7 @@
    "license": "other"
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 51,
    "name": "Luma UNI 1",
    "maker": "Luma Labs",
@@ -424,7 +424,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 52,
    "name": "P-Image-Ideogram (Very High)",
    "maker": "Pruna AI",
@@ -432,7 +432,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 53,
    "name": "Qwen Image 2.0 (2026-03-03)",
    "maker": "Alibaba",
@@ -440,7 +440,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 54,
    "name": "HunyuanImage 3.0 (Tencent Cloud)",
    "maker": "Tencent",
@@ -448,7 +448,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 55,
    "name": "FLUX.2 [dev] Flash",
    "maker": "Fal",
@@ -458,7 +458,7 @@
    "license": "other"
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 56,
    "name": "HunyuanImage 3.0 Instruct",
    "maker": "Tencent",
@@ -468,7 +468,7 @@
    "license": "other"
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 57,
    "name": "Wan 2.7",
    "maker": "Alibaba",
@@ -476,7 +476,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 58,
    "name": "Cosmos3-Super-Text2Image",
    "maker": "NVIDIA",
@@ -486,7 +486,7 @@
    "license": "other"
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 59,
    "name": "Nano Banana (Gemini 2.5 Flash Image)",
    "maker": "Google",
@@ -494,7 +494,7 @@
    "open": false
   },
   {
-   "modality": "image",
+   "category": "image",
    "rank": 60,
    "name": "Ideogram 4.0 Fast (Quality)",
    "maker": "Fal",
@@ -504,7 +504,7 @@
    "license": "other"
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 1,
    "name": "Wan 3.0",
    "maker": "Alibaba",
@@ -512,7 +512,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 2,
    "name": "Utopai X",
    "maker": "Utopai Studios",
@@ -520,7 +520,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 3,
    "name": "HeyGen Video 1",
    "maker": "HeyGen",
@@ -528,7 +528,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 4,
    "name": "MiniMax H3 (768p)",
    "maker": "MiniMax",
@@ -538,7 +538,7 @@
    "license": "other"
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 5,
    "name": "Dreamina Seedance 2.5",
    "maker": "ByteDance Seed",
@@ -546,7 +546,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 6,
    "name": "FLUX 3 Max (720p)",
    "maker": "Fal",
@@ -554,7 +554,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 7,
    "name": "MiniMax H3 Max",
    "maker": "Fal",
@@ -562,7 +562,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 8,
    "name": "FLUX 3",
    "maker": "Black Forest Labs",
@@ -570,7 +570,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 9,
    "name": "Dreamina Seedance 2.0",
    "maker": "ByteDance Seed",
@@ -578,7 +578,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 10,
    "name": "Gemini Omni Flash 1.1",
    "maker": "Google",
@@ -586,7 +586,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 11,
    "name": "Agnes-Video-2.5",
    "maker": "Sapiens AI",
@@ -594,7 +594,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 12,
    "name": "Grok Imagine Video 1.5",
    "maker": "SpaceXAI",
@@ -602,7 +602,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 13,
    "name": "HappyHorse-1.1",
    "maker": "Alibaba-ATH",
@@ -610,7 +610,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 14,
    "name": "MAGI-2 Preview",
    "maker": "Sand.ai",
@@ -618,7 +618,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 15,
    "name": "Wan2.7-260612",
    "maker": "Alibaba",
@@ -626,7 +626,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 16,
    "name": "HappyHorse-1.0",
    "maker": "Alibaba-ATH",
@@ -634,7 +634,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 17,
    "name": "Kling 3.0 Omni 1080p (Pro)",
    "maker": "KlingAI",
@@ -642,7 +642,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 18,
    "name": "Kling 3.0 1080p (Pro)",
    "maker": "KlingAI",
@@ -650,7 +650,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 19,
    "name": "Grok Imagine Video 1.5 Lite",
    "maker": "SpaceXAI",
@@ -658,7 +658,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 20,
    "name": "PixVerse V6",
    "maker": "PixVerse",
@@ -666,7 +666,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 21,
    "name": "Veo 3.1",
    "maker": "Google",
@@ -674,7 +674,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 22,
    "name": "Veo 3.1 Fast",
    "maker": "Google",
@@ -682,7 +682,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 23,
    "name": "Veo 3.1 Lite",
    "maker": "Google",
@@ -690,7 +690,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 24,
    "name": "LTX-2.5 Fast",
    "maker": "Lightricks",
@@ -700,7 +700,7 @@
    "license": "other"
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 25,
    "name": "LTX-2.5 Pro",
    "maker": "Lightricks",
@@ -710,7 +710,7 @@
    "license": "other"
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 26,
    "name": "Vidu Q3 Pro",
    "maker": "Vidu",
@@ -718,7 +718,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 27,
    "name": "Vidu Q3 Turbo",
    "maker": "Vidu",
@@ -726,7 +726,7 @@
    "open": false
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 28,
    "name": "LTX-2.3 Pro",
    "maker": "Lightricks",
@@ -736,7 +736,7 @@
    "license": "other"
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 29,
    "name": "LTX-2.3 Fast",
    "maker": "Lightricks",
@@ -746,7 +746,7 @@
    "license": "other"
   },
   {
-   "modality": "video",
+   "category": "video",
    "rank": 30,
    "name": "Boreal",
    "maker": "Creatify",
@@ -756,7 +756,7 @@
    "license": "other"
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 1,
    "name": "Eleven v4 Turbo",
    "maker": "ElevenLabs",
@@ -764,7 +764,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 2,
    "name": "Eleven v4",
    "maker": "ElevenLabs",
@@ -772,7 +772,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 3,
    "name": "Qwen-Audio-3.1-TTS-Plus",
    "maker": "Alibaba",
@@ -780,7 +780,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 4,
    "name": "Sonic 3.6",
    "maker": "Cartesia",
@@ -788,7 +788,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 5,
    "name": "Gemini 3.8 Flash TTS",
    "maker": "Google",
@@ -796,7 +796,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 6,
    "name": "Realtime TTS-2",
    "maker": "Inworld",
@@ -804,7 +804,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 7,
    "name": "Qwen-Audio-3.0-TTS-Plus",
    "maker": "Alibaba",
@@ -812,7 +812,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 8,
    "name": "Gemini 3.8 Flash-Lite TTS",
    "maker": "Google",
@@ -820,7 +820,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 9,
    "name": "Fish Audio Drama 3 Preview",
    "maker": "Fish Audio",
@@ -830,7 +830,7 @@
    "license": "other"
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 10,
    "name": "Simba 3.2",
    "maker": "SpeechifyAI",
@@ -838,7 +838,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 11,
    "name": "Breeze TTS 2",
    "maker": "BreezeBlue",
@@ -848,7 +848,7 @@
    "license": "other"
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 12,
    "name": "Voxtral 3 TTS",
    "maker": "Mistral",
@@ -856,7 +856,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 13,
    "name": "Realtime TTS-2 Flash",
    "maker": "Inworld",
@@ -864,7 +864,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 14,
    "name": "StepAudio 2.5 TTS (Aug 2026)",
    "maker": "StepFun",
@@ -872,7 +872,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 15,
    "name": "v3 Conversational",
    "maker": "ElevenLabs",
@@ -880,7 +880,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 16,
    "name": "Gemini 3.1 Flash TTS",
    "maker": "Google",
@@ -888,7 +888,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 17,
    "name": "Luna TTS",
    "maker": "VUI Labs",
@@ -896,7 +896,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 18,
    "name": "Sonic 3.5",
    "maker": "Cartesia",
@@ -904,7 +904,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 19,
    "name": "Ming-3.0-tts",
    "maker": "Ant Group",
@@ -914,7 +914,7 @@
    "license": "mit"
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 20,
    "name": "Fish Audio S2.1 Pro (Oct 2026)",
    "maker": "Fish Audio",
@@ -922,7 +922,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 21,
    "name": "Eleven v3",
    "maker": "ElevenLabs",
@@ -930,7 +930,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 22,
    "name": "Soniox TTS Real-Time v2",
    "maker": "Soniox",
@@ -938,7 +938,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 23,
    "name": "Gradium TTS (Sep 2026)",
    "maker": "Gradium",
@@ -946,7 +946,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 24,
    "name": "Speech 2.8 HD",
    "maker": "MiniMax",
@@ -954,7 +954,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 25,
    "name": "Lightning V3.1 Pro (Jul 2026)",
    "maker": "Smallest.ai",
@@ -962,7 +962,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 26,
    "name": "Speech 2.8 Turbo",
    "maker": "MiniMax",
@@ -970,7 +970,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 27,
    "name": "Gradium TTS (Aug 2026)",
    "maker": "Gradium",
@@ -978,7 +978,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 28,
    "name": "Falcon 2",
    "maker": "Murf AI",
@@ -986,7 +986,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 29,
    "name": "SpaceXAI TTS",
    "maker": "SpaceXAI",
@@ -994,7 +994,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 30,
    "name": "Azure HD 2.5",
    "maker": "Microsoft",
@@ -1002,7 +1002,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 31,
    "name": "Async Flash v1.5",
    "maker": "async",
@@ -1010,7 +1010,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 32,
    "name": "Step TTS 2 (Mar 2026)",
    "maker": "StepFun",
@@ -1018,7 +1018,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 33,
    "name": "Speech 2.6 HD",
    "maker": "MiniMax",
@@ -1026,7 +1026,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 34,
    "name": "Async Pro v1.0",
    "maker": "async",
@@ -1034,7 +1034,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 35,
    "name": "Simba 3.0",
    "maker": "SpeechifyAI",
@@ -1042,7 +1042,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 36,
    "name": "Speech 2.6 Turbo",
    "maker": "MiniMax",
@@ -1050,7 +1050,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 37,
    "name": "Fish Audio S2 Pro",
    "maker": "Fish Audio",
@@ -1060,7 +1060,7 @@
    "license": "other"
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 38,
    "name": "Speech-02-HD",
    "maker": "MiniMax",
@@ -1068,7 +1068,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 39,
    "name": "Chatterbox HD",
    "maker": "Resemble AI",
@@ -1076,7 +1076,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 40,
    "name": "TTS-1 HD",
    "maker": "OpenAI",
@@ -1084,7 +1084,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 41,
    "name": "Step Audio EditX (Mar 2026)",
    "maker": "StepFun",
@@ -1093,7 +1093,7 @@
    "weights": "stepfun-ai/Step-Audio-EditX"
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 42,
    "name": "Turbo v2.5",
    "maker": "ElevenLabs",
@@ -1101,7 +1101,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 43,
    "name": "Multilingual v2",
    "maker": "ElevenLabs",
@@ -1109,7 +1109,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 44,
    "name": "Speech 2.6",
    "maker": "Hithink",
@@ -1117,7 +1117,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 45,
    "name": "Voxtral TTS",
    "maker": "Mistral",
@@ -1127,7 +1127,7 @@
    "license": "cc-by-nc-4.0"
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 46,
    "name": "Speech-02-Turbo",
    "maker": "MiniMax",
@@ -1135,7 +1135,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 47,
    "name": "TTS-1",
    "maker": "OpenAI",
@@ -1143,7 +1143,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 48,
    "name": "OpenAudio S1",
    "maker": "Fish Audio",
@@ -1151,7 +1151,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 49,
    "name": "Gemini 2.5 Flash Lite TTS",
    "maker": "Google",
@@ -1159,7 +1159,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 50,
    "name": "Flash v2.5",
    "maker": "ElevenLabs",
@@ -1167,7 +1167,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 51,
    "name": "Studio",
    "maker": "Google",
@@ -1175,7 +1175,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 52,
    "name": "Journey",
    "maker": "Google",
@@ -1183,7 +1183,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 53,
    "name": "GPT-Realtime-2",
    "maker": "OpenAI",
@@ -1191,7 +1191,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 54,
    "name": "Maya 2 Flash",
    "maker": "Maya Research",
@@ -1199,7 +1199,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 55,
    "name": "T2A-01-HD",
    "maker": "MiniMax",
@@ -1207,7 +1207,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 56,
    "name": "Polly Generative",
    "maker": "Amazon",
@@ -1215,7 +1215,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 57,
    "name": "Kokoro 82M v1.0",
    "maker": "Kokoro",
@@ -1225,7 +1225,7 @@
    "license": "apache-2.0"
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 58,
    "name": "Magpie-Multilingual 357M (Feb 2026)",
    "maker": "NVIDIA",
@@ -1235,7 +1235,7 @@
    "license": "other"
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 59,
    "name": "Gemini 2.5 Flash TTS (Dec 2025)",
    "maker": "Google",
@@ -1243,7 +1243,7 @@
    "open": false
   },
   {
-   "modality": "audio",
+   "category": "audio",
    "rank": 60,
    "name": "Chirp 3: HD",
    "maker": "Google",

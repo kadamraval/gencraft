@@ -27,8 +27,6 @@ import { ProviderModelList } from "./provider-models"
 import { IntegrationsPanel } from "./integrations-panel"
 import { UpgradeCard } from "@/components/license/upgrade-card"
 import { FEATURE_NAMES, useFeature } from "@/lib/license"
-import { useMoney } from "@/lib/currency/currency"
-import { usageLedger } from "@/lib/ledger/usage-store"
 import { NoKeyBanner, ProviderKeyBar } from "./provider-key-bar"
 import { PROVIDERS } from "@/lib/registry/providers"
 import { getKeyState, useKeyedProviders } from "@/lib/registry/store"
@@ -54,10 +52,6 @@ export function SettingsModal({
 }: SettingsModalProps) {
   const [activeTab, setActiveTab] = React.useState<TabType>(initialTab || "general")
   const canConnect = useFeature("connectors")
-  const money = useMoney()
-  const [, tickLedger] = React.useReducer((n: number) => n + 1, 0)
-  React.useEffect(() => usageLedger.subscribe(tickLedger), [])
-  const monthSpend = usageLedger.getSpendOverview("monthly")
   const [localSettings, setLocalSettings] = React.useState<SettingsState>(settings)
 
   // Provider Selection (Strictly 5 providers)
@@ -187,45 +181,52 @@ export function SettingsModal({
           <main className={`flex-1 overflow-hidden bg-background text-foreground ${activeTab === "providers" ? "" : "p-5"}`}>
             {/* Providers fills the whole body, so its divider runs from the header line to the footer line */}
             {activeTab === "providers" && (
-          <div className="flex h-full animate-in fade-in duration-150">
-            <div className="flex w-52 flex-shrink-0 flex-col gap-1 overflow-y-auto border-r border-border/70 p-4">
-              {PROVIDERS.map((prov) => {
-                const isSelected = selectedProviderId === prov.id
-                const keyed = keyedProviders.includes(prov.id)
-                const spent = monthSpend.providers.find((p) => p.provider === prov.id)
-                return (
-                  <Button
-                    key={prov.id}
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setSelectedProviderId(prov.id)}
-                    className={`h-11 w-full justify-between rounded-xl px-2.5 ${isSelected ? "bg-secondary text-foreground" : "text-muted-foreground"}`}
-                  >
-                    <span className="flex min-w-0 items-center gap-2">
+          <div className="flex h-full flex-col animate-in fade-in duration-150">
+            {/* Provider tabs: the active one is joined to the key box below it, like a tab to its panel */}
+            <div className="flex-shrink-0 px-5 pt-4">
+              <div className="flex items-end gap-1">
+                {PROVIDERS.map((prov) => {
+                  const isSelected = selectedProviderId === prov.id
+                  const keyed = keyedProviders.includes(prov.id)
+                  return (
+                    <Button
+                      key={prov.id}
+                      type="button"
+                      variant="ghost"
+                      aria-pressed={isSelected}
+                      onClick={() => setSelectedProviderId(prov.id)}
+                      className={`gap-2 px-3 text-xs ${
+                        isSelected
+                          ? "relative z-10 -mb-px h-9 rounded-b-none rounded-t-xl border border-b-0 border-border/70 bg-card font-semibold text-foreground hover:bg-card"
+                          : "mb-1 h-8 rounded-full text-muted-foreground"
+                      }`}
+                    >
                       <ProviderLogo provider={prov.id} size={14} />
-                      <span className="flex min-w-0 flex-col items-start leading-tight">
-                        <span className="truncate text-xs font-medium">{prov.label}</span>
-                        <span className="truncate text-xs font-normal text-muted-foreground">{spent ? `${money.format(spent.costUsd)} this month` : "No usage this month"}</span>
-                      </span>
-                    </span>
-                    <span className={`h-2 w-2 flex-shrink-0 rounded-full ${keyed ? "bg-emerald-500" : "bg-muted-foreground/30"}`} title={keyed ? "Connected" : "No key"} />
-                  </Button>
-                )
-              })}
+                      <span>{prov.label}</span>
+                      <span className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${keyed ? "bg-emerald-500" : "bg-muted-foreground/30"}`} title={keyed ? "Connected" : "No key"} />
+                    </Button>
+                  )
+                })}
+              </div>
+              <div className={`rounded-xl border border-border/70 bg-card p-3 ${selectedProviderId === PROVIDERS[0].id ? "rounded-tl-none" : ""}`}>
+                <ProviderKeyBar provider={selectedProvider} settings={localSettings} onSave={saveSettings} embedded />
+              </div>
+              {!keyedProviders.includes(selectedProvider.id) && (
+                <div className="mt-3">
+                  <NoKeyBanner provider={selectedProvider} rejected={getKeyState(selectedProvider.id)?.status === "rejected"} />
+                </div>
+              )}
             </div>
 
-            <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-y-auto p-5 no-scrollbar">
-              <ProviderKeyBar provider={selectedProvider} settings={localSettings} onSave={saveSettings} />
-              {keyedProviders.includes(selectedProvider.id) ? (
+            {keyedProviders.includes(selectedProvider.id) && (
+              <div className="mt-3 min-h-0 flex-1 border-t border-border/70">
                 <ProviderModelList
                   providerId={selectedProvider.id}
                   settings={localSettings}
                   onPrices={(priceOverrides) => saveSettings({ ...localSettings, aiEngine: { ...localSettings.aiEngine, priceOverrides } })}
                 />
-              ) : (
-                <NoKeyBanner provider={selectedProvider} rejected={getKeyState(selectedProvider.id)?.status === "rejected"} />
-              )}
-            </div>
+              </div>
+            )}
           </div>
             )}
             <ScrollArea className={`h-full pr-2 ${activeTab === "providers" ? "hidden" : ""}`}>

@@ -45,9 +45,9 @@ export function featureOfEndpoint(endpoint: string): FeatureDef | undefined {
 const FEATURE_WORDS = new Set(["motion", "control", "transfer", "pose", "extend", "extension", "edit", "videoedit", "modify", "replace", "lipsync", "lip", "sync", "avatar", "transition", "effect", "effects", "styles", "t2v", "i2v", "r2v", "v2v", "reference"])
 
 /** The model with both its task and its feature taken out of the name: the key that ties a feature to the model it belongs to. */
-export function baseKey(record: Pick<ModelRecord, "endpoint" | "provider" | "modality">): string {
+export function baseKey(record: Pick<ModelRecord, "endpoint" | "provider" | "category">): string {
   const words = tokensOf(record.endpoint.replace(/[/_]/g, " ")).filter((t) => !FEATURE_WORDS.has(t))
-  return `${record.provider}|${record.modality}|${[...new Set(words)].sort().join(" ")}`
+  return `${record.provider}|${record.category}|${[...new Set(words)].sort().join(" ")}`
 }
 
 export interface FeatureOffer {
@@ -65,7 +65,7 @@ export function featuresOf(record: ModelRecord, pool: ModelRecord[]): FeatureOff
   const key = baseKey(record)
   const offers = new Map<EndpointFeature, FeatureOffer>()
   for (const r of pool) {
-    if (r.id === record.id || r.provider !== record.provider || r.modality !== record.modality || r.status === "deprecated") continue
+    if (r.id === record.id || r.provider !== record.provider || r.category !== record.category || r.status === "deprecated") continue
     const def = featureOfEndpoint(r.endpoint)
     if (!def || def.id === own?.id || baseKey(r) !== key) continue
     const held = offers.get(def.id)

@@ -8,5 +8,5 @@ export const isPassword = (text: string): boolean => text.length >= 8
 /** The code from the verification email: 6 digits */
 export const isCode = (text: string): boolean => /^\d{6}$/.test(text.trim())
 
-/** The app PIN: 4 to 6 digits */
-export const isPin = (text: string): boolean => /^\d{4,6}$/.test(text)
+/** The app PIN: exactly 6 digits */
+export const isPin = (text: string): boolean => /^\d{6}$/.test(text)

@@ -18,6 +18,8 @@ export interface BarStep {
   userSettings?: string[]
   /** Settings an input already controls, never listed here */
   controlled: string[]
+  /** The model is the best fit chosen by the app, not one the person picked */
+  auto?: boolean
 }
 
 interface Props {
@@ -50,6 +52,7 @@ export function GenerationBar({ steps, picking, onPick, onSetting }: Props) {
                   {rec && <ModelLogo name={rec.name} endpoint={rec.endpoint} family={rec.family} provider={rec.provider} size={14} />}
                   <span className="max-w-40 truncate">{rec?.name ?? "Choose model"}</span>
                   {rec && <FilterBadge model={rec} />}
+                  {rec && step.auto && <span className="text-xs text-muted-foreground">Auto</span>}
                   <ChevronDown className="h-3 w-3 flex-shrink-0 text-muted-foreground" />
                 </Button>
                 {rec &&

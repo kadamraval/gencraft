@@ -1,70 +1,43 @@
 import * as React from "react"
-import { ArrowLeft, ArrowRight, Check, FolderOpen, KeyRound, Loader2, Lock, Sparkles, UserRound } from "lucide-react"
+import { Check, FolderOpen, KeyRound, Loader2, Lock, ShieldCheck, Sparkles, UserRound } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { PinInput } from "@/components/ui/pin-input"
 import { ProviderKeyBar } from "@/components/settings/provider-key-bar"
 import { getAccountProvider } from "@/lib/account/provider"
 import { readSession, writeSession } from "@/lib/account/session"
 import type { AccountSession } from "@/lib/account/session"
 import { isCode, isEmail, isPassword, isPin } from "@/lib/account/validate"
-import { hasPassword, markUnlocked, setPassword } from "@/lib/auth/lock"
+import { hasPassword, markUnlocked, setPin as savePin } from "@/lib/auth/lock"
 import { chooseFolder, canChooseFolder, shownFolder } from "@/lib/backup/folder"
 import { HAS_PAID_CODE, IS_BETA } from "@/lib/edition"
 import { readSetup, SETUP_STEPS, writeSetup } from "@/lib/home/onboarding"
 import type { Plan, SetupStep } from "@/lib/home/onboarding"
-import { FREE_LIMITS, useLicense } from "@/lib/license"
-import { PLAN_ROWS, PRICES } from "@/lib/plans"
+import { useLicense } from "@/lib/license"
 import { PROVIDERS } from "@/lib/registry/providers"
 import type { SettingsState } from "@/types"
-import { cn } from "@/lib/utils"
 import { OnboardingArt } from "./onboarding-art"
+import { OnboardingShell, StepCard } from "./onboarding-shell"
+import { PricingPage } from "./pricing-page"
+import type { PlanChoice } from "./pricing-page"
 
 /**
- * The first screens a new person sees, kept short: sign up (verify by email, signed in once on this device), an optional PIN, pricing
- * (Free against Paid, side by side) and one quick setup screen. Until the account service is connected the stand-in provider lets the person
- * continue as a guest and the screen says so. "Run setup again" in Settings brings it back.
+ * The first screens a new person sees, kept short and alike: sign up (verify by email; signing in is for someone who reinstalled), a PIN that
+ * the app asks for each time it opens, pricing, and one quick setup screen. Until the account service is connected the stand-in provider lets
+ * the person continue as a guest and the screen says so. "Run setup again" in Settings brings it back.
  */
 
-const COPY: Record<SetupStep, { title: string; line: string }> = {
-  account: { title: "Welcome to Gencraft", line: "Make images, video, voice and finished stories with your own provider keys." },
-  pin: { title: "Lock Gencraft with a PIN?", line: "Optional. Gencraft asks for it each time it opens. You can change or remove it in Settings." },
-  plan: { title: "Choose your plan", line: "Free is open source. Paid has the same price for the same features, once a year or for life." },
-  setup: { title: "Quick setup", line: "Your name and one provider key. Everything else can wait." },
-  done: { title: "You are all set", line: "Here is what is ready. You can change any of it in Settings." },
-}
-
+const STEP_LABELS: Record<SetupStep, string> = { account: "Account", pin: "PIN", plan: "Plan", setup: "Setup", done: "Done" }
+const STEPS = SETUP_STEPS.map((id) => ({ id, label: STEP_LABELS[id] }))
 const SKIPPABLE: SetupStep[] = ["pin", "setup"]
+
+const ROW = "flex items-center gap-3 text-xs"
+const ROW_ICON = "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-secondary text-foreground"
 
 interface Props {
   settings: SettingsState
   onSaveSettings: (settings: SettingsState) => void
   onFinish: () => void
-}
-
-type Term = keyof typeof PRICES
-
-function PlanTable({ term }: { term: Term }) {
-  return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card text-xs">
-      <div className="grid grid-cols-[1.4fr_1fr_1fr] gap-2 border-b border-border bg-secondary/60 px-3 py-2 font-semibold">
-        <span />
-        <span>Free</span>
-        <span>{`Paid · ${PRICES[term].label}`}</span>
-      </div>
-      <div className="max-h-64 overflow-y-auto">
-        {PLAN_ROWS.map((row, i) => (
-          <div key={`${row.main}-${row.sub}-${i}`} className={cn("grid grid-cols-[1.4fr_1fr_1fr] gap-2 px-3 py-1.5", row.main && i > 0 && "border-t border-border/60")}>
-            <span className="min-w-0">
-              {row.main && <span className="block font-medium text-foreground">{row.main}</span>}
-              {row.sub && <span className="block truncate text-muted-foreground">{row.sub}</span>}
-            </span>
-            <span className={cn(row.free === "No" ? "text-muted-foreground" : "text-foreground")}>{row.free}</span>
-            <span className="text-foreground">{row.paid}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
 }
 
 export function OnboardingFlow({ settings, onSaveSettings, onFinish }: Props) {
@@ -74,7 +47,6 @@ export function OnboardingFlow({ settings, onSaveSettings, onFinish }: Props) {
   const plan: Plan = state.plan === "paid" && !HAS_PAID_CODE ? "free" : state.plan
   const step: SetupStep = SETUP_STEPS.includes(state.step) ? state.step : "account"
   const at = SETUP_STEPS.indexOf(step)
-  const copy = COPY[step]
 
   // sign up
   const [session, setSession] = React.useState<AccountSession | null>(() => readSession())
@@ -87,7 +59,7 @@ export function OnboardingFlow({ settings, onSaveSettings, onFinish }: Props) {
   const [pin, setPin] = React.useState("")
   const [pin2, setPin2] = React.useState("")
   // pricing
-  const [term, setTerm] = React.useState<Term>("lifetime")
+  const [term, setTerm] = React.useState<"year" | "lifetime">("lifetime")
   const [key, setKey] = React.useState("")
   // setup
   const [name, setName] = React.useState(settings.general.profileName ?? "")
@@ -112,26 +84,21 @@ export function OnboardingFlow({ settings, onSaveSettings, onFinish }: Props) {
     onFinish()
   }
 
-  const run = async (work: () => Promise<string | null>) => {
-    setBusy(true)
+  const choice: PlanChoice = plan === "paid" ? term : "free"
+  const choose = (c: PlanChoice) => {
     setError(null)
-    try {
-      const problem = await work()
-      if (problem) setError(problem)
-      else return true
-    } finally {
-      setBusy(false)
-    }
-    return false
+    if (c === "free") return go("plan", { plan: "free" })
+    setTerm(c)
+    go("plan", { plan: "paid" })
   }
 
-  // ---- what the main button does on each step, and whether it can
-  const accountReady = session !== null || !provider.accounts || (awaitingCode ? isCode(code) : isEmail(email) && isPassword(pass))
+  const needsAccountForm = !session && provider.accounts
+  const accountReady = !needsAccountForm || (awaitingCode ? isCode(code) : isEmail(email) && isPassword(pass))
   const pinReady = pin === "" || (isPin(pin) && pin === pin2)
-  const ready = step === "account" ? accountReady : step === "pin" ? pinReady : !busy
+  const ready = step === "account" ? accountReady : step === "pin" ? pinReady : true
 
   const submitAccount = async () => {
-    if (session || !provider.accounts) {
+    if (!needsAccountForm) {
       if (!session) setSession(writeSession({ guest: true }))
       return forward()
     }
@@ -158,11 +125,11 @@ export function OnboardingFlow({ settings, onSaveSettings, onFinish }: Props) {
   }
 
   const submitPin = async () => {
-    if (pin === "") return forward()
+    if (pin === "" || hasPassword()) return forward()
     setBusy(true)
     setError(null)
     try {
-      await setPassword(pin)
+      await savePin(pin)
       markUnlocked(true)
       forward()
     } finally {
@@ -171,8 +138,14 @@ export function OnboardingFlow({ settings, onSaveSettings, onFinish }: Props) {
   }
 
   const activate = async () => {
-    const ok = await run(async () => ((await provider.activateKey(key)) ? null : "That key is not valid. Check it and try again."))
-    if (ok) setKey("")
+    setBusy(true)
+    setError(null)
+    try {
+      if (await provider.activateKey(key)) setKey("")
+      else setError("That key is not valid. Check it and try again.")
+    } finally {
+      setBusy(false)
+    }
   }
 
   const saveName = () => {
@@ -180,7 +153,7 @@ export function OnboardingFlow({ settings, onSaveSettings, onFinish }: Props) {
     onSaveSettings({ ...settings, general })
   }
 
-  const onContinue = () => {
+  const onMain = () => {
     if (step === "account") return void submitAccount()
     if (step === "pin") return void submitPin()
     if (step === "plan" && plan === "paid" && license.plan !== "paid") setState(writeSetup({ plan: "free" }))
@@ -192,11 +165,24 @@ export function OnboardingFlow({ settings, onSaveSettings, onFinish }: Props) {
   const keysSaved = PROVIDERS.filter((p) => ((settings.aiEngine[p.keyField] as string | undefined) ?? "").trim() !== "").length
   const selectedProvider = PROVIDERS.find((p) => p.id === providerId) ?? PROVIDERS[0]!
 
+  const copy: Record<SetupStep, { title: string; line: string }> = {
+    account:
+      mode === "login" && needsAccountForm
+        ? { title: "Welcome back", line: "Log in once to restore your account on this device." }
+        : awaitingCode
+          ? { title: "Check your email", line: `We sent a 6-digit code to ${email.trim()}.` }
+          : { title: "Welcome to Gencraft", line: "Make images, video, voice and finished stories with your own provider keys." },
+    pin: { title: "Lock Gencraft with a PIN", line: "Optional. Gencraft asks for it every time it opens. You can change or remove it in Settings." },
+    plan: { title: "Choose your plan", line: "Free is open source. Paid is one plan with two ways to pay, and the same features either way." },
+    setup: { title: "Quick setup", line: "Your name and one provider key. Everything else can wait." },
+    done: { title: "You are all set", line: "Here is what is ready. You can change any of it in Settings." },
+  }
+
   const mainLabel =
     step === "done"
       ? "Open Gencraft"
       : step === "account"
-        ? session || !provider.accounts
+        ? !needsAccountForm
           ? "Continue as guest"
           : awaitingCode
             ? "Verify"
@@ -212,199 +198,191 @@ export function OnboardingFlow({ settings, onSaveSettings, onFinish }: Props) {
             : "Continue"
 
   return (
-    <div role="dialog" aria-modal="true" aria-labelledby="setup-title" className="fixed inset-0 z-[95] flex flex-col bg-background text-foreground">
-      <div className="flex items-center justify-between gap-4 px-6 py-4">
-        <span className="flex items-center gap-2 text-sm font-semibold">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-card font-mono text-xs font-bold">GC</span>
-          Gencraft
-        </span>
-        <div className="flex flex-1 items-center justify-center gap-1.5" aria-label={`Step ${at + 1} of ${SETUP_STEPS.length}`}>
-          {SETUP_STEPS.map((s, i) => (
-            <span key={s} className={cn("h-1.5 rounded-full transition-all", i === at ? "w-8 bg-primary" : i < at ? "w-4 bg-primary/60" : "w-4 bg-muted")} />
-          ))}
-        </div>
-        {step !== "done" && step !== "account" ? (
-          <Button type="button" variant="ghost" size="sm" onClick={finish}>
-            Skip setup
-          </Button>
-        ) : (
-          <span className="w-20" />
-        )}
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-6 pb-6">
-        <div className={cn("mx-auto flex min-h-full flex-col justify-center gap-5 py-2", step === "plan" ? "max-w-2xl" : "max-w-xl")}>
-          {step !== "plan" && <OnboardingArt step={step} />}
-          <div className="space-y-1 text-center">
-            <h1 id="setup-title" className="text-xl font-semibold tracking-tight">
-              {copy.title}
-            </h1>
-            <p className="text-sm text-muted-foreground">{copy.line}</p>
-            {step === "account" && IS_BETA && <p className="text-xs text-muted-foreground">Beta: features may change. Please report problems.</p>}
-          </div>
-
-          {step === "account" && (
-            <div className="space-y-3 rounded-xl border border-border bg-card p-4">
-              {session ? (
-                <p className="flex items-center gap-2 text-sm">
-                  <Check className="h-4 w-4 text-primary" />
-                  {session.guest ? "Continuing as a guest." : `Signed in as ${session.email}.`}
-                </p>
-              ) : !provider.accounts ? (
-                <p className="text-xs text-muted-foreground">Accounts are not open in this beta yet. Everything works on this device without one, and nothing is sent anywhere.</p>
-              ) : awaitingCode ? (
-                <>
-                  <p className="text-xs text-muted-foreground">{`We sent a 6-digit code to ${email.trim()}. Enter it to verify your email.`}</p>
-                  <Input value={code} onChange={(e) => setCode(e.target.value)} inputMode="numeric" maxLength={6} placeholder="6-digit code" aria-label="Verification code" className="h-9 text-xs" autoFocus />
-                </>
-              ) : (
-                <>
-                  <div className="flex gap-2">
-                    {(["signup", "login"] as const).map((m) => (
-                      <Button key={m} type="button" size="sm" variant={mode === m ? "secondary" : "ghost"} aria-pressed={mode === m} onClick={() => setMode(m)}>
-                        {m === "signup" ? "Sign up" : "Log in"}
-                      </Button>
-                    ))}
-                  </div>
-                  <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" aria-label="Email" className="h-9 text-xs" autoFocus />
-                  <Input type="password" value={pass} onChange={(e) => setPass(e.target.value)} placeholder="Password (at least 8 characters)" aria-label="Password" className="h-9 text-xs" />
-                </>
-              )}
-            </div>
-          )}
-
-          {step === "pin" && (
-            <div className="space-y-3 rounded-xl border border-border bg-card p-4">
-              {hasPassword() ? (
-                <p className="flex items-center gap-2 text-sm">
-                  <Lock className="h-4 w-4 text-primary" />A lock is already set on this device.
-                </p>
-              ) : (
-                <>
-                  <Input type="password" inputMode="numeric" maxLength={6} value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))} placeholder="PIN, 4 to 6 digits" aria-label="PIN" className="h-9 text-xs" autoFocus />
-                  {pin !== "" && <Input type="password" inputMode="numeric" maxLength={6} value={pin2} onChange={(e) => setPin2(e.target.value.replace(/\D/g, ""))} placeholder="Type it again" aria-label="Confirm PIN" className="h-9 text-xs" />}
-                  {pin !== "" && !pinReady && <p className="text-xs text-muted-foreground">{!isPin(pin) ? "Use 4 to 6 digits." : "The two PINs are different."}</p>}
-                </>
-              )}
-            </div>
-          )}
-
-          {step === "plan" && (
+    <OnboardingShell
+      steps={STEPS}
+      at={at}
+      title={copy[step].title}
+      line={copy[step].line}
+      note={step === "account" && IS_BETA ? "Beta: features may change. Please report problems." : undefined}
+      art={step !== "plan" ? <OnboardingArt step={step} /> : undefined}
+      wide={step === "plan"}
+      canSkipSetup={step !== "done" && step !== "account"}
+      onSkipSetup={finish}
+      onBack={back}
+      skipLabel={SKIPPABLE.includes(step) ? "Skip" : undefined}
+      onSkip={forward}
+      mainLabel={mainLabel}
+      mainDisabled={!ready}
+      busy={busy}
+      onMain={onMain}
+    >
+      {step === "account" && (
+        <StepCard>
+          {session ? (
+            <p className={ROW}>
+              <span className={ROW_ICON}>
+                <Check className="h-4 w-4 text-primary" />
+              </span>
+              {session.guest ? "Continuing as a guest." : `Signed in as ${session.email}.`}
+            </p>
+          ) : !provider.accounts ? (
+            <p className={ROW}>
+              <span className={ROW_ICON}>
+                <ShieldCheck className="h-4 w-4" />
+              </span>
+              <span className="text-muted-foreground">Accounts are not open in this beta yet. Everything works on this device without one, and nothing is sent anywhere.</span>
+            </p>
+          ) : awaitingCode ? (
             <div className="space-y-3">
-              <div className="flex flex-wrap items-center justify-center gap-2" role="group" aria-label="Paid term">
-                {(Object.keys(PRICES) as Term[]).map((t) => (
-                  <Button key={t} type="button" size="sm" variant={term === t ? "secondary" : "outline"} aria-pressed={term === t} onClick={() => setTerm(t)}>
-                    {`${PRICES[t].label} · $${PRICES[t].usd}`}
-                  </Button>
-                ))}
-              </div>
-              <PlanTable term={term} />
-              <p className="text-center text-xs text-muted-foreground">{`Free: ${FREE_LIMITS.projects} project. Paid: ${PRICES[term].line}, same features either way.`}</p>
-              <div className="flex gap-3">
-                <Button type="button" variant="outline" aria-pressed={plan === "free"} onClick={() => go("plan", { plan: "free" })} className={cn("h-auto flex-1 flex-col items-start gap-1 p-3 text-left", plan === "free" && "border-primary bg-secondary")}>
-                  <span className="text-sm font-semibold">Free</span>
-                  <span className="text-xs font-normal text-muted-foreground">Open source, no payment</span>
+              <PinInput value={code} onChange={setCode} mask={false} label="Verification code" autoFocus invalid={Boolean(error)} />
+              <p className="text-center text-xs text-muted-foreground">Enter the code from your email.</p>
+            </div>
+          ) : (
+            <>
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" aria-label="Email" className="h-10 text-sm" autoFocus />
+              <Input type="password" value={pass} onChange={(e) => setPass(e.target.value)} placeholder="Password (at least 8 characters)" aria-label="Password" className="h-10 text-sm" />
+              <p className="text-center text-xs text-muted-foreground">
+                {mode === "signup" ? "Already have an account, for example after a reinstall? " : "New to Gencraft? "}
+                <Button type="button" variant="link" className="h-auto p-0 text-xs" onClick={() => setMode(mode === "signup" ? "login" : "signup")}>
+                  {mode === "signup" ? "Log in" : "Sign up"}
                 </Button>
-                {HAS_PAID_CODE && (
-                  <Button type="button" variant="outline" aria-pressed={plan === "paid"} onClick={() => go("plan", { plan: "paid" })} className={cn("h-auto flex-1 flex-col items-start gap-1 p-3 text-left", plan === "paid" && "border-primary bg-secondary")}>
-                    <span className="text-sm font-semibold">{`Paid · ${PRICES[term].label}`}</span>
-                    <span className="text-xs font-normal text-muted-foreground">{PRICES[term].line}</span>
-                  </Button>
-                )}
+              </p>
+            </>
+          )}
+        </StepCard>
+      )}
+
+      {step === "pin" && (
+        <StepCard>
+          {hasPassword() ? (
+            <p className={ROW}>
+              <span className={ROW_ICON}>
+                <Lock className="h-4 w-4" />
+              </span>
+              A lock is already set on this device.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <p className="text-center text-xs font-medium text-muted-foreground">Choose a 6-digit PIN</p>
+                <PinInput value={pin} onChange={setPin} label="PIN" autoFocus />
               </div>
-              {!HAS_PAID_CODE && <p className="text-center text-xs text-muted-foreground">This community build runs on the Free plan.</p>}
-              {HAS_PAID_CODE && plan === "paid" && (
-                <div className="space-y-2 rounded-xl border border-border bg-card p-3">
-                  {license.plan === "paid" ? (
-                    <p className="flex items-center gap-2 text-sm">
-                      <Check className="h-4 w-4 text-primary" />
-                      Paid plan active{license.licensee ? ` for ${license.licensee}` : ""}.
+              {pin.length === 6 && (
+                <div className="space-y-2">
+                  <p className="text-center text-xs font-medium text-muted-foreground">Type it again</p>
+                  <PinInput value={pin2} onChange={setPin2} label="Repeat PIN" autoFocus invalid={pin2.length === 6 && pin2 !== pin} />
+                  {pin2.length === 6 && pin2 !== pin && (
+                    <p role="alert" className="text-center text-xs text-destructive">
+                      The two PINs are different.
                     </p>
-                  ) : (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <Input value={key} onChange={(e) => setKey(e.target.value)} placeholder="Licence key" aria-label="Licence key" className="h-9 text-xs" />
-                        <Button type="button" size="sm" className="h-9 min-w-20" disabled={!key.trim() || busy} onClick={() => void activate()}>
-                          {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Activate"}
-                        </Button>
-                      </div>
-                      {!provider.canBuy && <p className="text-xs text-muted-foreground">Buying inside the app opens with accounts. If you already have a key, enter it here; otherwise continue on Free for now.</p>}
-                    </>
                   )}
                 </div>
               )}
             </div>
           )}
+        </StepCard>
+      )}
 
-          {step === "setup" && (
-            <div className="space-y-3 rounded-xl border border-border bg-card p-4">
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" aria-label="Your name" className="h-9 text-xs" />
-              <div className="flex flex-wrap gap-1.5" role="group" aria-label="Provider">
-                {PROVIDERS.map((p) => (
-                  <Button key={p.id} type="button" size="sm" variant={providerId === p.id ? "secondary" : "outline"} aria-pressed={providerId === p.id} onClick={() => setProviderId(p.id)}>
-                    {p.label}
-                  </Button>
-                ))}
-              </div>
-              <ProviderKeyBar provider={selectedProvider} settings={settings} onSave={onSaveSettings} />
-              <p className="flex items-center gap-2 text-xs text-muted-foreground">
-                <FolderOpen className="h-4 w-4 flex-shrink-0" />
-                <span className="min-w-0 flex-1 truncate">{folder?.label ?? "Looking for the save folder..."}</span>
-                {canChooseFolder() && (
-                  <Button type="button" variant="ghost" size="sm" onClick={() => void chooseFolder().then(() => shownFolder().then(setFolder))}>
-                    Change
-                  </Button>
-                )}
-              </p>
-            </div>
+      {step === "plan" && (
+        <PricingPage choice={choice} onChoose={choose} paidAvailable={HAS_PAID_CODE}>
+          {HAS_PAID_CODE && (
+            <StepCard className="mx-auto w-full max-w-xl">
+              {license.plan === "paid" ? (
+                <p className={ROW}>
+                  <span className={ROW_ICON}>
+                    <Check className="h-4 w-4 text-primary" />
+                  </span>
+                  Paid plan active{license.licensee ? ` for ${license.licensee}` : ""}.
+                </p>
+              ) : (
+                <>
+                  <p className={ROW}>
+                    <span className={ROW_ICON}>
+                      <KeyRound className="h-4 w-4" />
+                    </span>
+                    <span className="font-medium">Have a licence key? Enter it to unlock Paid.</span>
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Input value={key} onChange={(e) => setKey(e.target.value)} placeholder="Licence key" aria-label="Licence key" className="h-10 text-sm" />
+                    <Button type="button" className="h-10 min-w-24" disabled={!key.trim() || busy} onClick={() => void activate()}>
+                      {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Activate"}
+                    </Button>
+                  </div>
+                  {plan === "paid" && !provider.canBuy && <p className="text-xs text-muted-foreground">Buying inside the app opens with accounts. Until then, continue on Free and add your key here or in Settings later.</p>}
+                </>
+              )}
+            </StepCard>
           )}
+        </PricingPage>
+      )}
 
-          {step === "done" && (
-            <ul className="space-y-2 rounded-xl border border-border bg-card p-4 text-xs">
-              <li className="flex items-center gap-2">
-                <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
-                {`Plan: ${license.plan === "paid" ? (license.term === "year" ? "Paid, One Year" : "Paid, Lifetime") : "Free"}`}
-              </li>
-              <li className="flex items-center gap-2">
-                <UserRound className="h-3.5 w-3.5 text-muted-foreground" />
-                {session && !session.guest ? `Signed in as ${session.email}` : settings.general.profileName ? `Hello, ${settings.general.profileName}` : "Guest"}
-              </li>
-              <li className="flex items-center gap-2">
-                <KeyRound className="h-3.5 w-3.5 text-muted-foreground" />
-                {keysSaved > 0 ? `${keysSaved} provider${keysSaved === 1 ? "" : "s"} connected` : "No provider key yet: add one in Settings, Providers"}
-              </li>
-              <li className="flex items-center gap-2">
-                <FolderOpen className="h-3.5 w-3.5 text-muted-foreground" />
-                {folder?.label ?? "Default folder"}
-              </li>
-            </ul>
-          )}
+      {step === "setup" && (
+        <StepCard>
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" aria-label="Your name" className="h-10 text-sm" />
+          <div className="flex flex-wrap gap-1.5" role="group" aria-label="Provider">
+            {PROVIDERS.map((p) => (
+              <Button key={p.id} type="button" size="sm" variant={providerId === p.id ? "secondary" : "outline"} aria-pressed={providerId === p.id} onClick={() => setProviderId(p.id)}>
+                {p.label}
+              </Button>
+            ))}
+          </div>
+          <ProviderKeyBar provider={selectedProvider} settings={settings} onSave={onSaveSettings} />
+          <p className={ROW}>
+            <span className={ROW_ICON}>
+              <FolderOpen className="h-4 w-4" />
+            </span>
+            <span className="min-w-0 flex-1 truncate text-muted-foreground">{folder?.label ?? "Looking for the save folder..."}</span>
+            {canChooseFolder() && (
+              <Button type="button" variant="ghost" size="sm" onClick={() => void chooseFolder().then(() => shownFolder().then(setFolder))}>
+                Change
+              </Button>
+            )}
+          </p>
+        </StepCard>
+      )}
 
-          {error && (
-            <p role="alert" className="text-center text-xs text-destructive">
-              {error}
-            </p>
-          )}
-        </div>
-      </div>
+      {step === "done" && (
+        <StepCard>
+          <ul className="space-y-3">
+            <li className={ROW}>
+              <span className={ROW_ICON}>
+                <Sparkles className="h-4 w-4" />
+              </span>
+              {`Plan: ${license.plan === "paid" ? (license.term === "year" ? "Paid, One Year" : "Paid, Lifetime") : "Free"}`}
+            </li>
+            <li className={ROW}>
+              <span className={ROW_ICON}>
+                <UserRound className="h-4 w-4" />
+              </span>
+              {session && !session.guest ? `Signed in as ${session.email}` : settings.general.profileName ? `Hello, ${settings.general.profileName}` : "Guest"}
+            </li>
+            <li className={ROW}>
+              <span className={ROW_ICON}>
+                <Lock className="h-4 w-4" />
+              </span>
+              {hasPassword() ? "PIN on: asked every time the app opens" : "No PIN: set one any time in Settings"}
+            </li>
+            <li className={ROW}>
+              <span className={ROW_ICON}>
+                <KeyRound className="h-4 w-4" />
+              </span>
+              {keysSaved > 0 ? `${keysSaved} provider${keysSaved === 1 ? "" : "s"} connected` : "No provider key yet: add one in Settings, Providers"}
+            </li>
+            <li className={ROW}>
+              <span className={ROW_ICON}>
+                <FolderOpen className="h-4 w-4" />
+              </span>
+              <span className="min-w-0 truncate">{folder?.label ?? "Default folder"}</span>
+            </li>
+          </ul>
+        </StepCard>
+      )}
 
-      <div className="flex items-center justify-between gap-3 border-t border-border px-6 py-3">
-        <Button type="button" variant="ghost" size="sm" className={cn("gap-1.5", at === 0 && "invisible")} onClick={back}>
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Back
-        </Button>
-        <div className="flex items-center gap-2">
-          {SKIPPABLE.includes(step) && (
-            <Button type="button" variant="ghost" size="sm" onClick={forward}>
-              Skip
-            </Button>
-          )}
-          <Button type="button" size="lg" className="min-w-36 gap-1.5" disabled={!ready || busy} onClick={onContinue}>
-            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : mainLabel}
-            {!busy && <ArrowRight className="h-3.5 w-3.5" />}
-          </Button>
-        </div>
-      </div>
-    </div>
+      {error && (
+        <p role="alert" className="text-center text-xs text-destructive">
+          {error}
+        </p>
+      )}
+    </OnboardingShell>
   )
 }

@@ -129,7 +129,7 @@ export function makerOf(r: Pick<ModelRecord, "name" | "endpoint" | "family" | "p
 
 function lineKey(r: ModelRecord, words: string[]): string {
   const slug = resolveLogoSlug({ name: r.name, endpoint: r.endpoint, family: r.family }) ?? r.endpoint.split("/")[0]
-  return [r.provider, slug, r.task ?? r.modality, words.join(" ")].join("|")
+  return [r.provider, slug, r.task ?? r.category, words.join(" ")].join("|")
 }
 
 /** The provider's own wording: "Previous image model", "Legacy GPT model", "Deprecated large model", "succeeded by GPT-5". */

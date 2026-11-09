@@ -1,8 +1,8 @@
-import type { RegistryModality } from "../registry/types"
+import type { AppCategory } from "../registry/types"
 
 /**
- * The maker list declares each model as (type, category, job). The database speaks in job ids (see jobs.json). This is the one table
- * between them, so a job is never worked out from a model's name.
+ * The maker list declares each model as (category, task, action). The database speaks in task and tool ids (see tasks.json and
+ * tools.json). This is the one table between them, so a task or tool is never worked out from a model's name.
  */
 const TABLE: Record<string, string> = {
   "image|text-to-image|generate": "text-to-image",
@@ -35,13 +35,7 @@ const TABLE: Record<string, string> = {
   "audio|audio-to-audio|voice-change": "audio-voice-changer",
 }
 
-/**
- * Jobs a picture model that follows instructions can do by being told to (the AI tool carries the sentence, see `instruction` in the tool
- * catalog). Upscaling, restoring and background removal are not here: a generator redraws the picture, it does not do those.
- */
-export const ALTERNATIVE_JOBS = ["image-remove-object", "image-restyle", "image-outpaint", "image-relight"] as const
-
-/** The job id for a declared (type, category, job), or undefined when the table has no row for it */
-export function jobIdFor(type: RegistryModality, category: string, job: string): string | undefined {
-  return TABLE[`${type}|${category}|${job}`]
+/** The task or tool id for a declared (category, task, action), or undefined when the table has no row for it */
+export function servesFor(category: AppCategory, task: string, action: string): string | undefined {
+  return TABLE[`${category}|${task}|${action}`]
 }

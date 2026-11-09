@@ -40,8 +40,8 @@ export function VoiceSettings({ settings, onChange }: Props) {
   const ai = settings.aiEngine
   const hasOpenAI = Boolean(getProviderApiKey("openai", settings))
   const hasGemini = Boolean(getProviderApiKey("gemini", settings))
-  const geminiModels = listed.filter((m) => m.provider === "gemini" && m.modality === "text")
-  const voiceModels = listed.filter((m) => m.provider === "openai" && m.modality === "audio")
+  const geminiModels = listed.filter((m) => m.provider === "gemini" && m.category === "text")
+  const voiceModels = listed.filter((m) => m.provider === "openai" && m.category === "audio")
 
   const sttValue = ai.speechToText ? `${ai.speechToText.provider}:${ai.speechToText.model}` : BROWSER
   const ttsValue = ai.textToSpeech ? `openai:${ai.textToSpeech.model}` : BROWSER

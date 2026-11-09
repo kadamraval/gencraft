@@ -1,4 +1,6 @@
-export type ModalityCategory = "text" | "image" | "video" | "audio" | "embedded"
+import type { Category } from "@/lib/registry/types"
+export type { Category }
+import { ledgerCategory } from "@/lib/legacy-names"
 export type ProviderId = "fal" | "openai" | "gemini" | "replicate" | "openrouter"
 
 /** How sure the cost is: reported by the provider, computed from what it says was used, estimated from a price list or a guess at the tokens, or the model has no price */
@@ -9,7 +11,7 @@ export const USAGE_LEDGER_EVENT = "usage-ledger-changed"
 export interface UsageLedgerItem {
   id: string
   modelName: string
-  category: ModalityCategory
+  category: Category
   provider: ProviderId
   action: "Deducted" | "Refunded"
   costUsd: number
@@ -31,8 +33,8 @@ export interface UsageLedgerItem {
 
 export type UsageDateRange = "today" | "weekly" | "monthly" | "3months" | "all"
 
-export interface ModalityStat {
-  category: ModalityCategory
+export interface CategoryStat {
+  category: Category
   label: string
   costUsd: number
   percentage: number
@@ -59,12 +61,12 @@ export interface SpendOverviewData {
   totalCostUsd: number
   totalGenerations: number
   avgCostPerRun: number
-  modalities: {
-    text: ModalityStat
-    image: ModalityStat
-    video: ModalityStat
-    audio: ModalityStat
-    embedded: ModalityStat
+  categories: {
+    text: CategoryStat
+    image: CategoryStat
+    video: CategoryStat
+    audio: CategoryStat
+    embedding: CategoryStat
   }
   providers: ProviderStat[]
   topProvider: {
@@ -77,7 +79,7 @@ export interface SpendOverviewData {
   topModel: {
     modelName: string
     provider: ProviderId
-    category: ModalityCategory
+    category: Category
     runs: number
     costUsd: number
   }
@@ -94,14 +96,13 @@ const PROVIDER_LABELS: Record<ProviderId, string> = {
   openrouter: "OpenRouter",
 }
 
-// Seed baseline of realistic BYOK generation records across all 5 modalities
 const LEDGER_KEY = "gencraft_usage_ledger_v1"
 
 /** The ledger holds only what really ran on this machine. It is stored locally and starts empty. */
 function loadHistory(): UsageLedgerItem[] {
   try {
     const raw = localStorage.getItem(LEDGER_KEY)
-    return raw ? (JSON.parse(raw) as UsageLedgerItem[]) : []
+    return raw ? (JSON.parse(raw) as UsageLedgerItem[]).map((i) => ({ ...i, category: ledgerCategory(i.category) })) : []
   } catch {
     return []
   }
@@ -133,7 +134,7 @@ class UsageLedgerStore {
   public addRecord(record: {
     modelName?: string
     modelId?: string
-    category: ModalityCategory
+    category: Category
     provider?: ProviderId
     action?: "Deducted" | "Refunded"
     costUsd: number
@@ -238,8 +239,8 @@ class UsageLedgerStore {
     const totalGenerations = billedRuns.length
     const avgCostPerRun = totalGenerations > 0 ? Math.round((totalCostUsd / totalGenerations) * 1000) / 1000 : 0
 
-    // Modality-wise statistics
-    const buildModalityStat = (cat: ModalityCategory, label: string, color: string): ModalityStat => {
+    // Statistics per category
+    const buildCategoryStat = (cat: Category, label: string, color: string): CategoryStat => {
       const catRuns = billedRuns.filter((i) => i.category === cat)
       const cost = Math.round(catRuns.reduce((acc, curr) => acc + curr.costUsd, 0) * 1000) / 1000
       const percentage = totalCostUsd > 0 ? Math.round((cost / totalCostUsd) * 100) : 0
@@ -253,12 +254,12 @@ class UsageLedgerStore {
       }
     }
 
-    const modalities = {
-      text: buildModalityStat("text", "Text", "#a855f7"),
-      image: buildModalityStat("image", "Image", "#06b6d4"),
-      video: buildModalityStat("video", "Video", "#22c55e"),
-      audio: buildModalityStat("audio", "Audio", "#ec4899"),
-      embedded: buildModalityStat("embedded", "Embeded", "#eab308"),
+    const categories = {
+      text: buildCategoryStat("text", "Text", "#a855f7"),
+      image: buildCategoryStat("image", "Image", "#06b6d4"),
+      video: buildCategoryStat("video", "Video", "#22c55e"),
+      audio: buildCategoryStat("audio", "Audio", "#ec4899"),
+      embedding: buildCategoryStat("embedding", "Embedding", "#eab308"),
     }
 
     // Provider usage breakdown
@@ -285,7 +286,7 @@ class UsageLedgerStore {
     }
 
     // Model usage ranking
-    const modelMap = new Map<string, { runs: number; costUsd: number; prov: ProviderId; cat: ModalityCategory }>()
+    const modelMap = new Map<string, { runs: number; costUsd: number; prov: ProviderId; cat: Category }>()
     billedRuns.forEach((r) => {
       const existing = modelMap.get(r.modelName) || { runs: 0, costUsd: 0, prov: r.provider, cat: r.category }
       existing.runs += 1
@@ -294,7 +295,7 @@ class UsageLedgerStore {
     })
 
     let topModelName = "Kling 1.5 Pro"
-    let topModelData = { runs: 0, costUsd: 0, prov: "fal" as ProviderId, cat: "video" as ModalityCategory }
+    let topModelData = { runs: 0, costUsd: 0, prov: "fal" as ProviderId, cat: "video" as Category }
     modelMap.forEach((data, name) => {
       if (data.runs > topModelData.runs) {
         topModelName = name
@@ -312,18 +313,18 @@ class UsageLedgerStore {
 
     // Segments array for progress visualization
     const segments: SpendSegment[] = [
-      { name: "Video", percentage: modalities.video.percentage, costUsd: modalities.video.costUsd, color: "#22c55e" },
-      { name: "Image", percentage: modalities.image.percentage, costUsd: modalities.image.costUsd, color: "#06b6d4" },
-      { name: "Audio", percentage: modalities.audio.percentage, costUsd: modalities.audio.costUsd, color: "#ec4899" },
-      { name: "Text", percentage: modalities.text.percentage, costUsd: modalities.text.costUsd, color: "#a855f7" },
-      { name: "Embeded", percentage: modalities.embedded.percentage, costUsd: modalities.embedded.costUsd, color: "#eab308" },
+      { name: "Video", percentage: categories.video.percentage, costUsd: categories.video.costUsd, color: "#22c55e" },
+      { name: "Image", percentage: categories.image.percentage, costUsd: categories.image.costUsd, color: "#06b6d4" },
+      { name: "Audio", percentage: categories.audio.percentage, costUsd: categories.audio.costUsd, color: "#ec4899" },
+      { name: "Text", percentage: categories.text.percentage, costUsd: categories.text.costUsd, color: "#a855f7" },
+      { name: "Embedding", percentage: categories.embedding.percentage, costUsd: categories.embedding.costUsd, color: "#eab308" },
     ].filter((s) => s.percentage > 0 || s.costUsd > 0)
 
     return {
       totalCostUsd,
       totalGenerations,
       avgCostPerRun,
-      modalities,
+      categories,
       providers,
       topProvider,
       topModel,

@@ -19,10 +19,10 @@ import type { Shortlist, ShortlistEntry } from "../src/lib/registry/shortlist.ts
 const here = path.dirname(fileURLToPath(import.meta.url))
 const out = path.resolve(here, "../src/lib/registry/shortlist.generated.json")
 
-const BOARDS: Array<{ modality: ShortlistEntry["modality"]; url: string }> = [
-  { modality: "image", url: "https://artificialanalysis.ai/text-to-image/arena/leaderboard-text" },
-  { modality: "video", url: "https://artificialanalysis.ai/video/leaderboard/text-to-video" },
-  { modality: "audio", url: "https://artificialanalysis.ai/text-to-speech/leaderboard" },
+const BOARDS: Array<{ category: ShortlistEntry["category"]; url: string }> = [
+  { category: "image", url: "https://artificialanalysis.ai/text-to-image/arena/leaderboard-text" },
+  { category: "video", url: "https://artificialanalysis.ai/video/leaderboard/text-to-video" },
+  { category: "audio", url: "https://artificialanalysis.ai/text-to-speech/leaderboard" },
 ]
 
 /** Rows kept per board. The registry matches by name, so a few more than will ever be shown is enough. */
@@ -51,11 +51,11 @@ for (const board of BOARDS) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     rows = parseLeaderboard(await res.text())
   } catch (e) {
-    console.log(`${board.modality}: could not read the board (${e instanceof Error ? e.message : String(e)})`)
+    console.log(`${board.category}: could not read the board (${e instanceof Error ? e.message : String(e)})`)
   }
   if (rows.length < MIN_ROWS) {
-    const old = previous.entries.filter((e) => e.modality === board.modality)
-    console.log(`${board.modality}: ${rows.length} rows is too few, keeping the ${old.length} from the last build`)
+    const old = previous.entries.filter((e) => e.category === board.category)
+    console.log(`${board.category}: ${rows.length} rows is too few, keeping the ${old.length} from the last build`)
     entries.push(...old)
     continue
   }
@@ -64,7 +64,7 @@ for (const board of BOARDS) {
   await Promise.all([...new Set(top.map((r) => r.weights).filter((w): w is string => Boolean(w)))].map(async (repo) => licences.set(repo, await licenseOf(repo))))
   top.forEach((r, i) =>
     entries.push({
-      modality: board.modality,
+      category: board.category,
       rank: i + 1,
       name: r.name,
       maker: r.creator ?? "",
@@ -73,7 +73,7 @@ for (const board of BOARDS) {
       ...(r.weights ? { weights: r.weights, ...(licences.get(r.weights) ? { license: licences.get(r.weights) } : {}) } : {}),
     }),
   )
-  console.log(`${board.modality}: ${top.length} models, ${top.filter((r) => r.weights).length} with public weights`)
+  console.log(`${board.category}: ${top.length} models, ${top.filter((r) => r.weights).length} with public weights`)
 }
 
 fs.writeFileSync(out, JSON.stringify({ builtAt: new Date().toISOString(), entries } satisfies Shortlist, null, 1))

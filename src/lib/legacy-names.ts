@@ -22,6 +22,17 @@ const LEFT_ALONE = new Set<string>(Object.values(LEGACY_LOCK_KEYS))
 const LEGACY_DATABASES = ["t18-results", "t18-registry", "t18-library", "t18-knowledge", "t18-history", "t18-folder", "t18-elements", "t18_packs"]
 const newDatabaseName = (old: string) => old.replace(/^t18/, "gencraft")
 
+/**
+ * Before the model words were settled (docs/terms.md) a saved model record named what it makes `modality`, and the spending ledger
+ * called embedding models "embedded". Saved data is read through these, so an older catalog, custom model or ledger keeps working.
+ */
+export function withCategory<T extends object>(record: T): T {
+  if (!("modality" in record) || "category" in record) return record
+  const { modality, ...rest } = record as T & { modality: unknown }
+  return { ...rest, category: modality } as T
+}
+export const ledgerCategory = <C extends string>(c: C | "embedded"): C => (c === "embedded" ? "embedding" : c) as C
+
 type KeyValueStore = Pick<Storage, "getItem" | "setItem" | "removeItem" | "key" | "length">
 
 /** Moves every value saved under an old key to the new key (a value already under the new key wins) and removes the old one. Returns how many moved. */

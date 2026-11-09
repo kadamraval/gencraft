@@ -17,13 +17,13 @@ export function registerProfiles(...profiles: Profile[]) {
 
 export const allProfiles = (): readonly Profile[] => registered
 
-type Target = Pick<ModelRecord, "name" | "endpoint" | "modality">
+type Target = Pick<ModelRecord, "name" | "endpoint" | "category">
 
 /** Hosts run a name into its number ("veo3.1"); a word of three letters or more is split from the digits after it. */
 const spaced = (s: string) => s.replace(/([a-z]{3,})(?=\d)/gi, "$1 ")
 
 function scoreOf(profile: Profile, source: Target): number {
-  if (profile.kind !== source.modality) return 0
+  if (profile.kind !== source.category) return 0
   const record = { ...source, name: spaced(source.name), endpoint: spaced(source.endpoint) }
   const haystack = tokensOf(`${record.name} ${record.endpoint.replace(/\//g, " ")}`)
   if ((profile.variantWords ?? []).some((w) => !haystack.includes(w))) return 0
@@ -37,7 +37,7 @@ const held = new Map<string, Profile | undefined>()
 
 /** The profile of this record, or undefined when the maker's page has not been captured for it. */
 export function profileFor(record: Target): Profile | undefined {
-  const key = `${registered.length}|${record.modality}|${record.name}|${record.endpoint}`
+  const key = `${registered.length}|${record.category}|${record.name}|${record.endpoint}`
   if (held.has(key)) return held.get(key)
   let best: { p: Profile; score: number } | undefined
   for (const p of registered) {

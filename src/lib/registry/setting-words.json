@@ -1,0 +1,449 @@
+{
+  "words": {
+    "upscale_factor": {
+      "label": "Scale",
+      "info": "How many times bigger the picture becomes."
+    },
+    "scale_factor": {
+      "label": "Scale",
+      "info": "How many times bigger the picture becomes."
+    },
+    "scale": {
+      "label": "Scale",
+      "info": "How many times bigger the picture becomes."
+    },
+    "factor": {
+      "label": "Scale",
+      "info": "How many times bigger the picture becomes."
+    },
+    "upscale_mode": {
+      "label": "Size by",
+      "info": "Choose a number of times bigger, or a target size such as 1080p."
+    },
+    "target_resolution": {
+      "label": "Target size",
+      "info": "The size you want the result to reach, such as 1080p or 4K."
+    },
+    "enhance_model": {
+      "label": "Best for",
+      "info": "The kind of picture the model is tuned for, such as normal photos, low-quality pictures or graphics."
+    },
+    "model": {
+      "label": "Version",
+      "info": "Which version of the model to use."
+    },
+    "variant": {
+      "label": "Cut-out type",
+      "info": "Which kind of cut-out to make. Portrait is best for people, general for anything."
+    },
+    "strength": {
+      "label": "Strength",
+      "info": "How strongly the model changes the picture. Low keeps it close to the original."
+    },
+    "creativity": {
+      "label": "Creativity",
+      "info": "How much new detail the model may add. Low stays true to the original."
+    },
+    "denoise": {
+      "label": "Clean up grain",
+      "info": "Removes grain and noise from the picture."
+    },
+    "sharpen": {
+      "label": "Sharpness",
+      "info": "Makes edges and fine detail crisper."
+    },
+    "fix_compression": {
+      "label": "Fix blockiness",
+      "info": "Smooths the blocky marks left by heavy compression, common in saved or shared pictures."
+    },
+    "noise_scale": {
+      "label": "Smoothness",
+      "info": "How much grain is added back. Higher looks more natural, lower looks cleaner."
+    },
+    "crop_to_fill": {
+      "label": "Fill the frame",
+      "info": "Crops the edges so the picture fills the new size with no empty space."
+    },
+    "face_enhancement": {
+      "label": "Improve faces",
+      "info": "Cleans up and sharpens faces."
+    },
+    "face_enhancement_strength": {
+      "label": "Face strength",
+      "info": "How strongly faces are improved."
+    },
+    "face_enhancement_creativity": {
+      "label": "Face detail",
+      "info": "How much new detail the model may add to faces. Low keeps faces true to the original."
+    },
+    "subject_detection": {
+      "label": "Focus on",
+      "info": "Which part of the picture to improve: everything, only the main subject or only the background."
+    },
+    "handfix": {
+      "label": "Fix Hands",
+      "info": "Redraws hands that the upscale could distort."
+    },
+    "sd_model": {
+      "label": "Look",
+      "info": "The kind of picture the model draws in: a realistic photo, a natural photo or flat and anime art."
+    },
+    "dynamic": {
+      "label": "Contrast",
+      "info": "How punchy the picture looks. Higher adds more contrast and detail."
+    },
+    "resemblance": {
+      "label": "Resemblance",
+      "info": "How closely the result stays like your original. Higher stays closer."
+    },
+    "tiling_width": {
+      "label": "Tile Width",
+      "info": "The size of each piece the picture is worked on in. Bigger is smoother but slower."
+    },
+    "tiling_height": {
+      "label": "Tile Height",
+      "info": "The size of each piece the picture is worked on in. Bigger is smoother but slower."
+    },
+    "downscaling": {
+      "label": "Shrink First",
+      "info": "Shrinks a very large picture before upscaling, which is faster."
+    },
+    "downscaling_resolution": {
+      "label": "Shrink Size",
+      "info": "How small the picture is made before upscaling."
+    },
+    "pattern": {
+      "label": "Seamless Pattern",
+      "info": "Makes the result repeat without visible seams, for patterns and textures."
+    },
+    "scheduler": {
+      "label": "Sampler",
+      "info": "The method the model uses to draw. The default suits most pictures."
+    },
+    "lora_links": {
+      "label": "Extra Styles",
+      "info": "Links to add-on styles that change how the picture looks."
+    },
+    "custom_sd_model": {
+      "label": "Own Model",
+      "info": "A model file of your own to draw with."
+    },
+    "face_enhance": {
+      "label": "Improve Faces",
+      "info": "Cleans up and sharpens faces."
+    },
+    "light_direction": {
+      "label": "Light from",
+      "info": "Where the new light comes from."
+    },
+    "light_source": {
+      "label": "Light from",
+      "info": "Where the new light comes from."
+    },
+    "light_type": {
+      "label": "Kind of light",
+      "info": "The look of the light, such as sunrise, spotlight or soft daylight."
+    },
+    "style": {
+      "label": "Style",
+      "info": "The look to repaint the picture in."
+    },
+    "image_style": {
+      "label": "Style",
+      "info": "The look to repaint the picture in."
+    },
+    "style_strength": {
+      "label": "Style strength",
+      "info": "How strongly the style is applied. Low keeps more of the original."
+    },
+    "structure_strength": {
+      "label": "Keep shapes",
+      "info": "How closely the original shapes and layout are kept. High keeps them almost exactly."
+    },
+    "aspect_ratio": {
+      "label": "Shape",
+      "info": "The proportions of the picture, such as square or wide."
+    },
+    "image_size": {
+      "label": "Size",
+      "info": "The size or shape of the result."
+    },
+    "size": {
+      "label": "Size",
+      "info": "The size or shape of the result."
+    },
+    "resolution": {
+      "label": "Size",
+      "info": "How big the result is, in pixels. Bigger looks sharper and costs more."
+    },
+    "quality": {
+      "label": "Quality",
+      "info": "Higher quality takes longer and may cost more."
+    },
+    "outpaint": {
+      "label": "Expand by",
+      "info": "How the picture is extended past its edges: all sides, one side or to a square."
+    },
+    "mask_blur": {
+      "label": "Edge softness",
+      "info": "How soft the edge of the cut-out is."
+    },
+    "mask_offset": {
+      "label": "Edge size",
+      "info": "Makes the cut-out a little bigger or smaller at the edge."
+    },
+    "refine_fg": {
+      "label": "Clean edges",
+      "info": "Refines the cut-out edge, helpful for hair and fine detail."
+    },
+    "background": {
+      "label": "Background",
+      "info": "What goes behind the subject."
+    },
+    "num_inference_steps": {
+      "label": "Steps",
+      "info": "How many passes the model makes. More is slower and can be better."
+    },
+    "guidance_scale": {
+      "label": "Follow the words",
+      "info": "How closely the model follows your description."
+    },
+    "output_format": {
+      "label": "File type",
+      "info": "The kind of file you get back."
+    }
+  },
+  "choices": {
+    "enhance_model": {
+      "standard v2": {
+        "label": "Standard",
+        "info": "The default for general-purpose use."
+      },
+      "low resolution v2": {
+        "label": "Low resolution",
+        "info": "Improves low-resolution pictures such as web graphics and screenshots."
+      },
+      "cgi": {
+        "label": "Art and CGI",
+        "info": "For digital art, 3D renders, logos and icons."
+      },
+      "high fidelity v2": {
+        "label": "High fidelity",
+        "info": "Keeps fine detail in sharp, high-resolution pictures."
+      },
+      "text refine": {
+        "label": "Text refine",
+        "info": "Sharpens text and branding so it stays readable."
+      }
+    },
+    "subject_detection": {
+      "all": {
+        "label": "Everything",
+        "info": "Finds every subject and improves each one."
+      },
+      "foreground": {
+        "label": "Main subject",
+        "info": "Improves the person or object in front."
+      },
+      "background": {
+        "label": "Background",
+        "info": "Improves what is behind the subject."
+      },
+      "none": {
+        "label": "Whole picture",
+        "info": "Treats the picture as one, with no subject found."
+      }
+    },
+    "upscale_mode": {
+      "factor": {
+        "label": "Times bigger",
+        "info": "Make the picture 2x, 4x and so on bigger."
+      },
+      "target": {
+        "label": "Target size",
+        "info": "Reach a size such as 1080p or 4K."
+      }
+    },
+    "handfix": {
+      "disabled": {
+        "label": "Off",
+        "info": "Leaves hands as the upscale draws them."
+      },
+      "hands_only": {
+        "label": "Hands Only",
+        "info": "Redraws just the hands."
+      },
+      "image_and_hands": {
+        "label": "Picture And Hands",
+        "info": "Improves the whole picture and fixes the hands."
+      }
+    },
+    "mode": {
+      "fast": {
+        "label": "Fast",
+        "info": "Quicker and cheaper, a little less refined."
+      },
+      "high": {
+        "label": "High quality",
+        "info": "Slower, with the best result."
+      }
+    },
+    "grain_model": {
+      "silver rich": {
+        "label": "Film silver",
+        "info": "Fine, classic film grain."
+      },
+      "gaussian": {
+        "label": "Smooth",
+        "info": "Even, soft grain."
+      },
+      "grey": {
+        "label": "Grey",
+        "info": "Neutral grain with no colour."
+      }
+    },
+    "mask_type": {
+      "manual": {
+        "label": "Marked area",
+        "info": "Uses the area you marked."
+      },
+      "automatic": {
+        "label": "Find it for me",
+        "info": "The model finds what to change."
+      }
+    },
+    "light_direction": {
+      "front": {
+        "label": "Front",
+        "info": "Light from the camera side."
+      },
+      "side": {
+        "label": "Side",
+        "info": "Light from the left or right."
+      },
+      "bottom": {
+        "label": "Below",
+        "info": "Light from underneath."
+      },
+      "top-down": {
+        "label": "Above",
+        "info": "Light from overhead."
+      }
+    },
+    "outpaint": {
+      "none": {
+        "label": "None",
+        "info": "Do not extend the picture."
+      },
+      "zoom out 1.5x": {
+        "label": "Zoom out 1.5x",
+        "info": "Adds room around all sides, 1.5 times wider."
+      },
+      "zoom out 2x": {
+        "label": "Zoom out 2x",
+        "info": "Adds room around all sides, twice as wide."
+      },
+      "make square": {
+        "label": "Make square",
+        "info": "Extends the short sides to make a square."
+      },
+      "left outpaint": {
+        "label": "Extend left",
+        "info": "Adds new picture on the left."
+      },
+      "right outpaint": {
+        "label": "Extend right",
+        "info": "Adds new picture on the right."
+      },
+      "top outpaint": {
+        "label": "Extend top",
+        "info": "Adds new picture above."
+      },
+      "bottom outpaint": {
+        "label": "Extend bottom",
+        "info": "Adds new picture below."
+      }
+    }
+  },
+  "fileChoices": [
+    {
+      "match": "juggernaut",
+      "flags": "i",
+      "label": "Realistic Photo",
+      "info": "Natural-looking photos with strong detail."
+    },
+    {
+      "match": "epicrealism",
+      "flags": "i",
+      "label": "Natural Photo",
+      "info": "Soft, true-to-life photos."
+    },
+    {
+      "match": "flat2d|animerge",
+      "flags": "i",
+      "label": "Flat And Anime Art",
+      "info": "Illustrations, anime and flat colours."
+    }
+  ],
+  "editor": {
+    "Exposure": "Makes the whole picture lighter or darker.",
+    "Contrast": "The difference between the light and dark parts. Higher looks punchier.",
+    "Brightness": "Makes the picture lighter or darker without changing the strongest highlights as much.",
+    "Highlights": "Brings down or lifts only the brightest parts.",
+    "Shadows": "Brightens or deepens only the darkest parts.",
+    "Saturation": "How strong the colours are. Zero is black and white.",
+    "Hue rotation": "Shifts every colour around the colour wheel.",
+    "Temperature": "Warmer (more orange) or cooler (more blue).",
+    "Tint": "Shifts the picture towards green or pink.",
+    "Hue": "Which colour to shift towards.",
+    "Amount": "How strong the effect is.",
+    "Luminance": "How light or dark that colour is.",
+    "Straighten": "Turns the picture a little to level the horizon.",
+    "Rotate": "Turns around the picture. For light, the side it comes from.",
+    "Elevation": "How high the light is, from below to above the subject.",
+    "Intensity": "How strong the light is.",
+    "Vertical": "Moves the camera up or down.",
+    "Zoom": "Moves the camera closer or further away.",
+    "Blur": "Softens the picture.",
+    "Grayscale": "Removes colour.",
+    "Sepia": "Gives a warm brown, old-photo tone.",
+    "Sharpen": "Makes edges and fine detail crisper.",
+    "Smart grain": "Adds fine film-like grain so skin does not look plastic.",
+    "Creativity": "How much new detail the model may add. Low stays true to the original.",
+    "HDR": "Adds punchy, high-contrast detail.",
+    "Resemblance": "How closely the result stays like your original.",
+    "Fractality": "How much fine, repeating detail is added to textures.",
+    "Presets": "Ready-made combinations of the settings below.",
+    "Optimized for": "The kind of picture to tune the result for.",
+    "Version": "How closely the result stays to your original look.",
+    "Opacity": "How strong the filter is."
+  },
+  "titleCase": {
+    "small": [
+      "a",
+      "an",
+      "and",
+      "as",
+      "at",
+      "by",
+      "for",
+      "in",
+      "of",
+      "on",
+      "or",
+      "the",
+      "to",
+      "with"
+    ],
+    "acronyms": {
+      "sd": "SD",
+      "hdr": "HDR",
+      "cgi": "CGI",
+      "ai": "AI",
+      "png": "PNG",
+      "jpg": "JPG",
+      "fps": "FPS",
+      "ui": "UI"
+    }
+  }
+}

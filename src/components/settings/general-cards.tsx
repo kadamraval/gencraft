@@ -79,10 +79,10 @@ export function CostCard({ onOpenUsage }: { onOpenUsage: () => void }) {
   const month = usageLedger.getSpendOverview("monthly")
   const all = usageLedger.getSpendOverview("all")
   const parts = [
-    { label: "Image", cost: month.modalities.image.costUsd, dot: "bg-sky-500" },
-    { label: "Video", cost: month.modalities.video.costUsd, dot: "bg-emerald-500" },
-    { label: "Audio", cost: month.modalities.audio.costUsd, dot: "bg-pink-500" },
-    { label: "Text", cost: month.modalities.text.costUsd, dot: "bg-purple-500" },
+    { label: "Image", cost: month.categories.image.costUsd, dot: "bg-sky-500" },
+    { label: "Video", cost: month.categories.video.costUsd, dot: "bg-emerald-500" },
+    { label: "Audio", cost: month.categories.audio.costUsd, dot: "bg-pink-500" },
+    { label: "Text", cost: month.categories.text.costUsd, dot: "bg-purple-500" },
   ]
   return (
     <div className={card}>

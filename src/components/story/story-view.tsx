@@ -962,7 +962,7 @@ ${brandWords}` : prompt)
                 {activeScene.shots.map((shot) => {
                   const patch = (p: Partial<ShotItem>) =>
                     updateActiveScene((sc) => ({ ...sc, shots: sc.shots.map((st) => (st.id === shot.id ? { ...st, ...p } : st)) }))
-                  const modelNames = [...new Set([...listedModels.filter((m) => m.modality === shot.mode).map((m) => m.name), shot.model])]
+                  const modelNames = [...new Set([...listedModels.filter((m) => m.category === shot.mode).map((m) => m.name), shot.model])]
                   return (
                     <div
                       key={shot.id}

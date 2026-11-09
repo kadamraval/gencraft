@@ -2,7 +2,7 @@ import "../models/profiles"
 import { profileFor } from "../models/profile"
 import { featureOfEndpoint } from "./features"
 import { makerRank } from "./logo-rules"
-import { refCapability } from "./slots"
+import { capabilityOfExact } from "../capability"
 import type { ModelRecord } from "./types"
 
 /**
@@ -37,21 +37,20 @@ const KINDS: Record<EditKind, { label: string; hint: string; alsoNeeds?: EditAct
 
 const ORDER: EditKind[] = ["edit", "extend", "lip-sync", "motion-transfer"]
 
-const takesVideo = (r: ModelRecord): boolean => {
-  const cap = refCapability(r)
-  return Boolean(cap.sourceVideo || cap.videos)
-}
+const takesVideo = (r: ModelRecord): boolean => capabilityOfExact(r).takes.some((t) => t.kind === "video")
 
 /** The actions available for an opened video: one per kind, from the best switched-on model that does it. */
 export function editActionsFor(pool: ModelRecord[], enabled: Set<string>): EditAction[] {
   const best = new Map<EditKind, { action: EditAction; rank: number; updated: string }>()
   for (const r of pool) {
-    if (r.modality !== "video" || r.status === "deprecated" || !enabled.has(r.id) || !takesVideo(r)) continue
+    if (r.category !== "video" || r.status === "deprecated" || !enabled.has(r.id) || !takesVideo(r)) continue
     const offers: Array<{ kind: EditKind; task?: "edit" | "extend" }> = []
     const feature = featureOfEndpoint(r.endpoint)
     if (feature && (ORDER as string[]).includes(feature.id)) offers.push({ kind: feature.id as EditKind })
     // A task inside the model counts only where the model takes a video, and is never a second copy of its own endpoint feature
     for (const t of profileFor(r)?.tasks ?? []) if (!offers.some((o) => o.kind === t.id)) offers.push({ kind: t.id, task: t.id })
+    // And whatever else its capability says it does with a clip (the one description every screen uses)
+    for (const d of capabilityOfExact(r).does) if ((ORDER as string[]).includes(d) && !offers.some((o) => o.kind === d)) offers.push({ kind: d as EditKind })
     for (const o of offers) {
       const kind = KINDS[o.kind]
       const action: EditAction = {

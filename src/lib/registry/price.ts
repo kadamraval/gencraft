@@ -156,13 +156,13 @@ export function estimateRun(rec: ModelRecord, chosen: Record<string, unknown>, c
       break
     case "per_1k_chars": {
       const chars = context.promptChars ?? 500
-      usd = amount * (chars / 1000) * (rec.modality === "image" ? images : 1)
+      usd = amount * (chars / 1000) * (rec.category === "image" ? images : 1)
       approximate = context.promptChars === undefined || approximate
       breakdown = `${chars.toLocaleString("en-US")} characters × ${fmt(amount)}/1K`
       break
     }
     case "per_1m_tokens": {
-      if (rec.modality === "text") {
+      if (rec.category === "text") {
         // A chat turn is estimated at about 1k tokens in and 1k out, using the exact input and output rates
         usd = (amount * 1000 + (rec.price.outputAmount ?? amount) * 1000) / 1_000_000
         approximate = true
@@ -171,7 +171,7 @@ export function estimateRun(rec: ModelRecord, chosen: Record<string, unknown>, c
       }
       const key = `${rec.provider}/${rec.endpoint}`
       const rate = rec.price.outputAmount ?? amount
-      if (rec.modality === "image") {
+      if (rec.category === "image") {
         const bySize = factFor(key, "image-by-size")
         const fact = bySize ?? factFor(key, "image-by-quality")
         // Sized models are billed by the size asked for; with none chosen, the smallest size is the standard run
@@ -182,11 +182,11 @@ export function estimateRun(rec: ModelRecord, chosen: Record<string, unknown>, c
         usd = (tokens * rate * images) / 1_000_000
         breakdown = `${tokens.toLocaleString("en-US")} tokens × ${fmt(rate)}/M`
       } else {
-        const fact = factFor(key, rec.modality === "video" ? "video-per-second" : "audio-per-second")
+        const fact = factFor(key, rec.category === "video" ? "video-per-second" : "audio-per-second")
         if (!fact?.tokensPerSecond) return { usd: null, display: "per token", approximate: true }
-        const secs = rec.modality === "audio" ? speechSeconds(context.promptChars ?? 500) : seconds
+        const secs = rec.category === "audio" ? speechSeconds(context.promptChars ?? 500) : seconds
         usd = (secs * fact.tokensPerSecond * rate) / 1_000_000
-        upTo = rec.modality === "video" && auto
+        upTo = rec.category === "video" && auto
         breakdown = `${secs} s × ${fact.tokensPerSecond.toLocaleString("en-US")} tokens/s × ${fmt(rate)}/M`
       }
       approximate = true
@@ -216,10 +216,10 @@ export function estimateRun(rec: ModelRecord, chosen: Record<string, unknown>, c
       breakdown = `${seconds} s × ${fmt(amount)}/min`
       break
     default:
-      usd = amount * (rec.modality === "image" ? images : 1)
+      usd = amount * (rec.category === "image" ? images : 1)
       // A model billed by the seconds it runs: the price is what a run typically costs, so it is a projection
       if (rec.price.computeSecond) approximate = true
-      breakdown = rec.price.computeSecond ? `a typical run (${fmt(amount)}), billed by run time` : rec.modality === "image" ? `${images} × ${fmt(amount)}` : "one run"
+      breakdown = rec.price.computeSecond ? `a typical run (${fmt(amount)}), billed by run time` : rec.category === "image" ? `${images} × ${fmt(amount)}` : "one run"
   }
   // What this model's bills have turned out to be against the price list (learned from the provider's own billing)
   const learned = calibrationFor(rec)
@@ -241,15 +241,15 @@ export function standardRun(rec: ModelRecord): { estimate: PriceEstimate; label:
   const raw = values.duration ?? values.duration_seconds ?? values.seconds
   const open = raw === undefined || raw === "auto" || (typeof raw === "number" && raw <= 0) || (typeof raw === "string" && /^(auto|-1|0)$/i.test(raw.trim()))
   const key = (["duration", "duration_seconds", "seconds"] as const).find((k) => k in rec.params.properties) ?? "duration"
-  if (rec.modality === "video" && open) values[key] = rec.summary?.maxSeconds && rec.summary.maxSeconds < 5 ? rec.summary.maxSeconds : 5
-  const promptChars = rec.price.unit === "per_1k_chars" || (rec.modality === "audio" && rec.price.unit === "per_1m_tokens") ? 1000 : undefined
+  if (rec.category === "video" && open) values[key] = rec.summary?.maxSeconds && rec.summary.maxSeconds < 5 ? rec.summary.maxSeconds : 5
+  const promptChars = rec.price.unit === "per_1k_chars" || (rec.category === "audio" && rec.price.unit === "per_1m_tokens") ? 1000 : undefined
   const estimate = estimateRun(rec, values, { promptChars })
   const parts: string[] = []
-  if (rec.modality === "video") parts.push(`${secondsOf(values)} s`)
-  if (rec.modality === "image") parts.push("1 image")
+  if (rec.category === "video") parts.push(`${secondsOf(values)} s`)
+  if (rec.category === "image") parts.push("1 image")
   if (promptChars) parts.push("1K characters")
-  if (rec.modality === "audio" && rec.price.unit === "per_run") parts.push("1 file")
-  if (rec.modality === "audio" && rec.price.unit === "per_minute") parts.push("1 min")
+  if (rec.category === "audio" && rec.price.unit === "per_run") parts.push("1 file")
+  if (rec.category === "audio" && rec.price.unit === "per_minute") parts.push("1 min")
   const size = values.resolution ?? values.image_size ?? values.size
   if (typeof size === "string" && size && !/^(auto|adaptive)$/i.test(size)) parts.push(size)
   return { estimate, label: parts.join(" · ") }

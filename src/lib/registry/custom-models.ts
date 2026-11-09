@@ -1,9 +1,10 @@
 import { EMPTY_SCHEMA } from "./types"
-import type { ModelRecord, RegistryModality } from "./types"
+import type { ModelRecord, AppCategory } from "./types"
 import { fetchFalRecord } from "./adapters/fal"
 import { fetchOpenRouterRecord } from "./adapters/openrouter"
 import { fetchReplicateRecord } from "./adapters/replicate"
 import { replicateCall } from "./net"
+import { withCategory } from "../legacy-names"
 
 /**
  * Models the person adds by hand: a provider and the model's id. The model's settings are read from the
@@ -16,7 +17,7 @@ const NAMES_KEY = "gencraft_model_names_v1"
 export function readCustomModels(): ModelRecord[] {
   try {
     const raw = localStorage.getItem(KEY)
-    return raw ? (JSON.parse(raw) as ModelRecord[]) : []
+    return raw ? (JSON.parse(raw) as ModelRecord[]).map(withCategory) : []
   } catch {
     return []
   }
@@ -52,7 +53,7 @@ export interface NewModel {
   /** The model's id at the provider, for example fal-ai/flux/dev or black-forest-labs/flux-schnell */
   modelId: string
   /** Needed where the provider does not say what a model makes */
-  modality: RegistryModality
+  category: AppCategory
   keys: { fal?: string; replicate?: string }
 }
 
@@ -64,7 +65,7 @@ export async function buildCustomModel(input: NewModel): Promise<ModelRecord> {
   if (input.provider === "fal") record = await fetchFalRecord(id, input.keys.fal)
   else if (input.provider === "replicate") {
     if (!input.keys.replicate) throw new Error("Add your Replicate key first.")
-    record = await fetchReplicateRecord(replicateCall(input.keys.replicate), id, input.modality)
+    record = await fetchReplicateRecord(replicateCall(input.keys.replicate), id, input.category)
   } else if (input.provider === "openrouter") record = await fetchOpenRouterRecord(id)
   else {
     // OpenAI and Gemini publish no settings for a model: it runs with a prompt, and the person can say what it makes
@@ -75,7 +76,7 @@ export async function buildCustomModel(input: NewModel): Promise<ModelRecord> {
       name: id,
       family: id,
       logoKey: input.provider,
-      modality: input.modality,
+      category: input.category,
       inputs: ["text"],
       params: EMPTY_SCHEMA,
       price: { unit: "unknown", amount: null, source: "estimate", fetchedAt: new Date().toISOString() },

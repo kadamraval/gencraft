@@ -75,7 +75,7 @@ check("data url split", JSON.stringify(splitDataUrl("data:audio/wav;base64,AB=="
 
 // Gemini image prices from the token facts (Google's pricing page: $30 per 1M for Nano Banana 2.1)
 const priced = (endpoint: string, amount: number, props: ModelRecord["params"]["properties"] = {}) =>
-  ({ id: `gemini/${endpoint}`, endpoint, name: endpoint, provider: "gemini", modality: "image", params: { type: "object", properties: props }, price: { unit: "per_1m_tokens", amount, source: "scraped", fetchedAt: "" }, status: "active" }) as unknown as ModelRecord
+  ({ id: `gemini/${endpoint}`, endpoint, name: endpoint, provider: "gemini", category: "image", params: { type: "object", properties: props }, price: { unit: "per_1m_tokens", amount, source: "scraped", fetchedAt: "" }, status: "active" }) as unknown as ModelRecord
 const nb = priced("gemini-nano-banana-2.1", 30, geminiImageParams("gemini-nano-banana-2.1").properties)
 const near = (a: number | null, b: number) => a !== null && Math.abs(a - b) < 0.0005
 check("price: Nano Banana 2.1 1K is $0.0336", near(estimateRun(nb, { image_size: "1K" }).usd, 0.0336))
@@ -101,7 +101,10 @@ check("gemini video answer: extracts generateVideoResponse URI", geminiVideoUrl(
 
 const orVidRec = rec("bytedance/seedance-2.5", { type: "object", properties: { aspect_ratio: { type: "string" }, resolution: { type: "string" }, duration: { type: "integer" } } })
 const orVidBody = openrouterVideoBody(orVidRec, "Cyberpunk street", { aspect_ratio: "16:9", resolution: "1080p", duration: 5 }, [png])
-check("openrouter video: top-level fields and image_url reference", orVidBody.model === "bytedance/seedance-2.5" && orVidBody.resolution === "1080p" && orVidBody.image_url === png)
+// The first picture of a plain list is the start frame, sent in frame_images as OpenRouter documents
+check("openrouter video: top-level fields and the start frame in frame_images", orVidBody.model === "bytedance/seedance-2.5" && orVidBody.resolution === "1080p" && JSON.stringify(orVidBody.frame_images) === JSON.stringify([{ type: "image_url", image_url: { url: png }, frame_type: "first_frame" }]))
+const orEdit = openrouterVideoBody(orVidRec, "Make the car red", {}, { videos: ["https://x/clip.mp4"], audios: ["https://x/voice.mp3"], images: [png] })
+check("openrouter video: pictures, clips and sounds go in input_references with their own types", JSON.stringify(orEdit.input_references) === JSON.stringify([{ type: "image_url", image_url: { url: png } }, { type: "video_url", video_url: { url: "https://x/clip.mp4" } }, { type: "audio_url", audio_url: { url: "https://x/voice.mp3" } }]) && orEdit.frame_images === undefined)
 
 const orAudRec = rec("openai/gpt-4o-audio-preview", { type: "object", properties: { voice: { type: "string" } } })
 const orAudBody = openrouterAudioBody(orAudRec, "Read this aloud", { voice: "nova" })

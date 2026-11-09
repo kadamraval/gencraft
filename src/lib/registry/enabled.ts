@@ -2,7 +2,7 @@ import { isLeadingMaker, makerRank } from "./logo-rules"
 import { packRankOf } from "./roles"
 import { entryFor } from "./shortlist"
 import type { ShortlistEntry } from "./shortlist"
-import type { ModelRecord, RegistryModality } from "./types"
+import type { ModelRecord, AppCategory } from "./types"
 
 /**
  * Which models the chat picker offers.
@@ -52,26 +52,26 @@ export function shortlistedFor(pool: ModelRecord[], entries?: ShortlistEntry[]):
 }
 
 /** The older way: for each maker and task the newest couple of models, strongest makers first. */
-function newestPerMaker(pool: ModelRecord[], modality: RegistryModality): ModelRecord[] {
+function newestPerMaker(pool: ModelRecord[], category: AppCategory): ModelRecord[] {
   const byLine = new Map<string, ModelRecord[]>()
   for (const r of pool) {
-    const key = `${r.maker ?? r.provider}|${r.task ?? r.modality}`
+    const key = `${r.maker ?? r.provider}|${r.task ?? r.category}`
     byLine.set(key, [...(byLine.get(key) ?? []), r])
   }
   const picks: ModelRecord[] = []
   for (const group of byLine.values()) picks.push(...[...group].sort(newest).slice(0, PER_MAKER_AND_TASK))
   return picks.sort(
     (a, b) =>
-      makerRank({ name: a.name, endpoint: a.endpoint, family: a.family }, modality) - makerRank({ name: b.name, endpoint: b.endpoint, family: b.family }, modality) ||
+      makerRank({ name: a.name, endpoint: a.endpoint, family: a.family }, category) - makerRank({ name: b.name, endpoint: b.endpoint, family: b.family }, category) ||
       Number(Boolean(b.featured)) - Number(Boolean(a.featured)) ||
       newest(a, b),
   )
 }
 
 /** The latest releases of the leading makers, newest first, that are not already in `have` */
-function newestReleases(pool: ModelRecord[], modality: RegistryModality, have: Set<string>): ModelRecord[] {
+function newestReleases(pool: ModelRecord[], category: AppCategory, have: Set<string>): ModelRecord[] {
   return pool
-    .filter((r) => !have.has(r.id) && isLeadingMaker({ name: r.name, endpoint: r.endpoint, family: r.family }, modality))
+    .filter((r) => !have.has(r.id) && isLeadingMaker({ name: r.name, endpoint: r.endpoint, family: r.family }, category))
     .sort(newest)
     .slice(0, NEWEST_SHOWN)
 }
@@ -79,25 +79,25 @@ function newestReleases(pool: ModelRecord[], modality: RegistryModality, have: S
 /** Top models: the industry leaders first (arena leaderboards for pictures, video and sound; the leading makers for chat), then the newest releases. */
 export function computeDefaultEnabled(listed: ModelRecord[]): string[] {
   const out: string[] = []
-  for (const modality of ["text", "image", "video", "audio"] as RegistryModality[]) {
-    const pool = listed.filter((r) => r.modality === modality && promptFirst(r) === 0)
-    if (modality === "text") {
-      const lead = newestPerMaker(pool, modality).slice(0, MAX_PER_MODALITY)
-      out.push(...lead.map((r) => r.id), ...newestReleases(pool, modality, new Set(lead.map((r) => r.id))).map((r) => r.id))
+  for (const category of ["text", "image", "video", "audio"] as AppCategory[]) {
+    const pool = listed.filter((r) => r.category === category && promptFirst(r) === 0)
+    if (category === "text") {
+      const lead = newestPerMaker(pool, category).slice(0, MAX_PER_MODALITY)
+      out.push(...lead.map((r) => r.id), ...newestReleases(pool, category, new Set(lead.map((r) => r.id))).map((r) => r.id))
       continue
     }
     const picks: Array<{ record: ModelRecord; rank: number }> = []
     for (const provider of new Set(pool.map((r) => r.provider))) {
       const mine = pool.filter((r) => r.provider === provider)
       const best = shortlistedFor(mine)
-      const chosen = best.length >= MIN_SHORTLISTED ? best : newestPerMaker(mine, modality).slice(0, MAX_PER_MODALITY)
+      const chosen = best.length >= MIN_SHORTLISTED ? best : newestPerMaker(mine, category).slice(0, MAX_PER_MODALITY)
       for (const [i, record] of chosen.entries()) picks.push({ record, rank: entryFor(record)?.rank ?? 1000 + i })
       // The standard database's own models come first on their provider
       for (const record of mine) {
         const own = packRankOf(record)
         if (own !== undefined) picks.push({ record, rank: own - 100 })
       }
-      for (const [i, record] of newestReleases(mine, modality, new Set(chosen.map((r) => r.id))).entries()) picks.push({ record, rank: 2000 + i })
+      for (const [i, record] of newestReleases(mine, category, new Set(chosen.map((r) => r.id))).entries()) picks.push({ record, rank: 2000 + i })
     }
     // Best first across providers: this order decides the model a fresh composer starts with
     picks.sort((a, b) => a.rank - b.rank)
@@ -115,9 +115,9 @@ export function enabledSet(listed: ModelRecord[], _legacyChoice?: string[]): Set
 }
 
 /** The strongest current model for one kind of output, used when nothing usable is configured. */
-export function defaultModelFor(modality: RegistryModality, listed: ModelRecord[]): ModelRecord | undefined {
+export function defaultModelFor(category: AppCategory, listed: ModelRecord[]): ModelRecord | undefined {
   const byId = new Map(listed.map((r) => [r.id, r]))
   return computeDefaultEnabled(listed)
     .map((id) => byId.get(id))
-    .find((r): r is ModelRecord => Boolean(r) && r!.modality === modality)
+    .find((r): r is ModelRecord => Boolean(r) && r!.category === category)
 }

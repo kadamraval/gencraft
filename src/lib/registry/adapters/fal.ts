@@ -1,4 +1,4 @@
-import type { ModelRecord, ParamProperty, ParamSchema, RegistryModality } from "../types"
+import type { ModelRecord, ParamProperty, ParamSchema, AppCategory } from "../types"
 import { applyParamPolicy, type PolicyResult } from "../param-policy"
 import { summarize } from "../summary"
 import { detectSlot } from "../slots"
@@ -29,7 +29,7 @@ export interface FalMeta {
   openapi?: { components?: { schemas?: Record<string, OpenApiSchema> }; error?: { message?: string } }
 }
 
-const CATEGORY_MODALITY: Record<string, RegistryModality> = {
+const FAL_TASK_CATEGORY: Record<string, AppCategory> = {
   "text-to-image": "image",
   "image-to-image": "image",
   "text-to-video": "video",
@@ -56,7 +56,7 @@ function inferFormat(key: string): ParamProperty["format"] | undefined {
   return undefined
 }
 
-function convertProp(key: string, s: OpenApiSchema, modality: RegistryModality): ParamProperty | null {
+function convertProp(key: string, s: OpenApiSchema, category: AppCategory): ParamProperty | null {
   const variant = s.anyOf?.find((v) => v.type && v.type !== "null") ?? s.oneOf?.find((v) => v.type && v.type !== "null") ?? s
   const type = variant.type
   // File fields: what each one is for, and how many files it takes, come from the provider's own schema
@@ -69,7 +69,7 @@ function convertProp(key: string, s: OpenApiSchema, modality: RegistryModality):
         maxItems: variant.maxItems ?? s.maxItems,
         description: s.description ?? variant.description,
       },
-      modality,
+      category,
     )
     if (slot) return { type: "string", title: s.title ?? key, format: slot.kind, slot }
   }
@@ -90,13 +90,13 @@ function convertProp(key: string, s: OpenApiSchema, modality: RegistryModality):
 }
 
 /** Converts fal's OpenAPI input into our schema, then keeps only the fields the policy allows. */
-export function extractInput(meta: FalMeta, modality: RegistryModality = CATEGORY_MODALITY[meta.metadata.category] ?? "image"): PolicyResult {
+export function extractInput(meta: FalMeta, category: AppCategory = FAL_TASK_CATEGORY[meta.metadata.category] ?? "image"): PolicyResult {
   const schemas = meta.openapi?.components?.schemas ?? {}
   const inputKey = Object.keys(schemas).find((k) => /Input$/.test(k) && !/Queue/.test(k))
   const input = inputKey ? schemas[inputKey] : undefined
   const properties: Record<string, ParamProperty> = {}
   for (const [key, raw] of Object.entries(input?.properties ?? {})) {
-    const p = convertProp(key, raw, modality)
+    const p = convertProp(key, raw, category)
     if (p) properties[key] = p
   }
   const policy = applyParamPolicy({ type: "object", properties, required: input?.required?.filter((r) => r in properties) })
@@ -130,13 +130,13 @@ export function attachSchema(rec: ModelRecord, params: ParamSchema): ModelRecord
     ...rec,
     params,
     inputs: hasImage && !rec.inputs.includes("image") ? [...rec.inputs, "image"] : rec.inputs,
-    summary: summarize(rec.modality, params, rec.description),
+    summary: summarize(rec.category, params, rec.description),
   }
 }
 
 export function mapFalModel(meta: FalMeta, fetchedAt: string): ModelRecord | null {
-  const modality = CATEGORY_MODALITY[meta.metadata.category]
-  if (!modality || meta.metadata.status === "deprecated") return null
+  const category = FAL_TASK_CATEGORY[meta.metadata.category]
+  if (!category || meta.metadata.status === "deprecated") return null
   const params = extractInputSchema(meta)
   const hasImage = Object.values(params.properties).some((p) => p.format === "image") || /^image-to|^video-to/.test(meta.metadata.category)
   return {
@@ -146,7 +146,7 @@ export function mapFalModel(meta: FalMeta, fetchedAt: string): ModelRecord | nul
     name: meta.metadata.display_name,
     family: meta.endpoint_id.split("/")[1] ?? meta.metadata.display_name,
     logoKey: meta.endpoint_id.split("/")[0] ?? "fal",
-    modality,
+    category,
     inputs: hasImage ? ["text", "image"] : ["text"],
     params,
     // fal pricing needs an authenticated call; fetchFalPricing fills it once a key exists.
@@ -200,7 +200,7 @@ export interface FalFetchResult {
 }
 
 /** The categories this reader knows, so the build can tell when fal lists one it does not */
-export const FAL_KNOWN_CATEGORIES = Object.keys(CATEGORY_MODALITY)
+export const FAL_KNOWN_CATEGORIES = Object.keys(FAL_TASK_CATEGORY)
 
 /** How many active models fal lists in each category, read from the whole list with no category filter. */
 export async function fetchFalCategoryCounts(opts: { apiKey?: string; signal?: AbortSignal } = {}): Promise<Record<string, number>> {
@@ -223,7 +223,7 @@ export async function fetchFalModels(
   opts: { categories?: string[]; pageSize?: number; maxPages?: number; apiKey?: string; signal?: AbortSignal } = {},
 ): Promise<FalFetchResult> {
   const fetchedAt = new Date().toISOString()
-  const categories = opts.categories ?? Object.keys(CATEGORY_MODALITY)
+  const categories = opts.categories ?? Object.keys(FAL_TASK_CATEGORY)
   const pageSize = opts.pageSize ?? 100
   const maxPages = opts.maxPages ?? 3
   const records: ModelRecord[] = []

@@ -6,8 +6,8 @@ const check = (name: string, ok: boolean, extra = "") => {
   console.log(`${ok ? "PASS" : "FAIL"}  ${name} ${ok ? "" : extra}`)
   if (!ok) fails++
 }
-const rec = (i: number, props: Record<string, ParamProperty>, modality: ModelRecord["modality"] = "video"): ModelRecord =>
-  ({ id: `p/${i}`, endpoint: `m/${i}`, name: `M${i}`, provider: "fal", modality, family: "", logoKey: "", inputs: ["text"], params: { type: "object", properties: props }, price: { unit: "unknown", amount: null, source: "estimate", fetchedAt: "" }, status: "active" }) as ModelRecord
+const rec = (i: number, props: Record<string, ParamProperty>, category: ModelRecord["category"] = "video"): ModelRecord =>
+  ({ id: `p/${i}`, endpoint: `m/${i}`, name: `M${i}`, provider: "fal", category, family: "", logoKey: "", inputs: ["text"], params: { type: "object", properties: props }, price: { unit: "unknown", amount: null, source: "estimate", fetchedAt: "" }, status: "active" }) as ModelRecord
 
 // Ten video models: nine take a negative prompt and a camera setting, one takes a rare "loop" and an odd standard-looking field
 const pool = Array.from({ length: 10 }, (_, i) =>

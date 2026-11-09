@@ -108,7 +108,7 @@ export function resolveLogoSlug(subject: LogoSubject): string | null {
   return provider ?? null
 }
 
-/** Makers users reach for first, per modality. Earlier entries rank higher in the picker. */
+/** Makers users reach for first, per category. Earlier entries rank higher in the picker. */
 const MAKER_PRIORITY: Record<string, string[]> = {
   text: ["claude", "openai", "gemini", "grok", "deepseek", "qwen", "meta", "mistral", "kimi", "zai"],
   image: ["nanobanana", "flux", "openai", "bytedance", "midjourney", "ideogram", "recraft", "google", "stability", "alibaba"],
@@ -116,14 +116,14 @@ const MAKER_PRIORITY: Record<string, string[]> = {
   audio: ["elevenlabs", "suno", "udio", "stability", "openai"],
 }
 
-export function makerRank(subject: LogoSubject, modality: string = "video"): number {
-  const order = MAKER_PRIORITY[modality] ?? []
+export function makerRank(subject: LogoSubject, category: string = "video"): number {
+  const order = MAKER_PRIORITY[category] ?? []
   const slug = resolveLogoSlug({ ...subject, provider: undefined })
   const i = slug ? order.indexOf(slug) : -1
   return i === -1 ? order.length : i
 }
 
 /** A maker people reach for first in this kind of output. Newest-release lists skip everyone else, so fine-tunes and one-offs do not crowd them. */
-export function isLeadingMaker(subject: LogoSubject, modality: string = "video"): boolean {
-  return makerRank(subject, modality) < (MAKER_PRIORITY[modality]?.length ?? 0)
+export function isLeadingMaker(subject: LogoSubject, category: string = "video"): boolean {
+  return makerRank(subject, category) < (MAKER_PRIORITY[category]?.length ?? 0)
 }

@@ -83,7 +83,7 @@ export function explainError(rawInput: string, ctx: ErrorContext = {}): Friendly
   const make = (kind: ErrorKind, title: string, message: string, extra: Partial<FriendlyError> = {}): FriendlyError => ({ kind, title, message, retryable: false, raw, ...extra })
 
   if (/cannot run the agent/i.test(text)) {
-    return make("bad-input", `${ctx.model ?? "This model"} cannot run the agent`, "The agent needs a chat model that can call tools, from OpenRouter, OpenAI or Google Gemini.", { hint: "Switch on one of those chat models in Settings, Providers, and set it as the Agent model in General." })
+    return make("bad-input", `${ctx.model ?? "This model"} cannot run the agent`, "The agent needs a chat model that can call tools, from OpenRouter, OpenAI or Google Gemini.", { hint: "Switch on one of those chat models in Settings, Providers, and set it under Settings, General, Agent Model." })
   }
 
   if (/no (chat|text|image|video|audio) model is available/i.test(text)) {

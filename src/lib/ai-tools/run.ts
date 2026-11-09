@@ -1,3 +1,5 @@
+import { capabilityOfExact, verbOfJob } from "@/lib/capability"
+import { DEVICE_PROVIDER, DEVICE_STEMS, splitStemsOnDevice } from "@/lib/device/stems"
 import { usageLedger } from "@/lib/ledger/usage-store"
 import { dispatchLiveProviderRequest } from "@/lib/providers/live-connectors"
 import { clampToSchema, defaultsFor } from "@/lib/registry/param-logic"
@@ -26,6 +28,10 @@ export interface ToolInputs {
   /** The extra file a tool needs: the voice for lip-sync, the picture for motion transfer */
   audioUrl?: string
   imageUrl?: string
+  /** The area to change, white where the model should work (a model with a mask field gets it) */
+  maskUrl?: string
+  /** Settings under the model's own names (its strength, light direction, style, size ...); only names the model has are used */
+  params?: Record<string, unknown>
   prompt?: string
   /** The person's choices, by option id */
   options?: Record<string, string | number | boolean>
@@ -105,24 +111,59 @@ export interface RunDeps {
 }
 
 /**
- * What is sent as the prompt. A model that does this job by following instructions (the database lists it as an alternative) is told what to
+ * What is sent as the prompt. A model that does this tool by following instructions (an editor, not one made for this job) is told what to
  * do, with the person's words in the sentence; every other model gets the person's words as they are.
  */
-export function promptFor(spec: Pick<ToolSpec, "id" | "instruction">, record: Pick<ModelRecord, "jobs">, typed: string): string {
-  const viaInstruction = spec.instruction !== undefined && record.jobs?.some((j) => j.id === spec.id && j.role === "alternative")
+export function promptFor(spec: Pick<ToolSpec, "id" | "instruction">, record: ModelRecord, typed: string, options: Record<string, unknown> = {}): string {
+  // A model made for this job gets the person's words; one that edits by words is told the job in a sentence
+  const verb = verbOfJob(spec.id)
+  const madeForIt = verb !== undefined && capabilityOfExact(record).dedicated.includes(verb)
+  const viaInstruction = spec.instruction !== undefined && !madeForIt
   if (!viaInstruction) return typed
-  return spec.instruction!.replace("{prompt}", typed).replace(/:\s*\./, ".").replace(/\s+/g, " ").trim()
+  // The person's words and chosen settings fill the sentence ("{language}"); a setting left empty drops out
+  const filled = spec.instruction!.replace("{prompt}", typed).replace(/\{(\w+)\}/g, (_, k: string) => (options[k] !== undefined && options[k] !== "" ? String(options[k]) : "the chosen language"))
+  return filled.replace(/:\s*\./, ".").replace(/\s+/g, " ").trim()
+}
+
+/** A job done on this computer (the stem splitter): no provider, no cost */
+async function runOnDevice(spec: ToolSpec, inputs: ToolInputs, deps: RunDeps): Promise<ToolResult> {
+  const { media } = inputs
+  const stems = await splitStemsOnDevice(media.url, deps.onLog, deps.signal)
+  const when = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+  const batch = `tool-${Date.now()}`
+  const assets = stems.map<MediaAsset>((s, i) => ({
+    id: `tool-audio-${Date.now()}-${i}`,
+    type: "audio",
+    title: `${s.name.charAt(0).toUpperCase()}${s.name.slice(1)}: ${media.name}`,
+    prompt: spec.name,
+    url: s.url,
+    thumbnailUrl: "",
+    aspectRatio: "16:9",
+    model: DEVICE_STEMS.name,
+    provider: DEVICE_PROVIDER as ProviderType,
+    createdAt: when,
+    batchId: batch,
+    projectId: deps.projectId,
+    cost: "",
+    status: "completed",
+    source: "generated",
+    params: { tool: spec.id, endpoint: DEVICE_STEMS.endpoint, from: media.name, stem: s.name },
+  }))
+  return { assets, costUsd: 0 }
 }
 
 export async function runTool(spec: ToolSpec, record: ModelRecord, inputs: ToolInputs, deps: RunDeps): Promise<ToolResult> {
-  const model = resolveModelInfo(record.id, record.modality)
-  const { params } = paramsFor(spec, record, inputs.options)
+  if (record.provider === DEVICE_PROVIDER) return runOnDevice(spec, inputs, deps)
+  const model = resolveModelInfo(record.id, record.category)
+  const base = paramsFor(spec, record, inputs.options).params
+  const own = Object.fromEntries(Object.entries(inputs.params ?? {}).filter(([k, v]) => v !== undefined && record.params.properties[k] !== undefined))
+  const params = Object.keys(own).length > 0 ? clampToSchema(record.params, { ...base, ...own }) : base
   const { media } = inputs
-  const typed = (inputs.prompt ?? "").trim()
-  const prompt = promptFor(spec, record, typed)
+  const typed = (inputs.prompt ?? "").trim() || spec.defaultPrompt || ""
+  const prompt = promptFor(spec, record, typed, inputs.options ?? {})
   if (spec.prompt?.required && !typed) throw new Error(`${spec.prompt.label} is needed.`)
   for (const need of spec.needs ?? []) {
-    if (need.required && !(need.kind === "audio" ? inputs.audioUrl : inputs.imageUrl)) throw new Error(`${need.label} is needed.`)
+    if (need.required && !(need.role === "mask" ? inputs.maskUrl : need.kind === "audio" ? inputs.audioUrl : inputs.imageUrl)) throw new Error(`${need.label} is needed.`)
   }
 
   const log = deps.onLog ?? (() => undefined)
@@ -132,14 +173,15 @@ export async function runTool(spec: ToolSpec, record: ModelRecord, inputs: ToolI
       actual = c
     },
     model,
-    modality: record.modality,
+    category: record.category,
     prompt,
     settings: deps.settings,
     params,
     references: {
-      images: media.kind === "image" ? [media.url] : inputs.imageUrl ? [inputs.imageUrl] : [],
+      images: [media.kind === "image" ? media.url : undefined, inputs.imageUrl].filter((u): u is string => Boolean(u)),
       sourceVideoUrl: media.kind === "video" ? media.url : undefined,
       sourceAudioUrl: media.kind === "audio" ? media.url : inputs.audioUrl,
+      maskUrl: inputs.maskUrl,
     },
     imageParams: { batchCount: 1 },
     videoParams: {},
@@ -147,7 +189,7 @@ export async function runTool(spec: ToolSpec, record: ModelRecord, inputs: ToolI
     onLog: log,
   })
   if (deps.signal?.aborted) throw new Error("Stopped.")
-  const urls = record.modality === "image" ? (live.imageUrls ?? []) : record.modality === "video" ? (live.videoUrl ? [live.videoUrl] : []) : live.audioUrl ? [live.audioUrl] : []
+  const urls = record.category === "image" ? (live.imageUrls ?? []) : record.category === "video" ? (live.videoUrl ? [live.videoUrl] : []) : live.audioUrl ? [live.audioUrl] : []
   if (urls.length === 0) throw new Error(`${record.name} finished but sent back no file.`)
 
   const estimate = estimateRun(record, params, { sourceVideo: media.kind === "video" })
@@ -155,7 +197,7 @@ export async function runTool(spec: ToolSpec, record: ModelRecord, inputs: ToolI
   usageLedger.addRecord({
     modelName: record.name,
     modelId: record.id,
-    category: record.modality,
+    category: record.category,
     provider: model.provider,
     action: "Deducted",
     costUsd,
@@ -169,12 +211,12 @@ export async function runTool(spec: ToolSpec, record: ModelRecord, inputs: ToolI
   const when = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
   const batch = `tool-${Date.now()}`
   const assets = urls.map<MediaAsset>((url, i) => ({
-    id: `tool-${record.modality}-${Date.now()}-${i}`,
-    type: record.modality as MediaAsset["type"],
+    id: `tool-${record.category}-${Date.now()}-${i}`,
+    type: record.category as MediaAsset["type"],
     title: `${spec.name}: ${media.name}`,
     prompt: prompt || spec.name,
     url,
-    thumbnailUrl: record.modality === "image" ? url : "",
+    thumbnailUrl: record.category === "image" ? url : "",
     aspectRatio: typeof params.aspect_ratio === "string" ? params.aspect_ratio : "16:9",
     model: record.name,
     provider: record.provider as ProviderType,

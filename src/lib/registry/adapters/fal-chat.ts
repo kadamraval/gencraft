@@ -13,6 +13,6 @@ export async function fetchFalChatModels(signal?: AbortSignal): Promise<ModelRec
   const all = await fetchOpenRouterModels(signal)
   return all
     // Variants such as :free or :batch are routes of OpenRouter's own, not models fal serves
-    .filter((r) => r.modality === "text" && !r.endpoint.includes(":"))
+    .filter((r) => r.category === "text" && !r.endpoint.includes(":"))
     .map((r) => ({ ...r, id: `fal-chat/${r.endpoint}`, provider: "fal", price: { ...r.price, source: "estimate" as const } }))
 }

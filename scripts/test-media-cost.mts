@@ -28,7 +28,7 @@ check("providers that do not report a cost have none", actualCostOf({ provider: 
 
 // OpenRouter text: the cost it reports replaces tokens times price
 {
-  const rec = { id: "openrouter/x", endpoint: "x", provider: "openrouter", name: "x", modality: "text", inputs: ["text"], params: { type: "object", properties: {} }, price: { unit: "per_1m_tokens", amount: 1, outputAmount: 2, source: "api", fetchedAt: "" }, status: "active" } as unknown as ModelRecord
+  const rec = { id: "openrouter/x", endpoint: "x", provider: "openrouter", name: "x", category: "text", inputs: ["text"], params: { type: "object", properties: {} }, price: { unit: "per_1m_tokens", amount: 1, outputAmount: 2, source: "api", fetchedAt: "" }, status: "active" } as unknown as ModelRecord
   const before = usageLedger.getAllItems().length
   const inner = new MockLanguageModelV4({
     doGenerate: async () => ({ content: [{ type: "text", text: "hi" }], finishReason: { unified: "stop", raw: undefined }, usage: { inputTokens: { total: 1000, noCache: 1000 }, outputTokens: { total: 100, text: 100 } }, providerMetadata: { openrouter: { usage: { cost: 0.0042 } } }, warnings: [] }) as never,
@@ -81,7 +81,7 @@ check("a run with no endpoint cannot be matched", reconcileFal([run("a", "x", "2
   check("the hardware rate and the typical run cost are read from the page's own figures", hw?.computeSecond === 0.000975 && hw?.amount === 0.0013 && hw?.unit === "per_run", hw)
   check("a page with no billing tiers falls back to those figures", JSON.stringify(parseReplicatePrice(page)) === JSON.stringify(hw), parseReplicatePrice(page))
   check("a page with no figures at all gives no price", parseHardwarePrice("<html>nothing here</html>") === null && parseReplicatePrice("<html></html>") === null)
-  const sdxl = { id: "replicate/stability-ai/sdxl", endpoint: "stability-ai/sdxl", provider: "replicate", name: "sdxl", modality: "image", inputs: ["text"], params: { type: "object", properties: {} }, price: { ...hw!, source: "scraped", fetchedAt: "" }, status: "active" } as unknown as ModelRecord
+  const sdxl = { id: "replicate/stability-ai/sdxl", endpoint: "stability-ai/sdxl", provider: "replicate", name: "sdxl", category: "image", inputs: ["text"], params: { type: "object", properties: {} }, price: { ...hw!, source: "scraped", fetchedAt: "" }, status: "active" } as unknown as ModelRecord
   const est = estimateRun(sdxl, {})
   check("before the run the price is Replicate's own median for a run, marked approximate", near(est.usd ?? 0, 0.0013) && est.approximate === true && /billed by run time/.test(est.breakdown ?? ""), est)
   check("after the run the cost is the seconds it took times the hardware's rate, marked computed", JSON.stringify(actualCostOf(sdxl, { metrics: { predict_time: 2.4 } })) === JSON.stringify({ usd: 2.4 * 0.000975, basis: "computed", note: "2.4 s on the model's hardware" }), actualCostOf(sdxl, { metrics: { predict_time: 2.4 } }))
@@ -101,7 +101,7 @@ check("a run with no endpoint cannot be matched", reconcileFal([run("a", "x", "2
   check("one odd day cannot swing it past double or under half", learnedRatio([billed("a", 0.4, 0.04), billed("b", 0.4, 0.04), billed("c", 0.4, 0.04)], "fal-ai/flux") === 2 && learnedRatio([billed("a", 0.004, 0.04), billed("b", 0.004, 0.04), billed("c", 0.004, 0.04)], "fal-ai/flux") === 0.5)
   check("another endpoint's bills are not used", learnedRatio([billed("a", 0.05, 0.04), billed("b", 0.05, 0.04), billed("c", 0.05, 0.04)], "fal-ai/other") === null)
   check("an earlier correction is taken out so the ratio does not compound", near(learnedRatio([billed("a", 0.05, 0.05, { factor: 1.25 }), billed("b", 0.05, 0.05, { factor: 1.25 }), billed("c", 0.05, 0.05, { factor: 1.25 })], "fal-ai/flux") ?? 0, 1.25))
-  const flux = { id: "fal/flux", endpoint: "fal-ai/flux", provider: "fal", name: "flux", modality: "image", inputs: ["text"], params: { type: "object", properties: {} }, price: { unit: "per_image", amount: 0.04, source: "api", fetchedAt: "" }, status: "active" } as unknown as ModelRecord
+  const flux = { id: "fal/flux", endpoint: "fal-ai/flux", provider: "fal", name: "flux", category: "image", inputs: ["text"], params: { type: "object", properties: {} }, price: { unit: "per_image", amount: 0.04, source: "api", fetchedAt: "" }, status: "active" } as unknown as ModelRecord
   setCalibration(() => 1.25)
   const learned = estimateRun(flux, {})
   setCalibration(null)

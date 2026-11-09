@@ -211,7 +211,7 @@ records = records.map((r) => {
       withSchema++
       for (const k of sc.unknown) unknownCount.set(k, (unknownCount.get(k) ?? 0) + 1)
     } else {
-      rec = { ...rec, summary: summarize(rec.modality, rec.params, rec.description) }
+      rec = { ...rec, summary: summarize(rec.category, rec.params, rec.description) }
     }
     const pr = cache.prices[r.id]?.price
     if (pr) {

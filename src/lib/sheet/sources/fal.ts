@@ -1,4 +1,4 @@
-import type { Category, CatalogSource, Fact, PriceValue } from "../types"
+import type { ProviderTask, CatalogSource, Fact, PriceValue } from "../types"
 
 /**
  * fal's own catalog: `GET /v1/models` gives every endpoint with its category, tags, status and update date, with no key. Prices come from
@@ -33,7 +33,7 @@ export function parseFalModels(models: FalModel[], only?: Set<string>): Fact[] {
     seen.add(m.endpoint_id)
     const base = { host: "fal", endpoint: m.endpoint_id, source: "fal", confidence: "provider" as const }
     const md = m.metadata ?? {}
-    if (md.category && CATEGORIES.has(md.category)) facts.push({ ...base, field: "category", value: md.category as Category })
+    if (md.category && CATEGORIES.has(md.category)) facts.push({ ...base, field: "task", value: md.category as ProviderTask })
     if (md.status === "active" || md.status === "deprecated") facts.push({ ...base, field: "status", value: md.status })
     if (md.display_name) facts.push({ ...base, field: "name", value: md.display_name })
     if (md.date) facts.push({ ...base, field: "date", value: md.date })

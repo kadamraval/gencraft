@@ -21,7 +21,7 @@ import type { ModelRecord, ParamProperty } from "./types"
 const HOSTS_WITH_SCHEMA = new Set(["fal", "replicate"])
 
 /** Tasks that are one kind of work for this purpose: text, image and reference to video share their settings. */
-function workKind(record: Pick<ModelRecord, "modality" | "task" | "endpoint">): string {
+function workKind(record: Pick<ModelRecord, "category" | "task" | "endpoint">): string {
   const task = taskOf(record)
   return task === "text-to-video" || task === "image-to-video" || task === "reference-to-video" ? "video" : task
 }
@@ -56,7 +56,7 @@ export function sameModelElsewhere(record: ModelRecord, pool: ModelRecord[]): Mo
   const canonical = canonicalModelId(record.endpoint, record.provider)
   const best = new Map<string, { r: ModelRecord; score: number }>()
   for (const other of pool) {
-    if (other.provider === record.provider || other.modality !== record.modality || workKind(other) !== kind) continue
+    if (other.provider === record.provider || other.category !== record.category || workKind(other) !== kind) continue
     let score = matchScore(record.name, other, record.maker ?? "")
     if (canonical.length >= 4 && canonical === canonicalModelId(other.endpoint, other.provider)) {
       score = Math.max(score, 0.95)
@@ -99,7 +99,7 @@ export function pickCheapestHostForModel(
 
 /** The settings other hosts list for this model that this host's list lacks, ready to add as untested. */
 export function crossHostExtras(record: ModelRecord, pool: ModelRecord[]): Record<string, ParamProperty> {
-  if (!HOSTS_WITH_SCHEMA.has(record.provider) || record.modality === "text") return {}
+  if (!HOSTS_WITH_SCHEMA.has(record.provider) || record.category === "text") return {}
   const own = record.params.properties
   const extras: Record<string, ParamProperty> = {}
   for (const other of sameModelElsewhere(record, pool)) {
@@ -134,7 +134,7 @@ function receiverFor(id: string, family: ModelRecord[]): ModelRecord | undefined
  * the version that suits each kind of file gets the slot, marked untested: it is shown, and a run settles it.
  */
 export function crossHostFiles(record: ModelRecord, pool: ModelRecord[]): Record<string, ParamProperty> {
-  if (!HOSTS_WITH_SCHEMA.has(record.provider) || record.modality === "text") return {}
+  if (!HOSTS_WITH_SCHEMA.has(record.provider) || record.category === "text") return {}
   const family = familyOf(record, pool)
   const has = new Set(family.flatMap((m) => Object.values(m.params.properties).filter((p) => p.slot).map(slotId)))
   const added: Record<string, ParamProperty> = {}

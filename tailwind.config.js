@@ -13,6 +13,9 @@ module.exports = {
       padding: "2rem",
     },
     extend: {
+      // A border with no colour of its own takes the theme's border colour, not Tailwind's light grey: otherwise a border that appears on
+      // click fades in from near-white for a moment
+      borderColor: { DEFAULT: "hsl(var(--border))" },
       fontFamily: {
         sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
         mono: ["Inter", "monospace"],
@@ -77,6 +80,10 @@ module.exports = {
           "0%": { opacity: "0" },
           "100%": { opacity: "1" },
         },
+        sweep: {
+          "0%": { transform: "translateX(-120%)" },
+          "100%": { transform: "translateX(320%)" },
+        },
         "ob-float": {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-8px)" },
@@ -105,6 +112,7 @@ module.exports = {
         },
       },
       animation: {
+        sweep: "sweep 1.8s ease-in-out infinite",
         "ob-float": "ob-float 5s ease-in-out infinite",
         "ob-float-slow": "ob-float 7s ease-in-out infinite",
         "ob-draw": "ob-draw 1.2s ease-out forwards",

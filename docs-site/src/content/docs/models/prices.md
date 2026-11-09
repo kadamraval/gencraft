@@ -1,12 +1,12 @@
 ---
 title: "Prices"
-description: "Every model Gencraft knows with the jobs it does, where it runs and what it costs."
+description: "Every model Gencraft knows with the tasks and tools it does, where it runs and what it costs."
 ---
 
 
 The price shown is the lowest across providers for that model. From the model database of 2026-10-24.
 
-| Model | Maker | Jobs | Providers | From |
+| Model | Maker | Tasks and tools | Providers | From |
 |---|---|---|---|---|
 | Audio Isolation | ElevenLabs | Voice isolation | fal | $0.100 per minute |
 | Autotune | autotune | Voice changer | Replicate | $0.0066 per run |
@@ -41,11 +41,11 @@ The price shown is the lowest across providers for that model. From the model da
 | Elevenlabs Music v2 | music | Music | fal | $0.600 per minute |
 | FILM | film | Slow motion | fal | $0.0013 per compute second |
 | FLUX 2 Pro Outpaint | flux-2-pro | Generative fill | fal | $0.030 per megapixel |
-| FLUX 3 Image Klein | black-forest-labs | Edit image (by prompt), Image to image, Remove object, Restyle, Generative fill, Relight | OpenRouter | $1.92 per 1M tokens |
+| FLUX 3 Image Klein | black-forest-labs | Image to image, Edit image (by prompt), Remove object, Restyle, Generative fill, Relight | OpenRouter | $1.92 per 1M tokens |
 | FLUX 3 Image | black-forest-labs | Edit image (by prompt) | OpenRouter | $9.82 per 1M tokens |
 | FLUX 3 Max Text to Video | flux-3-max | Text to video | fal | $0.043 per second |
-| FLUX 3 Video | black-forest-labs | Text to video, Image to video | OpenRouter | $0.170 per second |
-| FLUX 3 | Black Forest Labs | Text to image, Edit image (by prompt), Image to video, Edit video (by prompt), Extend video | fal, Replicate, OpenRouter | $0.021 per image |
+| FLUX 3 Video | black-forest-labs | Text to video | OpenRouter | $0.170 per second |
+| FLUX 3 | Black Forest Labs | Text to image, Image to video, Edit image (by prompt), Edit video (by prompt), Extend video | fal, Replicate, OpenRouter | $0.021 per image |
 | FLUX Video Upscale | black-forest-labs | Upscale video | OpenRouter | $0.035 per megapixel second |
 | FLUX Virtual Try-On  | flux-pro | Edit image (by prompt) | fal | $0.005 per megapixel |
 | FLUX.3 Klein | flux-3 | Text to image | fal | $0.009 per megapixel |
@@ -63,10 +63,10 @@ The price shown is the lowest across providers for that model. From the model da
 | Flux 2 Max | flux-2-max | Edit image (by prompt) | Replicate | $0.040 per run |
 | Flux 2 Pro | flux-2-pro | Text to image, Edit image (by prompt) | fal, Replicate | $0.015 per run |
 | Flux 3 Text To Video Draft | flux-3 | Text to video | fal | $0.060 per second |
-| GPT Image 2 | OpenAI | Edit image (by prompt), Text to image, Remove object, Restyle, Generative fill, Relight | OpenRouter, OpenAI | $2.00 per 1M tokens |
-| GPT Image 2.5 Flare | OpenAI | Edit image (by prompt), Text to image | OpenRouter | $30.00 per 1M tokens |
+| GPT Image 2 | OpenAI | Text to image, Edit image (by prompt), Remove object, Restyle, Generative fill, Relight | OpenRouter, OpenAI | $2.00 per 1M tokens |
+| GPT Image 2.5 Flare | OpenAI | Edit image (by prompt) | OpenRouter | $30.00 per 1M tokens |
 | GPT Image 2.5 Sunburst Text to Image | gpt-image-2.5 | Text to image | fal | $0.036 per image |
-| GPT Image 2.5 Sunburst | OpenAI | Edit image (by prompt), Text to image | OpenRouter, OpenAI | $30.00 per 1M tokens |
+| GPT Image 2.5 Sunburst | OpenAI | Text to image, Edit image (by prompt) | OpenRouter, OpenAI | $30.00 per 1M tokens |
 | GPT Image 2.5 | OpenAI | Text to image, Edit image (by prompt) | fal, Replicate, OpenRouter, OpenAI | $0.012 per image |
 | GPT-4o Mini TTS | OpenAI | Voiceover (text to speech) | OpenAI | $12.00 per 1M tokens |
 | GPT-4o Mini Transcribe | OpenAI | Transcribe | OpenAI | $1.25 per 1M tokens in, $5.00 out |
@@ -95,7 +95,7 @@ The price shown is the lowest across providers for that model. From the model da
 | Grok Imagine Video 1.5 | grok-imagine-video-1.5 | Text to video | Replicate | $0.080 per second |
 | Grok Imagine Video 1.5 | xAI | Text to video, Image to video, Reference to video | fal, OpenRouter, Replicate | $0.080 per second |
 | Grok Imagine Video Extension | grok-imagine-video-extension | Edit video (by prompt) | Replicate | $0.050 per second |
-| H3 Max Reference to Video | h3-max | Image to video, Reference to video | fal | $0.050 per second |
+| H3 Max Reference to Video | h3-max | Image to video | fal | $0.050 per second |
 | H3 Max | MiniMax | Text to video, Image to video | OpenRouter | $0.050 per second |
 | H3 | MiniMax | Text to video, Image to video | OpenRouter | $0.130 per second |
 | Hailuo H3 | MiniMax | Text to video, Image to video, Reference to video, Extend video, Relight video | fal | $0.033 per second |
@@ -108,7 +108,7 @@ The price shown is the lowest across providers for that model. From the model da
 | Ic Light Background | ic-light-background | Remove background | Replicate | $0.034 per run |
 | Ideogram 4.5 | Ideogram | Text to image, Edit image (by prompt) | fal | $0.008 per image |
 | Ideogram Remove Background | Ideogram | Remove background | fal | $0.010 per image |
-| Ideogram Vector | vector | Edit image (by prompt), Text to image, Image to image, Restyle, Relight | fal | $0.100 per image |
+| Ideogram Vector | vector | Text to image, Image to image, Edit image (by prompt), Restyle, Relight | fal | $0.100 per image |
 | Ideogram | Ideogram | Remove object | fal | $0.030 per run |
 | Image Colorization | image-colorization | Colorize | Replicate | $0.080 per run |
 | Image Editing Style Transfer | image-editing | Restyle | fal | $0.040 per image |
@@ -125,7 +125,7 @@ The price shown is the lowest across providers for that model. From the model da
 | Kling Video v2.6 Motion Control [Pro] | kling-video | Motion transfer | fal | $0.070 per second |
 | Kling Video | kling-video | Video to sound effects | fal | $0.035 per run |
 | Kling v2.5 Turbo Pro | kling-v2.5-turbo-pro | Image to video | Replicate | $0.070 per second |
-| Kling v3 Omni Video | kling-v3-omni-video | Image to video, Edit video (by prompt), Text to video | Replicate | $0.168 per second |
+| Kling v3 Omni Video | kling-v3-omni-video | Image to video, Text to video, Edit video (by prompt) | Replicate | $0.168 per second |
 | Krea V3 | Krea | Text to image, Edit image (by prompt) | fal, Replicate | $0.025 per megapixel |
 | LTX 2.3 | Lightricks | Reframe video | fal | $0.100 per second |
 | LTX 2.5 | Lightricks | Text to video, Image to video, Lip-sync | fal, Replicate | $0.030 per second |
@@ -138,7 +138,7 @@ The price shown is the lowest across providers for that model. From the model da
 | Ltx 2.3 Pro | ltx-2.3-pro | Image to video | Replicate | $0.080 per second |
 | Ltx 2.3 Quality | ltx-2.3-quality | Image to video, Lip-sync, Extend video, Restore / denoise video, Colorize video | fal | $0.0024 per megapixel |
 | Ltx 2.5 Audio to Video Fast | ltx-2.5 | Image to video, Lip-sync | fal | $0.130 per second |
-| Ltx 2.5 Audio to Video Pro | ltx-2.5 | Image to video, Lip-sync | fal | $0.170 per second |
+| Ltx 2.5 Audio to Video Pro | ltx-2.5 | Image to video | fal | $0.170 per second |
 | Lucy Restyle | lucy-restyle | Restyle video | fal | $0.010 per second |
 | Luma Uni-1 Edit Max | agent | Image to image | fal | $0.105 per image |
 | Luma Uni-1 Edit | agent | Image to image | fal | $0.045 per image |
@@ -153,7 +153,7 @@ The price shown is the lowest across providers for that model. From the model da
 | Mai Image 2.5 | mai-image-2.5 | Image to image | fal | $8.00 per 1M tokens in, $47.00 out |
 | MiniMax Speech 2.8 [Turbo] | MiniMax | Voiceover (text to speech) | fal | $0.100 per 1,000 characters |
 | MiniMax Speech-02 Turbo | MiniMax | Voiceover (text to speech) | fal | $0.060 per 1,000 characters |
-| Mirelo SFX2.0 | sfx2.0 | Video to sound effects, Sound effects | fal | $0.010 per second |
+| Mirelo SFX2.0 | sfx2.0 | Sound effects, Video to sound effects | fal | $0.010 per second |
 | Modify Video | modify-video | Edit video (by prompt) | Replicate | $0.019 per run |
 | Muse Image | meta | Edit image (by prompt) | OpenRouter | $2.40 per 1M tokens |
 | Muse Voice Transcribe 1.0 | meta | Transcribe | OpenRouter | $0.003 per minute |
@@ -165,7 +165,7 @@ The price shown is the lowest across providers for that model. From the model da
 | Nano Banana 2 Lite | nano-banana-2-lite | Text to image | fal, Replicate | $0.034 per image |
 | Nano Banana 2 | Google | Text to image, Remove object, Restyle, Generative fill, Relight | Gemini | $0.500 per 1M tokens in, $3.00 out |
 | Nano Banana 2 | nano-banana-2 | Text to image, Remove object, Restyle, Generative fill, Relight | Replicate | $0.067 per image |
-| Nano Banana 2.1 | Google | Edit image (by prompt), Text to image, Remove object, Restyle, Generative fill, Relight | OpenRouter, Gemini | $1.50 per 1M tokens in, $7.50 out |
+| Nano Banana 2.1 | Google | Edit image (by prompt), Remove object, Restyle, Generative fill, Relight | OpenRouter, Gemini | $1.50 per 1M tokens in, $7.50 out |
 | Nano Banana 2.1 | Google | Text to image, Edit image (by prompt) | fal, Replicate, OpenRouter, Gemini | $0.034 per image |
 | Nano Banana 2.1 | nano-banana-2.1 | Remove object, Restyle, Generative fill, Relight | Replicate | $0.034 per image |
 | Nano Banana Pro (Gemini 3 Pro Image) | Google | Edit image (by prompt) | OpenRouter | $120.00 per 1M tokens |
@@ -216,7 +216,7 @@ The price shown is the lowest across providers for that model. From the model da
 | Seedance 2.0 | ByteDance | Text to video, Image to video | OpenRouter | $4.00 per 1M tokens |
 | Seedance 2.0 | seedance-2.0 | Image to video | Replicate | $0.080 per second |
 | Seedance 2.5 US Reference to Video | seedance-2.5 | Image to video, Reference to video | fal | $0.221 per second |
-| Seedance 2.5 | ByteDance | Text to video, Image to video, Reference to video | fal, OpenRouter, Replicate | $0.103 per second |
+| Seedance 2.5 | ByteDance | Text to video, Image to video | fal, OpenRouter, Replicate | $0.103 per second |
 | Seedream 5 Lite | seedream-5-lite | Edit image (by prompt) | Replicate | $0.035 per image |
 | Seedream 5 | ByteDance | Text to image, Edit image (by prompt) | fal, Replicate | $0.035 per image |
 | Seedream 5.0 Flash | bytedance-seed | Edit image (by prompt) | OpenRouter | $4.31 per 1M tokens |

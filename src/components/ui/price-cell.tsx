@@ -1,7 +1,7 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useMoney } from "@/lib/currency/currency"
 import { standardRun } from "@/lib/registry/price"
-import type { ModelPrice, ModelRecord, RegistryModality } from "@/lib/registry/types"
+import type { ModelPrice, ModelRecord, AppCategory } from "@/lib/registry/types"
 
 /**
  * One price, written so it cannot be misread.
@@ -9,13 +9,14 @@ import type { ModelPrice, ModelRecord, RegistryModality } from "@/lib/registry/t
  *  - An image model billed per image token: the figure with what it counts underneath.
  *  - Everything else (per image, per second, per run) is one short figure.
  */
-export function PriceCell({ price, modality, model }: { price: ModelPrice; modality?: RegistryModality; /** With the model, a picture, clip or voice shows what a standard run costs */ model?: ModelRecord }) {
+export function PriceCell({ price, category, model }: { price: ModelPrice; category?: AppCategory; /** With the model, a picture, clip or voice shows what a standard run costs */ model?: ModelRecord }) {
   const money = useMoney()
-  const label = "mr-1 text-muted-foreground/60"
-  const box = "flex flex-shrink-0 flex-col items-end font-mono text-xs leading-tight text-muted-foreground"
+  const label = "mr-1 text-[10px] text-muted-foreground/60"
+  // The figure reads first; what it counts sits small underneath
+  const box = "flex flex-shrink-0 flex-col items-end gap-0.5 text-xs font-medium leading-none tabular-nums text-foreground/90"
 
   // What most people make, not the cheapest tier's unit rate: "$0.50" over "5 s · 1080p"
-  if (model && model.modality !== "text") {
+  if (model && model.category !== "text") {
     const { estimate, label: run } = standardRun(model)
     if (estimate.usd !== null) {
       const words = `${estimate.upTo ? "up to " : ""}${estimate.from ? "from " : ""}`
@@ -27,7 +28,7 @@ export function PriceCell({ price, modality, model }: { price: ModelPrice; modal
                 {words}
                 {money.format(estimate.usd)}
               </span>
-              {run && <span className="text-muted-foreground/60">{run}</span>}
+              {run && <span className="text-[10px] font-normal text-muted-foreground/70">{run}</span>}
             </span>
           </TooltipTrigger>
           <TooltipContent>
@@ -38,13 +39,13 @@ export function PriceCell({ price, modality, model }: { price: ModelPrice; modal
     }
   }
 
-  if (price.unit === "per_1m_tokens" && price.amount !== null && modality === "image") {
+  if (price.unit === "per_1m_tokens" && price.amount !== null && category === "image") {
     return (
       <Tooltip>
         <TooltipTrigger asChild>
           <span className={box}>
             <span>{money.token(price.amount)}</span>
-            <span className="text-muted-foreground/60">per 1M img tokens</span>
+            <span className="text-[10px] font-normal text-muted-foreground/70">per 1M img tokens</span>
           </span>
         </TooltipTrigger>
         <TooltipContent>Billed per million image tokens. The cost of one image depends on its size and quality.</TooltipContent>
@@ -75,13 +76,13 @@ export function PriceCell({ price, modality, model }: { price: ModelPrice; modal
   }
 
   // Billed by the token for audio or video, with no weight known for one clip: say what the number counts
-  if (price.unit === "per_1m_tokens" && price.amount !== null && modality !== "text") {
+  if (price.unit === "per_1m_tokens" && price.amount !== null && category !== "text") {
     return (
       <Tooltip>
         <TooltipTrigger asChild>
           <span className={box}>
             <span>{money.token(price.amount)}</span>
-            <span className="text-muted-foreground/60">per 1M tokens</span>
+            <span className="text-[10px] font-normal text-muted-foreground/70">per 1M tokens</span>
           </span>
         </TooltipTrigger>
         <TooltipContent>Billed per million tokens. What one clip costs depends on its length and text.</TooltipContent>
@@ -89,5 +90,5 @@ export function PriceCell({ price, modality, model }: { price: ModelPrice; modal
     )
   }
 
-  return <span className="flex-shrink-0 font-mono text-xs text-muted-foreground">{money.short(price) ?? "—"}</span>
+  return <span className="flex-shrink-0 text-xs font-medium tabular-nums text-foreground/90">{money.short(price) ?? "—"}</span>
 }

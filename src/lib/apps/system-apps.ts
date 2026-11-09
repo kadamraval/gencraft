@@ -8,6 +8,7 @@ import type { AppSpec } from "./types"
 export const SYSTEM_APPS: AppSpec[] = [
   {
     id: "sys_pdf_summary",
+    category: "text",
     name: "PDF summary",
     icon: "file-text",
     color: "blue",
@@ -31,6 +32,7 @@ export const SYSTEM_APPS: AppSpec[] = [
   },
   {
     id: "sys_product_photo",
+    category: "image",
     name: "Product photo studio",
     icon: "camera",
     color: "amber",
@@ -54,6 +56,7 @@ export const SYSTEM_APPS: AppSpec[] = [
   },
   {
     id: "sys_architect_render",
+    category: "image",
     name: "Architect 3D render",
     icon: "building",
     color: "teal",
@@ -78,6 +81,7 @@ export const SYSTEM_APPS: AppSpec[] = [
   },
   {
     id: "sys_social_posts",
+    category: "text",
     name: "Social post writer",
     icon: "megaphone",
     color: "pink",

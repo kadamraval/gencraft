@@ -4,7 +4,7 @@
  *   npx tsx scripts/build-docs-data.mts [pack file or address]
  *
  * Reads the model database (default src/lib/knowledge/pack.json; the docs workflow passes the published copy) and CHANGELOG.md, and writes into
- * docs-site/src/content/docs/: models/index.md, models/providers.md, models/jobs.md, models/prices.md and changelog.md.
+ * docs-site/src/content/docs/: models/index.md, models/providers.md, models/tasks-and-tools.md, models/prices.md and changelog.md.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 
@@ -17,7 +17,7 @@ interface Price {
 interface Line {
   provider: string
   endpoint: string
-  jobId: string
+  serves: string
   rank: number
   role: string
   price: Price
@@ -27,15 +27,14 @@ interface Model {
   makerId: string
   name: string
   version?: string
-  type: string
-  jobs: string[]
+  category: string
+  tasks: string[]
+  tools: string[]
   lines: Line[]
 }
-interface Job {
+interface Entry {
   id: string
   name: string
-  kind: string
-  group: string
   category: string
   takesIn: string
   gives: string
@@ -43,7 +42,8 @@ interface Job {
 interface Pack {
   generatedAt: string
   makers: Array<{ id: string; name: string }>
-  jobs: Job[]
+  tasks: Entry[]
+  tools: Entry[]
   models: Model[]
   gaps: Array<{ field: string }>
 }
@@ -85,70 +85,70 @@ const date = pack.generatedAt.slice(0, 10)
 const head = (title: string, description: string) => `---\ntitle: ${JSON.stringify(title)}\ndescription: ${JSON.stringify(description)}\n---\n\n`
 
 const lines = pack.models.flatMap((m) => m.lines.map((l) => ({ m, l })))
-const jobsById = new Map(pack.jobs.map((j) => [j.id, j]))
+const entryById = new Map([...pack.tasks, ...pack.tools].map((j) => [j.id, j]))
 
 // ---- overview
 const overview = [
-  head("Models and prices", "The models Gencraft knows on fal, Replicate, OpenRouter, OpenAI and Gemini: what each can do, the settings it takes and what it costs."),
+  head("Models and prices", "The models Gencraft knows on fal, Replicate, OpenRouter, OpenAI and Gemini: what each can do, the parameters it takes and what it costs."),
   `These pages are made automatically from Gencraft's model database, which is rebuilt every day from the providers' own lists. This copy is from **${date}**.`,
   "",
-  `- **${pack.models.length} models** from ${pack.makers.length} makers, on **${lines.length} provider lines**, doing **${pack.jobs.length} jobs**.`,
+  `- **${pack.models.length} models** from ${pack.makers.length} makers, on **${lines.length} provider lines**, doing **${pack.tasks.length} tasks** and **${pack.tools.length} tools**.`,
   "- [Providers](providers/): what each provider brings.",
-  "- [Jobs](jobs/): for each job, the best models on every provider, first choice first.",
-  "- [Prices](prices/): every model with the jobs it does, where it runs and what it costs.",
+  "- [Tasks and tools](tasks-and-tools/): for each task and tool, the best models on every provider, first choice first.",
+  "- [Prices](prices/): every model with the tasks and tools it does, where it runs and what it costs.",
   "",
-  "Prices are what the provider states and may change; Gencraft shows an estimate before every run and learns the real cost after it. Where a provider has no model for a job, the app says so and names what to add.",
+  "Prices are what the provider states and may change; Gencraft shows an estimate before every run and learns the real cost after it. Where a provider has no model for a task or tool, the app says so and names what to add.",
   "",
 ].join("\n")
 writeFileSync(`${out}/models/index.md`, overview)
 
 // ---- providers
-const prov: string[] = [head("Providers", "What each provider brings to Gencraft: how many models and which jobs."), `From the model database of ${date}.`, ""]
-prov.push("| Provider | Models | Provider lines | Jobs covered |", "|---|---|---|---|")
+const prov: string[] = [head("Providers", "What each provider brings to Gencraft: how many models and which tasks and tools."), `From the model database of ${date}.`, ""]
+prov.push("| Provider | Models | Provider lines | Tasks and tools covered |", "|---|---|---|---|")
 for (const [id, name] of PROVIDERS) {
   const ls = lines.filter((x) => x.l.provider === id)
-  prov.push(`| ${name} | ${new Set(ls.map((x) => x.m.id)).size} | ${ls.length} | ${new Set(ls.map((x) => x.l.jobId)).size} |`)
+  prov.push(`| ${name} | ${new Set(ls.map((x) => x.m.id)).size} | ${ls.length} | ${new Set(ls.map((x) => x.l.serves)).size} |`)
 }
 prov.push("")
 for (const [id, name] of PROVIDERS) {
   const ls = lines.filter((x) => x.l.provider === id)
   prov.push(`## ${name}`, "")
-  const byJob = new Map<string, number>()
-  for (const x of ls) byJob.set(x.l.jobId, (byJob.get(x.l.jobId) ?? 0) + 1)
-  const rows = [...byJob.entries()].sort((a, b) => b[1] - a[1])
-  prov.push("| Job | Models |", "|---|---|", ...rows.map(([j, n]) => `| ${jobsById.get(j)?.name ?? j} | ${n} |`), "")
+  const byServes = new Map<string, number>()
+  for (const x of ls) byServes.set(x.l.serves, (byServes.get(x.l.serves) ?? 0) + 1)
+  const rows = [...byServes.entries()].sort((a, b) => b[1] - a[1])
+  prov.push("| Task or tool | Models |", "|---|---|", ...rows.map(([j, n]) => `| ${entryById.get(j)?.name ?? j} | ${n} |`), "")
 }
 writeFileSync(`${out}/models/providers.md`, prov.join("\n"))
 
-// ---- jobs
-const jobsPage: string[] = [head("Jobs", "For each job Gencraft does, the best models on every provider, first choice first."), `A job is what Gencraft does with a model, such as upscaling a video or making an image from text. From the model database of ${date}.`, ""]
-const groups: Array<[string, string]> = [["create", "Making things from a prompt"], ["tool", "Tools for a file you already have"]]
-for (const [kind, title] of groups) {
-  jobsPage.push(`## ${title}`, "")
-  for (const job of pack.jobs.filter((j) => j.kind === kind)) {
-    const ls = lines.filter((x) => x.l.jobId === job.id)
+// ---- tasks and tools
+const servesPage: string[] = [head("Tasks and tools", "For each task and tool Gencraft offers, the best models on every provider, first choice first."), `A task makes something, such as an image from text. A tool changes a file you already have, such as upscaling a video. From the model database of ${date}.`, ""]
+const groups: Array<[Entry[], string]> = [[pack.tasks, "Tasks: making things from a prompt"], [pack.tools, "Tools: for a file you already have"]]
+for (const [list, title] of groups) {
+  servesPage.push(`## ${title}`, "")
+  for (const entry of list) {
+    const ls = lines.filter((x) => x.l.serves === entry.id)
     if (ls.length === 0) continue
-    jobsPage.push(`### ${job.name}`, "", `Takes ${job.takesIn}, gives ${job.gives}.`, "", "| Provider | Rank | Model | Price |", "|---|---|---|---|")
+    servesPage.push(`### ${entry.name}`, "", `Takes ${entry.takesIn}, gives ${entry.gives}.`, "", "| Provider | Rank | Model | Price |", "|---|---|---|---|")
     for (const [pid, pname] of PROVIDERS) {
-      for (const x of ls.filter((y) => y.l.provider === pid).sort((a, b) => a.l.rank - b.l.rank)) jobsPage.push(`| ${pname} | ${x.l.rank} | ${esc(x.m.name)} | ${priceText(x.l.price)} |`)
+      for (const x of ls.filter((y) => y.l.provider === pid).sort((a, b) => a.l.rank - b.l.rank)) servesPage.push(`| ${pname} | ${x.l.rank} | ${esc(x.m.name)} | ${priceText(x.l.price)} |`)
     }
-    jobsPage.push("")
+    servesPage.push("")
   }
 }
-writeFileSync(`${out}/models/jobs.md`, jobsPage.join("\n"))
+writeFileSync(`${out}/models/tasks-and-tools.md`, servesPage.join("\n"))
 
 // ---- prices
 const rows = pack.models
   .map((m) => {
     const where = [...new Set(m.lines.map((l) => providerName(l.provider)))].join(", ")
     const cheapest = m.lines.map((l) => ({ l, v: l.price.amount ?? Infinity })).sort((a, b) => a.v - b.v)[0]?.l
-    const jobs = [...new Set(m.jobs)].map((j) => jobsById.get(j)?.name ?? j).join(", ")
-    return `| ${esc(m.name)} | ${esc(makerName.get(m.makerId) ?? m.makerId)} | ${esc(jobs)} | ${where} | ${cheapest ? priceText(cheapest.price) : ""} |`
+    const does = [...m.tasks, ...m.tools].map((j) => entryById.get(j)?.name ?? j).join(", ")
+    return `| ${esc(m.name)} | ${esc(makerName.get(m.makerId) ?? m.makerId)} | ${esc(does)} | ${where} | ${cheapest ? priceText(cheapest.price) : ""} |`
   })
   .sort()
 writeFileSync(
   `${out}/models/prices.md`,
-  [head("Prices", "Every model Gencraft knows with the jobs it does, where it runs and what it costs."), `The price shown is the lowest across providers for that model. From the model database of ${date}.`, "", "| Model | Maker | Jobs | Providers | From |", "|---|---|---|---|---|", ...rows, ""].join("\n"),
+  [head("Prices", "Every model Gencraft knows with the tasks and tools it does, where it runs and what it costs."), `The price shown is the lowest across providers for that model. From the model database of ${date}.`, "", "| Model | Maker | Tasks and tools | Providers | From |", "|---|---|---|---|---|", ...rows, ""].join("\n"),
 )
 
 // ---- changelog

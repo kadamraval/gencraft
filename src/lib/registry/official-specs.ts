@@ -99,7 +99,7 @@ export function withOfficial(record: ModelRecord): ModelRecord {
   const add: Record<string, ParamProperty> = { ...(spec?.add ?? {}) }
   // A maker that takes shots in the prompt gets the Multi-shot control wherever the host has no yes/no switch of its own
   // (a host that only has shot_type or multi_prompt, like Kling on fal, still gets it)
-  if (record.modality === "video" && !("multi_shot" in add) && profileFor(record)?.shotsInPrompt && !nativeShotsKey(record)) add.multi_shot = SHOTS_IN_PROMPT
+  if (record.category === "video" && !("multi_shot" in add) && profileFor(record)?.shotsInPrompt && !nativeShotsKey(record)) add.multi_shot = SHOTS_IN_PROMPT
   if (Object.keys(add).length === 0) return record
   const missing = Object.entries(add).filter(([key]) => !(key in record.params.properties))
   if (missing.length === 0) return record

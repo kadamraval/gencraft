@@ -1,6 +1,6 @@
 import { attributeOfField } from "./attributes"
 import { AUDIO_SWITCH_KEYS } from "./canonical"
-import type { ModelRecord, ParamProperty, RegistryModality } from "./types"
+import type { ModelRecord, ParamProperty, AppCategory } from "./types"
 
 /**
  * What is standard for a kind of output, worked out from the models themselves.
@@ -28,10 +28,10 @@ export interface Prevalence {
 
 const keyOf = (field: string): string => (AUDIO_SWITCH_KEYS as readonly string[]).includes(field) ? "sound" : (attributeOfField(field) ?? field)
 
-export function prevalenceOf(pool: ModelRecord[]): Partial<Record<RegistryModality, Prevalence>> {
-  const out: Partial<Record<RegistryModality, Prevalence>> = {}
-  for (const modality of ["image", "video", "audio"] as RegistryModality[]) {
-    const models = pool.filter((r) => r.modality === modality && Object.values(r.params.properties).some((p) => !p.format))
+export function prevalenceOf(pool: ModelRecord[]): Partial<Record<AppCategory, Prevalence>> {
+  const out: Partial<Record<AppCategory, Prevalence>> = {}
+  for (const category of ["image", "video", "audio"] as AppCategory[]) {
+    const models = pool.filter((r) => r.category === category && Object.values(r.params.properties).some((p) => !p.format))
     if (models.length < MIN_MODELS) continue
     const counts = new Map<string, number>()
     for (const r of models) {
@@ -39,7 +39,7 @@ export function prevalenceOf(pool: ModelRecord[]): Partial<Record<RegistryModali
       const keys = new Set(Object.entries(r.params.properties).filter(([, p]) => !p.format && !p.untested).map(([k]) => keyOf(k)))
       for (const k of keys) counts.set(k, (counts.get(k) ?? 0) + 1)
     }
-    out[modality] = { total: models.length, share: new Map([...counts].map(([k, n]) => [k, n / models.length])) }
+    out[category] = { total: models.length, share: new Map([...counts].map(([k, n]) => [k, n / models.length])) }
   }
   return out
 }
@@ -56,8 +56,8 @@ export function tierFor(key: string, p: ParamProperty, stats: Prevalence): Param
 }
 
 /** The record with each field in the tier the catalog gives it. Returns the same record when nothing moves. */
-export function retier(record: ModelRecord, all: Partial<Record<RegistryModality, Prevalence>>): ModelRecord {
-  const stats = all[record.modality]
+export function retier(record: ModelRecord, all: Partial<Record<AppCategory, Prevalence>>): ModelRecord {
+  const stats = all[record.category]
   if (!stats) return record
   let moved = false
   const properties: Record<string, ParamProperty> = {}

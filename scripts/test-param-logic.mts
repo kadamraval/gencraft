@@ -53,11 +53,11 @@ check("2K is about four times 1K", Math.abs(megapixelsOf({ resolution: "2K" }) /
 check("a size object is measured", Math.abs(megapixelsOf({ image_size: { width: 2000, height: 1000 } }) - 2) < 1e-9)
 check("a preset is measured", megapixelsOf({ image_size: "square" }) < 0.3)
 
-const rec = (unit: string) => ({ modality: "image", params: { type: "object", properties: {} }, price: { unit, amount: 0.01, source: "official" } }) as unknown as ModelRecord
+const rec = (unit: string) => ({ category: "image", params: { type: "object", properties: {} }, price: { unit, amount: 0.01, source: "official" } }) as unknown as ModelRecord
 const small = estimateRun(rec("per_megapixel"), { resolution: "1K" }).usd!
 const big = estimateRun(rec("per_megapixel"), { resolution: "4K" }).usd!
 check("a per-megapixel price grows with the size", big > small * 10, `${small} ${big}`)
-const openLength = estimateRun({ ...rec("per_second"), modality: "video" } as ModelRecord, { duration: "auto" })
+const openLength = estimateRun({ ...rec("per_second"), category: "video" } as ModelRecord, { duration: "auto" })
 check("a per-second price with an open length is priced at the most it could run, and says so", Number.isFinite(openLength.usd!) && openLength.upTo === true && openLength.usd === 0.1, JSON.stringify(openLength))
 
 check("a billing condition is named the way the composer names it", ruleKey("target resolution") === "resolution" && ruleKey("with audio") === "generate_audio" && ruleKey("model variant") === "model_variant")
@@ -65,7 +65,7 @@ const tier = (variant: string, res: string, price: string) => ({ criteria: [{ ti
 const page = `<script>"billingConfig": ${JSON.stringify({ current_tiers: [tier("non_video_in", "480p", "$0.08"), tier("non_video_in", "4k", "$1")] })}, "price": "x"</script>`
 const parsed = parseReplicatePrice(page)!
 check("a tier keeps every condition", parsed.rules?.[1]?.when.resolution === "4k" && parsed.rules?.[1]?.when.model_variant === "non_video_in", JSON.stringify(parsed.rules))
-const seed = { modality: "video", params: { type: "object", properties: {} }, price: { unit: parsed.unit, amount: parsed.amount, rules: parsed.rules, source: "scraped" } } as unknown as ModelRecord
+const seed = { category: "video", params: { type: "object", properties: {} }, price: { unit: parsed.unit, amount: parsed.amount, rules: parsed.rules, source: "scraped" } } as unknown as ModelRecord
 check("the price follows the resolution", estimateRun(seed, { resolution: "4k", duration: 5 }, { sourceVideo: false }).usd === 5 && estimateRun(seed, { resolution: "480p", duration: 5 }, { sourceVideo: false }).usd === 0.4)
 check("a duration of -1 (auto) still prices", Number.isFinite(estimateRun(seed, { resolution: "480p", duration: -1 }, { sourceVideo: false }).usd!))
 
@@ -121,18 +121,18 @@ const refusedRec = applyParamChecks({ id: "test/model-b", params: nano.params })
 check("a refusal flags the setting", refusedRec.params.properties.thinking_level?.rejected === true)
 
 // Sorting a file-making model that Replicate files under "official"
-check("an image model is sorted as image", mediaKindOf({ name: "nano-banana-2.1", description: "Google's fast image generation and editing" })?.modality === "image")
-check("a video model is sorted as video", mediaKindOf({ name: "veo-3.1", description: "Text-to-video with audio" })?.modality === "video")
+check("an image model is sorted as image", mediaKindOf({ name: "nano-banana-2.1", description: "Google's fast image generation and editing" })?.category === "image")
+check("a video model is sorted as video", mediaKindOf({ name: "veo-3.1", description: "Text-to-video with audio" })?.category === "video")
 check("an image-to-video model keeps its task", mediaKindOf({ name: "x", description: "Animate a still image into a video" })?.task === "image-to-video")
-check("a speech model is sorted as audio", mediaKindOf({ name: "tts-hd", description: "Studio voice speech" })?.modality === "audio")
+check("a speech model is sorted as audio", mediaKindOf({ name: "tts-hd", description: "Studio voice speech" })?.category === "audio")
 check("a model that says nothing is left out", mediaKindOf({ name: "thing", description: "A useful model" }) === null)
-check("the name outranks the description", mediaKindOf({ name: "lyria-3", description: "Music for your video" })?.modality === "audio" && mediaKindOf({ name: "flux-3", description: "Images and short video clips" })?.modality === "image")
+check("the name outranks the description", mediaKindOf({ name: "lyria-3", description: "Music for your video" })?.category === "audio" && mediaKindOf({ name: "flux-3", description: "Images and short video clips" })?.category === "image")
 check("a tool that changes a file is not offered", mediaKindOf({ name: "video-upscale", description: "Make a video sharper" }) === null && mediaKindOf({ name: "remove-background", description: "Cut out the subject of an image" }) === null)
-check("the model's own fields outrank its name: FLUX 3 on Replicate makes video", mediaKindOf({ name: "flux-3", description: "A multimodal model" }, ["draft", "images", "duration", "resolution", "start_video", "aspect_ratio", "generate_audio"])?.modality === "video")
-check("a length alone is not video: a music model with a duration stays audio", mediaKindOf({ name: "stable-audio-2.5", description: "Make music" }, ["duration", "seed"])?.modality === "audio")
-check("a voice field means audio", mediaKindOf({ name: "something", description: "Generates" }, ["text", "voice"])?.modality === "audio")
-check("an image model's fields do not make it video", mediaKindOf({ name: "nano-banana-2.1", description: "Fast image generation" }, ["image_input", "aspect_ratio", "resolution", "output_format"])?.modality === "image")
-check("a video model with no cue in its name is sorted by its description", mediaKindOf({ name: "seedance-2.5", description: "Cinematic video with native audio" })?.modality === "video")
+check("the model's own fields outrank its name: FLUX 3 on Replicate makes video", mediaKindOf({ name: "flux-3", description: "A multimodal model" }, ["draft", "images", "duration", "resolution", "start_video", "aspect_ratio", "generate_audio"])?.category === "video")
+check("a length alone is not video: a music model with a duration stays audio", mediaKindOf({ name: "stable-audio-2.5", description: "Make music" }, ["duration", "seed"])?.category === "audio")
+check("a voice field means audio", mediaKindOf({ name: "something", description: "Generates" }, ["text", "voice"])?.category === "audio")
+check("an image model's fields do not make it video", mediaKindOf({ name: "nano-banana-2.1", description: "Fast image generation" }, ["image_input", "aspect_ratio", "resolution", "output_format"])?.category === "image")
+check("a video model with no cue in its name is sorted by its description", mediaKindOf({ name: "seedance-2.5", description: "Cinematic video with native audio" })?.category === "video")
 
 console.log(fails ? `${fails} FAILED` : "ALL PASS")
 process.exit(fails ? 1 : 0)

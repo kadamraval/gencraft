@@ -107,9 +107,9 @@ export function validateSpec(spec: AppSpec, registry: RegistryView): { ok: boole
       const rec = s.model && s.model !== "auto" ? registry.get(s.model) : undefined
       if (s.model && s.model !== "auto") {
         if (!rec) err(`step "${s.id}" names the model "${s.model}", which does not exist`)
-        else if (rec.modality !== s.kind) err(`step "${s.id}" makes ${s.kind}s but "${s.model}" makes ${rec.modality}`)
+        else if (rec.category !== s.kind) err(`step "${s.id}" makes ${s.kind}s but "${s.model}" makes ${rec.category}`)
         else if (!registry.listed().some((m) => m.id === rec.id)) err(`step "${s.id}": the model "${s.model}" is not switched on or has no key`)
-      } else if (!registry.listed().some((m) => m.modality === s.kind)) {
+      } else if (!registry.listed().some((m) => m.category === s.kind)) {
         err(`step "${s.id}" needs a ${s.kind} model, and none is available. Add a provider key and switch one on.`)
       }
       // What each name stands for: an input of the right kind, or the result of an earlier step of the right kind
@@ -156,7 +156,7 @@ export function validateSpec(spec: AppSpec, registry: RegistryView): { ok: boole
         if (need.video && !slots.video) say(`gives a video to work on, but ${name} does not take one. Pick a model whose line says a video to work on.`)
         if (need.audio && !slots.audio) say(`gives a sound to work on, but ${name} does not take one. Pick a model whose line says a sound to work on.`)
         if (!said && !versionFor(rec, pool, need)) say(`is missing something ${name} cannot run without (see REQUIRES in its line): a start frame, a reference picture, a video or a sound. Give it one, or pick another model.`)
-      } else if ((!s.model || s.model === "auto") && wants && !pool.some((m) => m.modality === s.kind && versionFor(m, pool, need))) {
+      } else if ((!s.model || s.model === "auto") && wants && !pool.some((m) => m.category === s.kind && versionFor(m, pool, need))) {
         err(`step "${s.id}" hands over ${need.pictures > 0 ? `${need.pictures} picture${need.pictures === 1 ? "" : "s"}` : "files"}${need.start ? ", a start frame" : ""}${need.end ? ", an end frame" : ""}${need.video ? ", a video" : ""}${need.audio ? ", a sound" : ""}, but no ${s.kind} model you have takes that. Use fewer or name a model that does.`)
       }
       if (rec) {

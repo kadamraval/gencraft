@@ -1,3 +1,5 @@
+import { capabilityOfExact } from "@/lib/capability"
+import { takesGiven, type Given } from "@/lib/capability/match"
 import { familyOf } from "@/lib/registry/families"
 import { referenceImageLimit, refCapability } from "@/lib/registry/slots"
 import type { ModelRecord } from "@/lib/registry/types"
@@ -50,20 +52,20 @@ export function slotsOfExact(rec: ModelRecord): Slots {
   }
 }
 
-/** Whether this endpoint can take everything the step hands it */
+/** What a step hands the model, in the one rule's words: pictures may go to any picture field, frames to their own */
+export function givenOf(need: Need): Given[] {
+  const out: Given[] = []
+  if (need.pictures > 0) out.push({ kind: "image", count: need.pictures })
+  if (need.start) out.push({ kind: "image", role: "start" })
+  if (need.end) out.push({ kind: "image", role: "end" })
+  if (need.video) out.push({ kind: "video" })
+  if (need.audio) out.push({ kind: "audio" })
+  return out
+}
+
+/** Whether this endpoint can take everything the step hands it, and has all it cannot run without (the one rule every screen uses) */
 export function fits(rec: ModelRecord, need: Need): boolean {
-  const s = slotsOfExact(rec)
-  if (need.pictures > s.pictures) return false
-  if (need.start && !s.start) return false
-  if (need.end && !s.end) return false
-  if (need.video && !s.video) return false
-  if (need.audio && !s.audio) return false
-  // It also cannot run without what it requires
-  if (s.needs.includes("start") && !need.start) return false
-  if (s.needs.includes("reference") && need.pictures === 0) return false
-  if (s.needs.includes("video") && !need.video) return false
-  if (s.needs.includes("audio") && !need.audio) return false
-  return true
+  return takesGiven(capabilityOfExact(rec), givenOf(need))
 }
 
 /** The model's versions at its provider (one of them is the model itself) */
@@ -100,7 +102,7 @@ export function describePictures(rec: ModelRecord, pool: ModelRecord[]): string 
   if (s.pictures === 0) parts.push("no reference pictures")
   else if (s.pictures === 1) parts.push(s.unstated ? "1 reference picture (the maker states no limit)" : "1 reference picture")
   else parts.push(`up to ${s.pictures} reference pictures`)
-  if (rec.modality === "video") {
+  if (rec.category === "video") {
     if (s.start) parts.push("start frame")
     if (s.end) parts.push("end frame")
     if (s.video) parts.push("a video to work on (edit, extend or copy its motion)")

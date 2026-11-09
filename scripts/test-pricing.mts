@@ -9,13 +9,13 @@ const check = (name: string, ok: boolean, extra = "") => {
 }
 const near = (a: number | null, b: number, eps = 0.0005) => a !== null && Math.abs(a - b) <= eps
 
-const rec = (o: { provider?: string; endpoint: string; modality: ModelRecord["modality"]; unit: ModelRecord["price"]["unit"]; amount: number; out?: number; rules?: PriceRule[]; props?: Record<string, ParamProperty>; max?: number }): ModelRecord =>
+const rec = (o: { provider?: string; endpoint: string; category: ModelRecord["category"]; unit: ModelRecord["price"]["unit"]; amount: number; out?: number; rules?: PriceRule[]; props?: Record<string, ParamProperty>; max?: number }): ModelRecord =>
   ({
     id: `${o.provider ?? "replicate"}/${o.endpoint}`,
     endpoint: o.endpoint,
     name: o.endpoint,
     provider: o.provider ?? "replicate",
-    modality: o.modality,
+    category: o.category,
     family: o.endpoint,
     logoKey: "",
     inputs: ["text"],
@@ -28,20 +28,20 @@ const rec = (o: { provider?: string; endpoint: string; modality: ModelRecord["mo
 const res = (e: string[]): ParamProperty => ({ type: "string", enum: e })
 
 // Per second by tier: Wan 3.0 prime (Alibaba: $0.068 / $0.14 / $0.28 per second)
-const wan = rec({ endpoint: "alibaba/wan-3-prime", modality: "video", unit: "per_second", amount: 0.068, rules: [{ when: { resolution: "480p" }, amount: 0.068 }, { when: { resolution: "720p" }, amount: 0.14 }, { when: { resolution: "1080p" }, amount: 0.28 }], props: { resolution: res(["480p", "720p", "1080p"]), duration: { type: "integer", minimum: 2, maximum: 30 } } })
+const wan = rec({ endpoint: "alibaba/wan-3-prime", category: "video", unit: "per_second", amount: 0.068, rules: [{ when: { resolution: "480p" }, amount: 0.068 }, { when: { resolution: "720p" }, amount: 0.14 }, { when: { resolution: "1080p" }, amount: 0.28 }], props: { resolution: res(["480p", "720p", "1080p"]), duration: { type: "integer", minimum: 2, maximum: 30 } } })
 check("per second by resolution: Wan 3.0 prime 5 s 1080p = $1.40", near(estimateRun(wan, { resolution: "1080p", duration: 5 }).usd, 1.4))
 check("the cheapest tier is not used for a dearer choice", near(estimateRun(wan, { resolution: "720p", duration: 5 }).usd, 0.7))
 check("the working is shown", estimateRun(wan, { resolution: "1080p", duration: 5 }).breakdown === "5 s × $0.28/s", String(estimateRun(wan, { resolution: "1080p", duration: 5 }).breakdown))
 
 // A model that picks its own length is priced at the most it could run
-const auto = rec({ endpoint: "x/seedance", modality: "video", unit: "per_second", amount: 0.1, max: 30, props: { duration: { type: "integer", minimum: -1, maximum: 30 } } })
+const auto = rec({ endpoint: "x/seedance", category: "video", unit: "per_second", amount: 0.1, max: 30, props: { duration: { type: "integer", minimum: -1, maximum: 30 } } })
 const a = estimateRun(auto, { duration: -1 })
 check("an open length is priced at the most and says so", near(a.usd, 3) && a.upTo === true && a.display.startsWith("up to"), a.display)
 
 // Per clip by length: Hailuo 2.3 (Replicate: 768P 6 s $0.28, 10 s $0.56, 1080P 6 s $0.49)
 const hailuo = rec({
   endpoint: "minimax/hailuo-2.3",
-  modality: "video",
+  category: "video",
   unit: "per_run",
   amount: 0.28,
   rules: [
@@ -55,14 +55,14 @@ check("a clip price follows its length: 6 s = $0.28, 10 s = $0.56", near(estimat
 check("and its resolution: 1080P 6 s = $0.49", near(estimateRun(hailuo, { resolution: "1080P", duration: 6 }).usd, 0.49))
 
 // Sound on or off as a variant: Veo 3.1 ($0.40 with sound, $0.20 without; Replicate rules)
-const veo = rec({ endpoint: "google/veo-3.1", modality: "video", unit: "per_second", amount: 0.2, rules: [{ when: { model_variant: "with_audio" }, amount: 0.4 }, { when: { model_variant: "without_audio" }, amount: 0.2 }], props: { generate_audio: { type: "boolean", default: true }, duration: { type: "integer", enum: [4, 6, 8] } } })
+const veo = rec({ endpoint: "google/veo-3.1", category: "video", unit: "per_second", amount: 0.2, rules: [{ when: { model_variant: "with_audio" }, amount: 0.4 }, { when: { model_variant: "without_audio" }, amount: 0.2 }], props: { generate_audio: { type: "boolean", default: true }, duration: { type: "integer", enum: [4, 6, 8] } } })
 check("sound on is the with-audio price: 8 s = $3.20", near(estimateRun(veo, { generate_audio: true, duration: 8 }).usd, 3.2))
 check("sound off is the cheaper one: 8 s = $1.60", near(estimateRun(veo, { generate_audio: false, duration: 8 }).usd, 1.6))
 
 // A variant that is a field of the model: Kling standard / pro, with sound
 const kling = rec({
   endpoint: "kwaivgi/kling-v3-video",
-  modality: "video",
+  category: "video",
   unit: "per_second",
   amount: 0.168,
   rules: [
@@ -76,31 +76,31 @@ const kling = rec({
 check("the variant is read from the model's own mode field", near(estimateRun(kling, { mode: "pro", generate_audio: true, duration: 5 }).usd, 1.68) && near(estimateRun(kling, { mode: "standard", generate_audio: false, duration: 5 }).usd, 0.84), String(estimateRun(kling, { mode: "pro", generate_audio: true, duration: 5 }).usd))
 
 // A video going in changes the price: Seedance (Replicate: 480p $0.1028/s without, $0.4304/s with)
-const seed = rec({ endpoint: "bytedance/seedance-2.5", modality: "video", unit: "per_second", amount: 0.1028, rules: [{ when: { model_variant: "non_video_in", resolution: "480p" }, amount: 0.1028 }, { when: { model_variant: "video_in", resolution: "480p" }, amount: 0.4304 }], props: { resolution: res(["480p", "720p"]), duration: { type: "integer", minimum: 4, maximum: 30 } } })
+const seed = rec({ endpoint: "bytedance/seedance-2.5", category: "video", unit: "per_second", amount: 0.1028, rules: [{ when: { model_variant: "non_video_in", resolution: "480p" }, amount: 0.1028 }, { when: { model_variant: "video_in", resolution: "480p" }, amount: 0.4304 }], props: { resolution: res(["480p", "720p"]), duration: { type: "integer", minimum: 4, maximum: 30 } } })
 check("a source video selects the video-in price", near(estimateRun(seed, { resolution: "480p", duration: 5 }, { sourceVideo: true }).usd, 2.152) && near(estimateRun(seed, { resolution: "480p", duration: 5 }, { sourceVideo: false }).usd, 0.514))
 
 // When the settings cannot say which tier, the lowest is shown and marked
-const luma = rec({ endpoint: "luma/ray-3.2", modality: "video", unit: "per_run", amount: 0.15, rules: [{ when: { model_variant: "sdr", resolution: "540p" }, amount: 0.15 }, { when: { model_variant: "hdr", resolution: "540p" }, amount: 0.3 }], props: { resolution: res(["540p"]) } })
+const luma = rec({ endpoint: "luma/ray-3.2", category: "video", unit: "per_run", amount: 0.15, rules: [{ when: { model_variant: "sdr", resolution: "540p" }, amount: 0.15 }, { when: { model_variant: "hdr", resolution: "540p" }, amount: 0.3 }], props: { resolution: res(["540p"]) } })
 const open = estimateRun(luma, { resolution: "540p" })
 check("an undecided tier is shown as 'from' the lowest", near(open.usd, 0.15) && open.from === true && open.display.startsWith("from"), open.display)
 
 // Per image by size and by quality
-const nano = rec({ endpoint: "google/nano-banana-2.1", modality: "image", unit: "per_image", amount: 0.0336, rules: [{ when: { resolution: "1K" }, amount: 0.0336 }, { when: { resolution: "2K" }, amount: 0.0504 }, { when: { resolution: "4K" }, amount: 0.1134 }], props: { resolution: res(["1K", "2K", "4K"]) } })
+const nano = rec({ endpoint: "google/nano-banana-2.1", category: "image", unit: "per_image", amount: 0.0336, rules: [{ when: { resolution: "1K" }, amount: 0.0336 }, { when: { resolution: "2K" }, amount: 0.0504 }, { when: { resolution: "4K" }, amount: 0.1134 }], props: { resolution: res(["1K", "2K", "4K"]) } })
 check("per image by size: Nano Banana 2.1 1K = $0.0336, 4K = $0.1134", near(estimateRun(nano, { resolution: "1K" }).usd, 0.0336, 0.00001) && near(estimateRun(nano, { resolution: "4K" }).usd, 0.1134, 0.00001))
-const flat = rec({ endpoint: "x/img", modality: "image", unit: "per_image", amount: 0.05, props: { num_images: { type: "integer", minimum: 1, maximum: 4 } } })
+const flat = rec({ endpoint: "x/img", category: "image", unit: "per_image", amount: 0.05, props: { num_images: { type: "integer", minimum: 1, maximum: 4 } } })
 check("several images multiply", near(estimateRun(flat, { num_images: 4 }).usd, 0.2))
 
 // Tokens with a stated fact
-const omni = rec({ provider: "gemini", endpoint: "gemini-omni-1.1-flash", modality: "video", unit: "per_1m_tokens", amount: 1.5, out: 17.5, props: { duration: { type: "integer", minimum: 1, maximum: 10 } } })
+const omni = rec({ provider: "gemini", endpoint: "gemini-omni-1.1-flash", category: "video", unit: "per_1m_tokens", amount: 1.5, out: 17.5, props: { duration: { type: "integer", minimum: 1, maximum: 10 } } })
 check("Gemini Omni video: 5,792 tokens a second at $17.50 per million = about $0.10 a second", near(estimateRun(omni, { duration: 5 }).usd, 0.5068, 0.001) && estimateRun(omni, { duration: 5 }).approximate)
-const tts = rec({ provider: "gemini", endpoint: "gemini-3.8-flash-tts", modality: "audio", unit: "per_1m_tokens", amount: 0.5, out: 9 })
+const tts = rec({ provider: "gemini", endpoint: "gemini-3.8-flash-tts", category: "audio", unit: "per_1m_tokens", amount: 0.5, out: 9 })
 check("Gemini TTS: 25 tokens a second, 1,000 characters is about 67 s = $0.015", near(estimateRun(tts, {}, { promptChars: 1000 }).usd, 0.015, 0.001), String(estimateRun(tts, {}, { promptChars: 1000 }).usd))
-const gpt = rec({ provider: "openai", endpoint: "gpt-image-2.5-sunburst", modality: "image", unit: "per_1m_tokens", amount: 30, props: { quality: res(["low", "medium", "high"]) } })
+const gpt = rec({ provider: "openai", endpoint: "gpt-image-2.5-sunburst", category: "image", unit: "per_1m_tokens", amount: 30, props: { quality: res(["low", "medium", "high"]) } })
 check("GPT Image tokens by quality: medium = $0.047", near(estimateRun(gpt, { quality: "medium" }).usd, 0.047, 0.0005), String(estimateRun(gpt, { quality: "medium" }).usd))
-check("a token price with no fact is left open, not invented", estimateRun(rec({ provider: "openrouter", endpoint: "x/unknown-image", modality: "image", unit: "per_1m_tokens", amount: 10 }), {}).usd === null)
+check("a token price with no fact is left open, not invented", estimateRun(rec({ provider: "openrouter", endpoint: "x/unknown-image", category: "image", unit: "per_1m_tokens", amount: 10 }), {}).usd === null)
 
 // Per thousand characters, using the real text length
-const eleven = rec({ endpoint: "elevenlabs/v3", modality: "audio", unit: "per_1k_chars", amount: 0.1 })
+const eleven = rec({ endpoint: "elevenlabs/v3", category: "audio", unit: "per_1k_chars", amount: 0.1 })
 check("speech by the thousand characters follows the text: 2,500 characters = $0.25", near(estimateRun(eleven, {}, { promptChars: 2500 }).usd, 0.25))
 check("with no text yet it assumes 500 characters and says so", near(estimateRun(eleven, {}).usd, 0.05) && estimateRun(eleven, {}).approximate)
 
@@ -140,7 +140,7 @@ check("Replicate public page schema scraper extracts dereferenced_openapi_schema
 
 const noSchemaRep = recordFromReplicate(
   { owner: "bytedance", name: "seedance-2.5", latest_version: { id: "v1", openapi_schema: { components: { schemas: { Output: { type: "string", format: "uri" } } } } } },
-  { modality: "video", task: "text-to-video" },
+  { category: "video", task: "text-to-video" },
   new Date().toISOString(),
 )!
 check("Replicate model without Input schema gets OpenAI-standard video params via LiteLLM layer", Boolean(noSchemaRep?.params.properties.aspect_ratio && noSchemaRep?.params.properties.duration && noSchemaRep?.params.properties.resolution))
@@ -158,7 +158,7 @@ const orVideo = mapOpenRouterVideoModel(
   },
   new Date().toISOString(),
 )!
-check("OpenRouter video model maps to video modality with per_second tier rules", orVideo.modality === "video" && near(orVideo.price.amount, 0.12) && orVideo.price.rules?.length === 2)
+check("OpenRouter video model maps to video category with per_second tier rules", orVideo.category === "video" && near(orVideo.price.amount, 0.12) && orVideo.price.rules?.length === 2)
 
 const orAudio = mapOpenRouterModel(
   {
@@ -169,7 +169,7 @@ const orAudio = mapOpenRouterModel(
   },
   new Date().toISOString(),
 )!
-check("OpenRouter audio model maps to audio modality with voice param and token rate", orAudio.modality === "audio" && Boolean(orAudio.params.properties.voice) && near(orAudio.price.outputAmount ?? 0, 80))
+check("OpenRouter audio model maps to audio category with voice param and token rate", orAudio.category === "audio" && Boolean(orAudio.params.properties.voice) && near(orAudio.price.outputAmount ?? 0, 80))
 
 // fal's own pricing notes, as the pages write them
 {

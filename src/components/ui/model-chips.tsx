@@ -17,6 +17,7 @@ function MoreChip({ more }: { more: string[] }) {
         <span className={CHIP}>+{more.length}</span>
       </TooltipTrigger>
       <TooltipContent side="top" className="text-xs">
+        <span className="text-muted-foreground">Other: </span>
         {more.join(" · ")}
       </TooltipContent>
     </Tooltip>

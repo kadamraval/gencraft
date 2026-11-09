@@ -16,7 +16,7 @@ import {
   UsageDateRange,
   UsageLedgerItem,
   SpendOverviewData,
-  ModalityCategory,
+  Category,
   ProviderId,
 } from "@/lib/ledger/usage-store"
 import { Button } from "@/components/ui/button"
@@ -48,12 +48,12 @@ const PROVIDER_NAMES: Record<ProviderId, string> = {
   openrouter: "OpenRouter",
 }
 
-const CATEGORY_LABELS: Record<ModalityCategory, string> = {
+const CATEGORY_LABELS: Record<Category, string> = {
   video: "Video",
   image: "Image",
   audio: "Audio",
   text: "Text",
-  embedded: "Embedding",
+  embedding: "Embedding",
 }
 
 /** One figure with what it means, as its own card. */
@@ -166,18 +166,18 @@ export function UsageHistoryView({ onClose: _onClose, settings }: UsageHistoryVi
 
           {/* Right Toolbar Controls */}
           <div className="flex items-center gap-2 shrink-0">
-            {/* Category / Modality Filter */}
+            {/* Category / Category Filter */}
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="h-9 w-32 text-xs bg-secondary/30 border-border/70">
                 <SelectValue placeholder="All types" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Modalities</SelectItem>
+                <SelectItem value="all">All categories</SelectItem>
                 <SelectItem value="video">Video</SelectItem>
                 <SelectItem value="image">Image</SelectItem>
                 <SelectItem value="audio">Audio</SelectItem>
                 <SelectItem value="text">Text</SelectItem>
-                <SelectItem value="embedded">Embedding</SelectItem>
+                <SelectItem value="embedding">Embedding</SelectItem>
               </SelectContent>
             </Select>
 
@@ -284,7 +284,7 @@ export function UsageHistoryView({ onClose: _onClose, settings }: UsageHistoryVi
           <div className="sticky top-0 z-10 grid grid-cols-[160px_1fr_120px_120px_100px] items-center gap-4 py-3 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-border/60 bg-secondary/40 backdrop-blur-sm">
             <div>Provider</div>
             <div>Model & Specs</div>
-            <div>Modality</div>
+            <div>Category</div>
             <div className="text-right">Direct Cost</div>
             <div className="text-right">Recorded</div>
           </div>
@@ -324,7 +324,7 @@ export function UsageHistoryView({ onClose: _onClose, settings }: UsageHistoryVi
                     </div>
                   </div>
 
-                  {/* Modality Category */}
+                  {/* Category Category */}
                   <div>
                     <span className="inline-flex px-2 py-0.5 rounded-md text-xs font-medium bg-secondary/80 text-foreground">
                       {CATEGORY_LABELS[row.category] || row.category}

@@ -24,16 +24,16 @@ export const PARAM_ALIAS_GROUPS: Record<string, readonly string[]> = {
   reasoning_effort: ["reasoning_effort", "thinking_level", "reasoning"],
 }
 
-/** Standard OpenAI-compatible baseline properties per modality when a host omits schema details. */
-export function standardPropertiesForModality(
-  record: Pick<ModelRecord, "modality" | "task" | "endpoint" | "inputs">,
+/** Standard OpenAI-compatible baseline properties per category when a host omits schema details. */
+export function standardPropertiesForCategory(
+  record: Pick<ModelRecord, "category" | "task" | "endpoint" | "inputs">,
   caps?: LiteLLMCapabilities,
 ): Record<string, ParamProperty> {
   const props: Record<string, ParamProperty> = {}
   const task = (record.task ?? "").toLowerCase()
   const ep = record.endpoint.toLowerCase()
 
-  if (record.modality === "image") {
+  if (record.category === "image") {
     props.aspect_ratio = {
       type: "string",
       title: "Aspect ratio",
@@ -66,7 +66,7 @@ export function standardPropertiesForModality(
         tier: "common",
       }
     }
-  } else if (record.modality === "video") {
+  } else if (record.category === "video") {
     props.aspect_ratio = {
       type: "string",
       title: "Aspect ratio",
@@ -105,7 +105,7 @@ export function standardPropertiesForModality(
         tier: "common",
       }
     }
-  } else if (record.modality === "audio") {
+  } else if (record.category === "audio") {
     const isSpeech = task === "text-to-speech" || task === "speech" || ep.includes("tts") || ep.includes("speech")
     if (isSpeech) {
       props.voice = {
@@ -125,7 +125,7 @@ export function standardPropertiesForModality(
         tier: "common",
       }
     }
-  } else if (record.modality === "text") {
+  } else if (record.category === "text") {
     if (caps?.reasoning) {
       props.reasoning_effort = {
         type: "string",
@@ -152,7 +152,7 @@ export function getSupportedOpenAIParams(record: ModelRecord, caps?: LiteLLMCapa
     }
     return [...canonical]
   }
-  return Object.keys(standardPropertiesForModality(record, caps))
+  return Object.keys(standardPropertiesForCategory(record, caps))
 }
 
 /**
@@ -161,8 +161,8 @@ export function getSupportedOpenAIParams(record: ModelRecord, caps?: LiteLLMCapa
  */
 export function withStandardParams(record: ModelRecord, caps?: LiteLLMCapabilities): ModelRecord {
   const existing = record.params.properties
-  if (Object.keys(existing).length > 0 && record.modality !== "text") return record
-  const std = standardPropertiesForModality(record, caps)
+  if (Object.keys(existing).length > 0 && record.category !== "text") return record
+  const std = standardPropertiesForCategory(record, caps)
   if (Object.keys(std).length === 0) return record
 
   const merged: Record<string, ParamProperty> = { ...existing }

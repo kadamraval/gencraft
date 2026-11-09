@@ -28,6 +28,13 @@ async function page(url: string): Promise<string | null> {
   return null
 }
 
+/** Every public model Replicate lists, from its sitemap (the full catalog; the collections hold only a part of it) */
+export async function replicateSitemap(): Promise<string[]> {
+  const xml = await page("https://replicate.com/sitemap-models.xml")
+  if (!xml) return []
+  return [...new Set([...xml.matchAll(/<loc>https:\/\/replicate\.com\/([^<\/]+\/[^<\/]+)<\/loc>/g)].map((m) => m[1]!))]
+}
+
 export function publicReplicateCall(): ReplicateFetch {
   return async (path) => {
     if (path === "/v1/collections") {
@@ -51,11 +58,18 @@ export function publicReplicateCall(): ReplicateFetch {
       const schema = parseReplicatePublicSchema(html)
       const at = html.indexOf('"model":')
       const desc = /"description":\s*"((?:[^"\\]|\\.)*)"/.exec(html.slice(at >= 0 ? at : 0))
+      // The page's own facts: how often it ran, whether it is one of Replicate's official models, and the links its description gives
+      const meta = (k: string) => new RegExp(`replicate:${k}"\\s+content="([^"]*)"`).exec(html)?.[1]
+      const runs = Number(meta("run_count"))
+      const links = [...new Set([...html.matchAll(/https?:\/\/(?:huggingface\.co|github\.com)\/[\w.-]+\/[\w.-]+/g)].map((m) => m[0]))].filter((l) => !/\.(png|jpe?g|svg)$/i.test(l))
       return json({
         owner,
         name,
         description: desc ? (JSON.parse(`"${desc[1]}"`) as string) : undefined,
-        latest_version: schema ? { id: schema.versionId ?? "public", openapi_schema: schema.openapi_schema } : undefined,
+        ...(Number.isFinite(runs) && runs > 0 ? { run_count: runs } : {}),
+        is_official: meta("is_official") === "true",
+        weight_links: links,
+        latest_version: schema ? { id: schema.versionId ?? "public", created_at: meta("latest_version_created_at"), openapi_schema: schema.openapi_schema } : undefined,
       })
     }
     return json({ detail: `not available without a token: ${path}` }, 404)

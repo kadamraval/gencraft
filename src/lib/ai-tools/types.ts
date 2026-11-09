@@ -46,6 +46,8 @@ export interface ToolOption {
 /** Another file besides the main one: a voice to sync to, a mask */
 export interface ToolNeed {
   kind: MediaKind
+  /** A second file in this role (the area to change): a model must have a field for it */
+  role?: "mask"
   label: string
   required: boolean
 }
@@ -66,6 +68,8 @@ export interface ToolSpec {
   needs?: ToolNeed[]
   /** The tool needs words from the person (what to remove, how to restyle) */
   prompt?: { label: string; placeholder: string; required: boolean }
+  /** Words sent when the person types none and the model needs some (SAM Audio is told which part to pull out) */
+  defaultPrompt?: string
   options?: ToolOption[]
   /**
    * What to tell a picture model that has no tool of its own for this job but follows instructions (the database lists such a model as an

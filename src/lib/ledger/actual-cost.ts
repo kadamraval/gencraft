@@ -19,7 +19,7 @@ export interface ActualCost {
 export function actualCostOf(
   rec: Pick<ModelRecord, "provider"> & {
     endpoint?: string
-    modality?: ModelRecord["modality"]
+    category?: ModelRecord["category"]
     price?: { unit?: string; amount?: number | null; outputAmount?: number; cachedAmount?: number; computeSecond?: number }
   },
   raw: unknown,

@@ -1,3 +1,5 @@
+import { newEditOnlyStory, saveNewCut } from "@/components/apps/video-edit-app"
+import { DEVICE_STEMS } from "@/lib/device/stems"
 import { toolContextOf } from "@/components/ai-tools/use-tool-context"
 import type { AgentToolEnv } from "@/lib/ai-tools/agent-env"
 import { toolById } from "@/lib/ai-tools/catalog"
@@ -58,12 +60,10 @@ import { MediaDetailModal, DetailMediaItem } from "@/components/media-vault/medi
 import { executeWithFallback } from "@/lib/agent/fallback-router"
 import type { ResolvedModelInfo } from "@/lib/agent/fallback-router"
 import { dispatchLiveProviderRequest, getProviderApiKey } from "@/lib/providers/live-connectors"
-import { adaptGenerationPackage } from "@/lib/providers/model-capabilities"
-import { MODEL_CATALOG } from "@/lib/providers/catalog"
 import { startPackScheduler } from "@/lib/packs/store"
 import { startKnowledgeScheduler } from "@/lib/knowledge/store"
 import { startAppUpdateScheduler } from "@/lib/updates/app-update"
-import { getListedModels, getRecord, resolveAIModel, setPriceOverrides, setProviderKeys, startRegistryScheduler, useListedModels } from "@/lib/registry/store"
+import { getListedModels, getRecord, setPriceOverrides, setProviderKeys, startRegistryScheduler, useListedModels } from "@/lib/registry/store"
 import { computeDefaultEnabled, enabledSet } from "@/lib/registry/enabled"
 import { listBookmarks, seedBookmarks } from "@/lib/registry/bookmarks"
 import { liveRegistry } from "@/lib/apps/runtime"
@@ -708,12 +708,13 @@ export function App() {
       },
       run: async (toolId, endpoint, from, input) => {
         const spec = toolById(toolId)
-        const rec = getToolRecords().find((r) => r.endpoint === endpoint) ?? getListedModels().find((r) => r.endpoint === endpoint)
+        const rec = [...getToolRecords(), DEVICE_STEMS].find((r) => r.endpoint === endpoint) ?? getListedModels().find((r) => r.endpoint === endpoint)
         if (!spec || !rec) throw new Error("That tool is not available.")
         const done = await runTool(spec, rec, { media: from, prompt: input.prompt, options: input.options }, { settings, projectId: activeProject?.id })
         setAssets((prev) => [...done.assets, ...prev])
         return done
       },
+      save: (made) => setAssets((prev) => [...made, ...prev]),
     }
   }
 
@@ -727,7 +728,7 @@ export function App() {
       if (brandLogo) refUrls.push(brandLogo)
       const timestamp = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
       const run = await executeWithFallback({
-        modality: kind,
+        category: kind,
         settings: g.settings,
         primaryModelId: rec?.id,
         actionName: `Agent ${kind}`,
@@ -738,7 +739,7 @@ export function App() {
           const live = await dispatchLiveProviderRequest({
             onActualCost: report,
             model,
-            modality: kind,
+            category: kind,
             prompt: a.prompt,
             settings: g.settings,
             params: values,
@@ -884,7 +885,7 @@ export function App() {
     chain: async (execute) =>
       (
         await executeWithFallback({
-          modality: "text",
+          category: "text",
           settings,
           primaryModelId: modelId,
           actionName: "Chat",
@@ -907,7 +908,7 @@ export function App() {
       return made ? { ...made.tools, ...sharedTools({ providerSearch: Boolean(made.tools), memory: settings.aiEngine.memoryEnabled !== false }) } : undefined
     },
     plain: async (model, prompt) => {
-      const live = await dispatchLiveProviderRequest({ model, modality: "text", prompt, settings, onLog: () => undefined })
+      const live = await dispatchLiveProviderRequest({ model, category: "text", prompt, settings, onLog: () => undefined })
       if (!live.textResponse) throw new Error("The model returned no text")
       recordTextEstimate(getRecord(model.id), prompt, live.textResponse, "Chat")
       return live.textResponse
@@ -1032,16 +1033,8 @@ export function App() {
     }
     const timestamp = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
 
-    // Resolve active model and dynamically adapt generation package according to model capabilities
-    const activeModel =
-      resolveAIModel(params.modelId) ||
-      MODEL_CATALOG.find((m) => m.type === params.mode) ||
-      MODEL_CATALOG[0]!
-
-    // A model from the registry gets exactly the prompt the user wrote (plus chosen Elements). The older
-    // capability adapter rewrites prompts with bracketed notes, which is only for the bundled legacy models.
+    // The model as the registry and the standard database know it. It gets exactly the prompt the user wrote (plus chosen Elements).
     const registryRecord = getRecord(params.modelId)
-    const exact = Boolean(registryRecord && registryRecord.endpoint !== registryRecord.id)
     const job = (kind: "chat" | "image" | "video" | "audio", count: number) => ({
       kind,
       status: (slot.waited ? "queued" : "running") as "queued" | "running",
@@ -1102,17 +1095,19 @@ export function App() {
       return true
     }
 
-    const adaptedPackage = adaptGenerationPackage({
-      rawPrompt: sentPrompt,
-      activeModel,
-      settings,
-      characterRef: params.characterRef,
-      mentionItems: params.referenceItem ? [params.referenceItem] : [],
+    // An image, video or audio model nothing knows cannot be run or priced: say so instead of running another model in its place
+    if ((params.mode === "image" || params.mode === "video" || params.mode === "audio") && !registryRecord) {
+      fail(assistantMsgId, `The model "${params.modelId}" is not in the model database or any provider's list. Pick another model in the composer.`, params.mode)
+      return
+    }
+    // The files the run conditions on: a start frame first, then the picked reference, then the character's picture
+    const frames = {
+      referenceImageUrl: params.startFrameUrl ?? params.referenceItem?.imageUrl ?? params.characterRef?.imageUrl,
       startFrameUrl: params.startFrameUrl,
       endFrameUrl: params.endFrameUrl,
       cameraMotion: params.cameraMotion,
-      aspectRatio: params.aspectRatio,
-    })
+      characterSignature: params.characterRef ? params.characterRef.signatureToken || params.characterRef.id : undefined,
+    }
 
     // 1. Append user message
     const userMsg: ChatMessage = {
@@ -1138,7 +1133,7 @@ export function App() {
 
       try {
         const result = await executeWithFallback({
-          modality: "video",
+          category: "video",
           settings,
           primaryModelId: params.modelId,
           actionName: "Video",
@@ -1149,20 +1144,19 @@ export function App() {
             const live = await dispatchLiveProviderRequest({
               onActualCost: report,
               model,
-              modality: "video",
-              prompt: exact ? sentPrompt : adaptedPackage.adaptedPrompt,
+              category: "video",
+              prompt: sentPrompt,
               settings,
               params: params.modelParams,
               references,
               videoParams: {
                 duration: params.targetDuration,
                 aspectRatio: params.aspectRatio,
-                referenceImageUrl: adaptedPackage.referenceImageUrl,
-                referenceVideoUrl: adaptedPackage.referenceVideoUrl,
-                startFrameUrl: adaptedPackage.startFrameUrl,
-                endFrameUrl: adaptedPackage.endFrameUrl,
-                cameraMotion: adaptedPackage.cameraMotion,
-                characterSignature: adaptedPackage.characterSignature,
+                referenceImageUrl: frames.referenceImageUrl,
+                startFrameUrl: frames.startFrameUrl,
+                endFrameUrl: frames.endFrameUrl,
+                cameraMotion: frames.cameraMotion,
+                characterSignature: frames.characterSignature,
               },
               onLog: (l) => stepLogs.push(l),
             })
@@ -1211,7 +1205,7 @@ export function App() {
 
       try {
         const result = await executeWithFallback({
-          modality: "image",
+          category: "image",
           settings,
           primaryModelId: params.modelId,
           actionName: `${params.batchCount}x Image Render Batch`,
@@ -1229,15 +1223,15 @@ export function App() {
             const liveResult = await dispatchLiveProviderRequest({
               onActualCost: report,
               model,
-              modality: "image",
-              prompt: exact ? sentPrompt : adaptedPackage.adaptedPrompt,
+              category: "image",
+              prompt: sentPrompt,
               settings,
               params: params.modelParams,
               references,
               imageParams: {
                 batchCount: params.batchCount,
                 aspectRatio: params.aspectRatio,
-                referenceImageUrl: adaptedPackage.referenceImageUrl,
+                referenceImageUrl: frames.referenceImageUrl,
               },
               onLog: (l) => {
                 stepLogs.push(l)
@@ -1295,7 +1289,7 @@ export function App() {
 
       try {
         const result = await executeWithFallback({
-          modality: "audio",
+          category: "audio",
           settings,
           primaryModelId: params.modelId,
           actionName: "Soundtrack & Foley Track",
@@ -1313,7 +1307,7 @@ export function App() {
             const liveResult = await dispatchLiveProviderRequest({
               onActualCost: report,
               model,
-              modality: "audio",
+              category: "audio",
               prompt: sentPrompt,
               settings,
               params: params.modelParams,
@@ -1363,13 +1357,13 @@ export function App() {
   // Text for the Story page's script agent, from the chat model chosen in Settings
   const generateStoryText = async (prompt: string): Promise<string> => {
     const run = await executeWithFallback({
-      modality: "text",
+      category: "text",
       settings,
       primaryModelId: settings.aiEngine.activeTextModelId,
       actionName: "Story script",
       onDiagnosticLog: () => undefined,
       execute: async (model) => {
-        const live = await dispatchLiveProviderRequest({ model, modality: "text", prompt, settings, onLog: () => undefined })
+        const live = await dispatchLiveProviderRequest({ model, category: "text", prompt, settings, onLog: () => undefined })
         if (!live.textResponse) throw new Error("The model returned no text")
         recordTextEstimate(getRecord(model.id), prompt, live.textResponse, "Story script")
         return live.textResponse
@@ -1556,6 +1550,22 @@ export function App() {
 
   // An image made into a video: the composer opens in video mode with the image attached (it becomes the start frame
   // on a model that takes one, a reference on one that takes those)
+  // A picture sent to an app: the Apps page opens that card with the picture loaded
+  const [cardToOpen, setCardToOpen] = React.useState<{ cardId: string; file: { url: string; name: string } } | undefined>()
+  const useInApp = (cardId: string, file: { url: string; name: string }) => {
+    setDetailModalOpen(false)
+    setCardToOpen({ cardId, file })
+    setMainTab("apps")
+  }
+
+  // Video Edit: a clip opened in the timeline editor, as a new cut kept with the stories
+  const [cutToOpen, setCutToOpen] = React.useState<string | undefined>()
+  const openInVideoEdit = (clip: { url: string; name: string; seconds?: number }) => {
+    setDetailModalOpen(false)
+    setCutToOpen(saveNewCut(newEditOnlyStory(clip)))
+    setMainTab("apps")
+  }
+
   const handleTurnToVideo = (item: DetailMediaItem) => {
     setDetailModalOpen(false)
     setMainTab("chat")
@@ -1590,9 +1600,9 @@ export function App() {
     ] as const
     setSettings((s) => {
       let next = s
-      for (const [key, modality] of slots) {
+      for (const [key, category] of slots) {
         if (next.aiEngine[key] && listedModels.some((m) => m.id === next.aiEngine[key])) continue
-        const pick = defaultModelFor(modality, listedModels)
+        const pick = defaultModelFor(category, listedModels)
         if (pick) next = { ...next, aiEngine: { ...next.aiEngine, [key]: pick.id } }
       }
       return next
@@ -1616,7 +1626,7 @@ export function App() {
 
   return (
     <TooltipProvider delayDuration={150}>
-    <ToolHostProvider value={{ settings, projectId: activeProject?.id, onAssets: (added) => setAssets((prev) => [...added, ...prev]), onOpenSettings: () => handleOpenSettings("providers") }}>
+    <ToolHostProvider value={{ settings, projectId: activeProject?.id, onAssets: (added) => setAssets((prev) => [...added, ...prev]), onOpenSettings: () => handleOpenSettings("providers"), onOpenInVideoEdit: openInVideoEdit, onUseInApp: useInApp }}>
       <div className="app-root relative h-screen w-screen overflow-hidden bg-background text-foreground flex flex-col">
       {/* 1. MASTER PASSWORD GATE: Strictly locked until authenticated */}
       <MasterPasswordGate
@@ -1884,6 +1894,7 @@ export function App() {
               <main className="flex-1 relative overflow-hidden">
                 <MediaVaultView
                   type={mainTab}
+                  settings={settings}
                   activeProject={activeProject}
                   onNavigateToChat={() => {
                     setMainTab("chat")
@@ -1928,7 +1939,7 @@ export function App() {
               </main>
             ) : (
               /* APPS: small tools that make things, built by the agent or shipped with the studio */
-              <main className="flex-1 relative overflow-hidden">
+              <main className="relative min-w-0 flex-1 overflow-hidden">
                 <AppsView
                   settings={settings}
                   assets={assets}
@@ -1945,6 +1956,15 @@ export function App() {
                   editActions={editActions}
                   onEditMedia={handleEditVideo}
                   onOpenSettings={handleOpenSettings}
+                  videoEdit={{ library: { assets, projects, activeProjectId: activeProject?.id }, settings, onOpenSettings: handleOpenSettings, onGenerateText: generateStoryText, getAgentRuntime: agentRuntime }}
+                  openCard={cardToOpen}
+                  onOpenCardHandled={() => setCardToOpen(undefined)}
+                  openCut={cutToOpen}
+                  onOpenCutHandled={() => setCutToOpen(undefined)}
+                  onCreate={(category) => {
+                    setMainTab("chat")
+                    setReuseRequest({ nonce: Date.now(), mode: category === "text" ? "chat" : category, prompt: "", id: "", name: "" })
+                  }}
                   onAssets={(added) => setAssets((prev) => [...added, ...prev])}
                   onOpenAsset={(a) => handleOpenDetailModal({ id: a.id, title: a.title, type: a.type, url: a.url, thumbnailUrl: a.thumbnailUrl, prompt: a.prompt, model: a.model, aspectRatio: a.aspectRatio, status: "completed", activity: "generated", authorName: "You", createdAt: a.createdAt })}
                 />

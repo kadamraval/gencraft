@@ -54,8 +54,8 @@ export function migrateModelSettings(settings: SettingsState): SettingsState {
       removed.push(id)
       aiEngine[key] = ""
     }
-    const modality = MODALITY_OF[key]
-    if (fallbackModels[modality]) fallbackModels[modality] = fallbackModels[modality]!.filter((fid) => Boolean(getRecord(fid)))
+    const category = MODALITY_OF[key]
+    if (fallbackModels[category]) fallbackModels[category] = fallbackModels[category]!.filter((fid) => Boolean(getRecord(fid)))
   }
   rememberRemoved(removed)
   return { ...settings, aiEngine: { ...aiEngine, fallbackModels } }

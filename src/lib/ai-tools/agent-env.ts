@@ -21,6 +21,8 @@ export interface AgentToolEnv {
   run: (toolId: string, endpoint: string, media: ToolMedia, input: { prompt?: string; options?: Record<string, string | number | boolean> }) => Promise<{ assets: MediaAsset[]; costUsd: number }>
   /** Which of the models that can do a tool to use (the level's pick). Without it the first, best-ranked one runs. */
   choose?: (toolId: string, candidates: ModelRecord[]) => ModelRecord | undefined
+  /** Keeps media made in the app with no model (a still, a GIF) in the Library */
+  save?: (assets: MediaAsset[]) => void
   /** What a run would cost, or null when the price is unknown (used for the approval rule) */
   estimate: (toolId: string, mediaId: string, options?: Record<string, string | number | boolean>) => number | null
 }

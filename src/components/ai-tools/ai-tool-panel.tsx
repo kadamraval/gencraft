@@ -11,7 +11,7 @@ import { choicesFor, optionsFor, paramsFor, priceOf, runTool } from "@/lib/ai-to
 import type { ToolMedia } from "@/lib/ai-tools/run"
 import type { MediaKind, Surface, ToolOption } from "@/lib/ai-tools/types"
 import type { ModelRecord } from "@/lib/registry/types"
-import { formatPriceShort } from "@/lib/registry/types"
+import { ModelPickerButton } from "@/components/models/model-picker"
 import type { MediaAsset, SettingsState } from "@/types"
 import { useBookmarks } from "@/lib/registry/bookmarks"
 import { iconOf } from "./tool-icons"
@@ -42,6 +42,8 @@ export interface AiToolPanelProps {
   noMedia?: string
   /** Filters the cards by name */
   query?: string
+  /** An Edit option to open straight away (an app card that is one option) */
+  startWith?: string
 }
 
 const usd = (n: number | null) => (n === null ? "price unknown" : n < 0.01 ? `$${n.toFixed(4)}` : `$${n.toFixed(2)}`)
@@ -86,7 +88,7 @@ function OptionField({ option, record, value, onChange }: { option: ToolOption; 
   )
 }
 
-export function AiToolPanel({ media, kind, surface, settings, projectId, audioUrl, imageUrl, onCutTool, onDone, onOpenSettings, className, query, noMedia }: AiToolPanelProps) {
+export function AiToolPanel({ media, kind, surface, settings, projectId, audioUrl, imageUrl, onCutTool, onDone, onOpenSettings, className, query, noMedia, startWith }: AiToolPanelProps) {
   const ctx = useToolContext(settings)
   const [open, setOpen] = React.useState<ToolOffer | null>(null)
   const [modelId, setModelId] = React.useState<string>("")
@@ -119,6 +121,17 @@ export function AiToolPanel({ media, kind, surface, settings, projectId, audioUr
   }, [open, showAll, marked])
   const record = choices.find((r) => r.id === modelId) ?? choices[0]
   const price = record && media && open ? priceOf(record, paramsFor(open.spec, record, options).params, media) : null
+
+  // An app card that is one Edit option opens it once its models are known
+  const started = React.useRef(false)
+  React.useEffect(() => {
+    if (!startWith || started.current) return
+    const offer = offers.find((o) => o.spec.id === startWith)
+    if (offer) {
+      started.current = true
+      start(offer)
+    }
+  }, [startWith, offers]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const start = (offer: ToolOffer) => {
     setOpen(offer)
@@ -185,9 +198,12 @@ export function AiToolPanel({ media, kind, surface, settings, projectId, audioUr
         {(choices.length > 1 || open.more.length > 0) && (
           <label className="block space-y-1 text-xs text-muted-foreground">
             Model
-            <Select
+            <ModelPickerButton
+              ordered
+              records={choices}
               value={record.id}
-              onValueChange={(id) => {
+              className="w-full"
+              onChange={(id) => {
                 setModelId(id)
                 try {
                   localStorage.setItem(`gencraft_tool_model_${open.spec.id}`, id)
@@ -195,22 +211,7 @@ export function AiToolPanel({ media, kind, surface, settings, projectId, audioUr
                   // storage unavailable: the choice lasts until the panel closes
                 }
               }}
-            >
-              <SelectTrigger aria-label="Model" className="h-8 rounded-md bg-secondary px-2 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {choices.map((r, i) => (
-                  <React.Fragment key={r.id}>
-                    {marked.has(choices[0]!.id) && i === choices.filter((c) => marked.has(c.id)).length && <div className="px-2 pb-1 pt-1.5 text-xs font-semibold text-muted-foreground">More</div>}
-                    <SelectItem value={r.id} className="text-xs">
-                      {marked.has(r.id) ? "★ " : ""}
-                      {r.name} · {formatPriceShort(r.price)}
-                    </SelectItem>
-                  </React.Fragment>
-                ))}
-              </SelectContent>
-            </Select>
+            />
             {open.more.length > 0 && (
               <Button type="button" variant="ghost" size="sm" onClick={() => setShowAll((v) => !v)} className="h-6 px-1 text-xs text-muted-foreground">
                 {showAll ? "Show fewer" : `Show all (${open.more.length} more)`}
@@ -228,7 +229,7 @@ export function AiToolPanel({ media, kind, surface, settings, projectId, audioUr
         {fields.map((o) => (
           <OptionField key={o.id} option={o} record={record} value={options[o.id]} onChange={(v) => setOptions((prev) => ({ ...prev, [o.id]: v }))} />
         ))}
-        {missing && <p className="rounded-md bg-secondary p-2 text-xs text-muted-foreground">This tool needs a {missing.label.toLowerCase()}, and none is chosen here.</p>}
+        {missing && <p className="rounded-md bg-secondary p-2 text-xs text-muted-foreground">This needs a {missing.label.toLowerCase()}, and none is chosen here.</p>}
         <p className="text-xs text-muted-foreground">
           {media ? (price === null ? "The price is not known for this model." : `About ${usd(price)}${media.seconds ? ` for ${Math.round(media.seconds)} s` : ""}.`) : "Choose something to work on first."}
         </p>

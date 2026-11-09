@@ -1,4 +1,4 @@
-import type { ModelPrice, ModelRecord, ParamProperty, ParamSchema, PriceRule, RegistryModality } from "../types"
+import type { ModelPrice, ModelRecord, ParamProperty, ParamSchema, PriceRule, AppCategory } from "../types"
 import { withReferenceSlot } from "../ref-limits"
 
 export interface ORModel {
@@ -8,6 +8,8 @@ export interface ORModel {
   created?: number
   context_length?: number
   expiration_date?: string | null
+  /** The model's public weights on Hugging Face, when it has them */
+  hugging_face_id?: string | null
   architecture?: { input_modalities?: string[]; output_modalities?: string[] }
   supported_voices?: string[] | null
   pricing?: {
@@ -42,7 +44,7 @@ export function mapOpenRouterModel(m: ORModel, fetchedAt: string): ModelRecord |
   // OpenRouter lists speech and transcription models as kinds of their own
   const isSpeechKind = out.includes("speech") || out.includes("transcription")
   const isAudioModel = isSpeechKind || out.includes("audio") && (!out.includes("text") || /\baudio\b|\btts\b|\bspeech\b|\bvoice\b|lyria|music|song/i.test(m.id))
-  const modality: RegistryModality | null = out.includes("video")
+  const category: AppCategory | null = out.includes("video")
     ? "video"
     : out.includes("image")
       ? "image"
@@ -51,7 +53,7 @@ export function mapOpenRouterModel(m: ORModel, fetchedAt: string): ModelRecord |
         : out.includes("text")
           ? "text"
           : null
-  if (!modality) return null
+  if (!category) return null
   // Negative prices mark routers that pick a model at run time. They have no price of their own.
   if (Number(m.pricing?.prompt) < 0) return null
 
@@ -60,9 +62,9 @@ export function mapOpenRouterModel(m: ORModel, fetchedAt: string): ModelRecord |
     const def = PARAM_DEFS[p]
     if (def) properties[p] = def
   }
-  const isImage = modality === "image"
-  const isVideo = modality === "video"
-  const isAudio = modality === "audio"
+  const isImage = category === "image"
+  const isVideo = category === "video"
+  const isAudio = category === "audio"
 
   if (isImage) {
     // Chat sampling settings do not shape a picture. The images endpoint takes the fields below; each model's provider decides
@@ -93,6 +95,8 @@ export function mapOpenRouterModel(m: ORModel, fetchedAt: string): ModelRecord |
     } else {
       const voices = Array.isArray(m.supported_voices) && m.supported_voices.length > 0 ? m.supported_voices.map(String) : ["alloy", "ash", "ballad", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer", "verse"]
       properties.voice = { type: "string", title: "Voice", enum: voices, default: voices[0], tier: "unique" }
+      // A sound model that also listens (GPT Audio) takes a sound to work on: it hears it and answers with a new one
+      if ((m.architecture?.input_modalities ?? []).includes("audio")) properties.input_audio = { type: "string", title: "Audio", format: "audio", tier: "common", slot: { kind: "audio", role: "source", list: false, max: 1 } }
     }
   }
 
@@ -139,7 +143,7 @@ export function mapOpenRouterModel(m: ORModel, fetchedAt: string): ModelRecord |
     name: m.name.replace(/^[^:]+:\s*/, ""),
     family,
     logoKey: family,
-    modality,
+    category,
     task: isVideo ? (inputs.includes("image") ? "image-to-video" : "text-to-video") : isAudio ? (out.includes("transcription") ? "speech-to-text" : /lyria|music|song/i.test(m.id) ? "text-to-audio" : "text-to-speech") : isImage ? (inputs.includes("image") ? "image-to-image" : "text-to-image") : undefined,
     inputs: inputs.length > 0 ? inputs : ["text"],
     params: { type: "object", properties },
@@ -149,8 +153,45 @@ export function mapOpenRouterModel(m: ORModel, fetchedAt: string): ModelRecord |
     description: m.description,
     updatedAt: m.created ? new Date(m.created * 1000).toISOString() : undefined,
     retiresAt: m.expiration_date ? new Date(`${m.expiration_date}T00:00:00Z`).toISOString() : undefined,
-    summary: m.context_length && modality === "text" ? { contextTokens: m.context_length } : undefined,
+    summary: m.context_length && category === "text" ? { contextTokens: m.context_length } : undefined,
+    // OpenRouter names the model's Hugging Face repository when its weights are public; for language models it names it for every open
+    // one, so a language model without one is closed
+    ...(m.hugging_face_id ? { weights: "open" as const } : category === "text" ? { weights: "closed" as const } : {}),
   })
+}
+
+/**
+ * OpenRouter's embedding models (its own list, /api/v1/embeddings/models). They are records of the category "embedding", which the app
+ * does not run yet: the database lists them. Billed per input token.
+ */
+export async function fetchOpenRouterEmbeddings(signal?: AbortSignal): Promise<ModelRecord[]> {
+  const fetchedAt = new Date().toISOString()
+  const res = await fetch("https://openrouter.ai/api/v1/embeddings/models", { signal })
+  if (!res.ok) throw new Error(`OpenRouter embedding models: HTTP ${res.status}`)
+  const json = (await res.json()) as { data?: ORModel[] }
+  return (json.data ?? [])
+    .filter((m) => !m.id.includes(":") && Number(m.pricing?.prompt) >= 0)
+    .map((m) => {
+      const family = m.id.split("/")[0] ?? "openrouter"
+      return {
+        id: `openrouter/${m.id}`,
+        endpoint: m.id,
+        provider: "openrouter",
+        name: m.name.replace(/^[^:]+:s*/, ""),
+        family,
+        logoKey: family,
+        category: "embedding" as unknown as AppCategory,
+        task: "text-to-embedding",
+        inputs: ["text"],
+        // The OpenAI-compatible embeddings request every one of them takes
+        params: { type: "object", properties: { encoding_format: { type: "string", title: "Format", enum: ["float", "base64"], default: "float", tier: "technical" } } },
+        price: { unit: "per_1m_tokens", amount: Number(m.pricing?.prompt) * 1_000_000, source: "api", fetchedAt },
+        status: "active",
+        description: m.description,
+        updatedAt: m.created ? new Date(m.created * 1000).toISOString() : undefined,
+        ...(m.hugging_face_id ? { weights: "open" as const } : { weights: "closed" as const }),
+      } satisfies ModelRecord
+    })
 }
 
 /**
@@ -199,7 +240,7 @@ function videoToolKind(id: string): "edit" | "upscale" | "avatar" | undefined {
 }
 
 /** Maps an entry from OpenRouter's `/api/v1/videos/models` catalog into a `ModelRecord`. */
-export function mapOpenRouterVideoModel(m: ORModel & Record<string, unknown>, fetchedAt: string): ModelRecord | null {
+export function mapOpenRouterVideoModel(m: ORModel & Record<string, unknown>, fetchedAt: string, takes: string[] = []): ModelRecord | null {
   if (!m.id) return null
   const frames = (m.supported_frame_images as string[] | null | undefined) ?? []
   const tool = videoToolKind(m.id)
@@ -214,6 +255,13 @@ export function mapOpenRouterVideoModel(m: ORModel & Record<string, unknown>, fe
     properties.image = { type: "string", title: "Face", format: "image", slot: { kind: "image", role: "source", list: false, max: 1 } }
     properties.audio = { type: "string", title: "Voice", format: "audio", slot: { kind: "audio", role: "source", list: false, max: 1 } }
   }
+  // What the model takes besides frames, as OpenRouter's own model list says (input_modalities). They are sent as `input_references`
+  // (image_url, video_url, audio_url): reference pictures, clips and sounds the model works from
+  if (!tool) {
+    if (takes.includes("image")) properties.input_images = { type: "array", title: "Reference images", format: "image", slot: { kind: "image", role: "reference", list: true, max: null } }
+    if (takes.includes("video")) properties.input_videos = { type: "array", title: "Reference videos", format: "video", slot: { kind: "video", role: "reference", list: true, max: null } }
+    if (takes.includes("audio")) properties.input_audios = { type: "array", title: "Reference audio", format: "audio", slot: { kind: "audio", role: "reference", list: true, max: null } }
+  }
   if (aspects.length > 0) properties.aspect_ratio = { type: "string", title: "Aspect ratio", enum: aspects, default: aspects[0], tier: "common" }
   if (resolutions.length > 0) properties.resolution = { type: "string", title: "Resolution", enum: resolutions, default: resolutions.find((r) => /720p/i.test(r)) ?? resolutions[0], tier: "common" }
   if (durations.length > 0) properties.duration = { type: "integer", title: "Duration (s)", enum: durations, default: durations.includes(5) ? 5 : durations[0], tier: "common" }
@@ -226,7 +274,8 @@ export function mapOpenRouterVideoModel(m: ORModel & Record<string, unknown>, fe
 
   const family = m.id.split("/")[0] ?? "openrouter"
   const price: ModelPrice = priceFromSkus(m.pricing_skus as Record<string, string> | undefined, resolutions, fetchedAt) ?? { unit: "unknown", amount: null, source: "api", fetchedAt }
-  const inputs: ModelRecord["inputs"] = tool === "avatar" ? ["text", "image", "audio"] : tool === "edit" ? ["text", "video"] : tool === "upscale" ? ["video"] : frames.length > 0 ? ["text", "image"] : ["text"]
+  const listed = takes.filter((k): k is "text" | "image" | "video" | "audio" => ["text", "image", "video", "audio"].includes(k))
+  const inputs: ModelRecord["inputs"] = tool === "avatar" ? ["text", "image", "audio"] : tool === "edit" ? ["text", "video"] : tool === "upscale" ? ["video"] : listed.length > 0 ? listed : frames.length > 0 ? ["text", "image"] : ["text"]
   return {
     id: `openrouter/${m.id}`,
     endpoint: m.id,
@@ -235,7 +284,7 @@ export function mapOpenRouterVideoModel(m: ORModel & Record<string, unknown>, fe
     family,
     logoKey: family,
     maker: family,
-    modality: "video",
+    category: "video",
     task: tool === "edit" || tool === "upscale" ? "video-to-video" : tool === "avatar" ? "audio-to-video" : "text-to-video",
     inputs,
     params: { type: "object", properties },
@@ -260,12 +309,15 @@ export async function fetchOpenRouterModels(signal?: AbortSignal): Promise<Model
   // "all" lists every model whatever it makes (chat, pictures, speech, music); the default list is chat only
   const urls = ["https://openrouter.ai/api/v1/models?output_modalities=all"]
   const seen = new Map<string, ModelRecord>()
+  // What each model takes in, from the main list: the video list does not say it
+  const inputsOf = new Map<string, string[]>()
   for (const url of urls) {
     const res = await fetch(url, { signal })
     if (!res.ok) throw new Error(`OpenRouter models: HTTP ${res.status}`)
     const json = (await res.json()) as { data: ORModel[] }
     for (const k of Object.keys(lastOpenRouterRead)) delete lastOpenRouterRead[k]
     for (const m of json.data ?? []) {
+      inputsOf.set(m.id, m.architecture?.input_modalities ?? [])
       const rec = mapOpenRouterModel(m, fetchedAt)
       if (rec) seen.set(rec.id, rec)
       // Routers that pick a model at run time (negative price) are left out on purpose and do not count as missed
@@ -282,7 +334,7 @@ export async function fetchOpenRouterModels(signal?: AbortSignal): Promise<Model
     if (vRes.ok) {
       const vJson = (await vRes.json()) as { data?: Array<ORModel & Record<string, unknown>> }
       for (const vm of vJson.data ?? []) {
-        const rec = mapOpenRouterVideoModel(vm, fetchedAt)
+        const rec = mapOpenRouterVideoModel(vm, fetchedAt, inputsOf.get(vm.id) ?? [])
         if (rec) seen.set(rec.id, rec)
       }
     }

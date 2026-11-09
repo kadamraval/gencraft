@@ -1,12 +1,12 @@
 ---
 title: "Providers"
-description: "What each provider brings to Gencraft: how many models and which jobs."
+description: "What each provider brings to Gencraft: how many models and which tasks and tools."
 ---
 
 
 From the model database of 2026-10-24.
 
-| Provider | Models | Provider lines | Jobs covered |
+| Provider | Models | Provider lines | Tasks and tools covered |
 |---|---|---|---|
 | fal | 119 | 182 | 38 |
 | Replicate | 93 | 114 | 24 |
@@ -16,7 +16,7 @@ From the model database of 2026-10-24.
 
 ## fal
 
-| Job | Models |
+| Task or tool | Models |
 |---|---|
 | Image to video | 23 |
 | Text to image | 17 |
@@ -59,7 +59,7 @@ From the model database of 2026-10-24.
 
 ## Replicate
 
-| Job | Models |
+| Task or tool | Models |
 |---|---|
 | Text to image | 18 |
 | Image to video | 17 |
@@ -88,7 +88,7 @@ From the model database of 2026-10-24.
 
 ## OpenRouter
 
-| Job | Models |
+| Task or tool | Models |
 |---|---|
 | Voiceover (text to speech) | 16 |
 | Text to video | 15 |
@@ -107,7 +107,7 @@ From the model database of 2026-10-24.
 
 ## OpenAI
 
-| Job | Models |
+| Task or tool | Models |
 |---|---|
 | Text to image | 6 |
 | Remove object | 4 |
@@ -119,7 +119,7 @@ From the model database of 2026-10-24.
 
 ## Gemini
 
-| Job | Models |
+| Task or tool | Models |
 |---|---|
 | Text to image | 4 |
 | Remove object | 4 |

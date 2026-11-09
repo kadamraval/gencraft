@@ -1,4 +1,7 @@
-export type RegistryModality = "text" | "image" | "video" | "audio"
+/** Category: what a model makes (docs/terms.md) */
+export type Category = "text" | "image" | "video" | "audio" | "embedding"
+/** The categories the app runs models of today */
+export type AppCategory = Exclude<Category, "embedding">
 
 export type PriceUnit = "per_image" | "per_second" | "per_run" | "per_1m_tokens" | "per_megapixel" | "per_1k_chars" | "per_minute" | "per_megapixel_second" | "per_frame" | "unknown"
 
@@ -124,8 +127,15 @@ export interface ModelRecord {
   provider: string
   name: string
   family: string
+  /** The one model this endpoint is a version of in the standard database ("kuaishou/kling-3.0"): its text, image, reference and edit
+   * endpoints and its quality tiers all carry the same one, and the pickers show it once */
+  versionId?: string
+  /** The quality tier this endpoint runs (standard, pro, 4k), when the model has several */
+  tier?: string
+  /** What tells this model apart within its version (Pro, Lite, Klein), shown as a badge beside the simple name */
+  variant?: string
   logoKey: string
-  modality: RegistryModality
+  category: AppCategory
   inputs: Array<"text" | "image" | "video" | "audio">
   params: ParamSchema
   price: ModelPrice
@@ -133,6 +143,10 @@ export interface ModelRecord {
   description?: string
   /** Provider-highlighted models rank first in the picker */
   featured?: boolean
+  /** How many times people ran it, when the provider publishes the count (Replicate): the provider's own measure of popularity */
+  runs?: number
+  /** Whether the weights are public, when the provider's page says so (a weights or source link) */
+  weights?: "open" | "closed"
   /** The company that made the model (Kling, Google, Black Forest Labs). Differs from `provider` for hosted models. */
   maker?: string
   /** Parsed version from the name, used to decide which model supersedes which */
@@ -157,8 +171,8 @@ export interface ModelRecord {
   addedAt?: string
   /** Added by the person by hand: kept across refreshes and never pruned */
   custom?: boolean
-  /** The jobs the standard database says this model does, and how it ranks for each on its provider (1 = first choice) */
-  jobs?: Array<{ id: string; rank: number; role?: "model" | "substitute" | "alternative" }>
+  /** The tasks and tools the standard database says this model serves, and how it ranks for each on its provider (1 = first choice) */
+  serves?: Array<{ id: string; rank: number; role?: "model" | "substitute" | "alternative" }>
   /** A tool that changes a file (upscale, background removal ...): used by the AI tools, never offered as a model to make something with */
   utility?: boolean
 }
@@ -252,10 +266,10 @@ export const UNIT_TEXT: Record<PriceUnit, string> = {
 }
 
 /** "$0.07 per second" in the chosen currency; token prices show input and output. */
-export function describePrice(price: ModelPrice, format: (usd: number) => string, modality?: RegistryModality): string {
+export function describePrice(price: ModelPrice, format: (usd: number) => string, category?: AppCategory): string {
   if (price.amount === null && price.computeSecond) return `${format(price.computeSecond)} per second of machine time`
   if (price.amount === null) return "Price not published"
-  if (price.unit === "per_1m_tokens" && modality === "image") return `${format(price.amount)} per 1M image tokens (cost depends on size and quality)`
+  if (price.unit === "per_1m_tokens" && category === "image") return `${format(price.amount)} per 1M image tokens (cost depends on size and quality)`
   const base = `${format(price.amount)} ${UNIT_TEXT[price.unit]}`.trim()
   return price.outputAmount !== undefined ? `${format(price.amount)} in / ${format(price.outputAmount)} out ${UNIT_TEXT[price.unit]}` : base
 }

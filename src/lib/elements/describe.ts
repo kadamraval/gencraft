@@ -1,3 +1,4 @@
+import { capabilityOfExact } from "@/lib/capability"
 import type { ModelRecord } from "../registry/types"
 import type { ElementCategory } from "./types"
 
@@ -95,7 +96,7 @@ export async function describeExample(req: DescribeRequest): Promise<string> {
 /** Text models that accept images and that the user has a key for, cheapest input price first. */
 export function describerCandidates(models: ModelRecord[], hasKey: (provider: string) => boolean): ModelRecord[] {
   return models
-    .filter((m) => m.modality === "text" && m.inputs.includes("image") && ["openai", "gemini", "openrouter"].includes(m.provider) && hasKey(m.provider))
+    .filter((m) => m.category === "text" && capabilityOfExact(m).abilities.includes("vision") && ["openai", "gemini", "openrouter"].includes(m.provider) && hasKey(m.provider))
     .sort((a, b) => {
       const x = a.price.amount
       const y = b.price.amount

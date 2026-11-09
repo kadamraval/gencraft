@@ -52,7 +52,7 @@ const missing = new Map<string, number>()
 for (const m of models) {
   const rank = shortlistRank(m)
   if (rank === undefined || profileFor(m)) continue
-  const key = `${m.modality}: ${m.name.replace(/ (Text|Image|Reference|Video|Edit|First).*$/i, "")}`
+  const key = `${m.category}: ${m.name.replace(/ (Text|Image|Reference|Video|Edit|First).*$/i, "")}`
   missing.set(key, Math.min(rank, missing.get(key) ?? 999))
 }
 for (const [name, rank] of [...missing].sort((a, b) => a[1] - b[1]).slice(0, 25)) say("info", `no profile yet: ${name} (board rank ${rank})`)

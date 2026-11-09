@@ -158,27 +158,51 @@ export function openrouterImages(json: unknown): string[] {
   return data.map((d) => (d.b64_json ? `data:${d.media_type ?? "image/png"};base64,${d.b64_json}` : (d.url ?? ""))).filter(Boolean)
 }
 
-/** POST /api/v1/videos: OpenRouter unified video generation payload. */
-export function openrouterVideoBody(record: Pick<ModelRecord, "endpoint" | "params">, prompt: string, params: Params, references: string[] = []): Record<string, unknown> {
+/** What goes into an OpenRouter video job besides words: frames, and the pictures, clips and sounds it works from */
+export interface OpenRouterVideoFiles {
+  start?: string
+  end?: string
+  images?: string[]
+  videos?: string[]
+  audios?: string[]
+}
+
+/**
+ * POST /api/v1/videos: OpenRouter unified video generation payload. Start and end frames go in `frame_images`; pictures, clips and sounds
+ * the model works from go in `input_references` (image_url, video_url, audio_url).
+ * https://openrouter.ai/docs/api/api-reference/video-generation/submit-a-video-generation-request (read 2026-10-26)
+ */
+export function openrouterVideoBody(record: Pick<ModelRecord, "endpoint" | "params">, prompt: string, params: Params, files: OpenRouterVideoFiles | string[] = {}): Record<string, unknown> {
   const sent = sendableParams(record, params)
   const body: Record<string, unknown> = { model: record.endpoint, prompt }
-  for (const key of ["aspect_ratio", "resolution", "duration", "generate_audio", "seed"] as const) {
+  for (const key of ["aspect_ratio", "resolution", "duration", "generate_audio", "seed", "upscale_factor", "creativity"] as const) {
     if (sent[key] !== undefined && sent[key] !== "") body[key] = sent[key]
   }
   if (body.aspect_ratio === "auto") delete body.aspect_ratio
-  if (references.length > 0) {
-    body.image_url = references[0]
-    body.input_references = references.map((url) => ({ type: "image_url", image_url: { url } }))
-  }
+  // An older caller hands the pictures as a plain list: the first is the start frame
+  const f: OpenRouterVideoFiles = Array.isArray(files) ? { start: files[0], images: files.slice(1) } : files
+  const frames = [
+    ...(f.start ? [{ type: "image_url", image_url: { url: f.start }, frame_type: "first_frame" }] : []),
+    ...(f.end ? [{ type: "image_url", image_url: { url: f.end }, frame_type: "last_frame" }] : []),
+  ]
+  if (frames.length > 0) body.frame_images = frames
+  const refs = [
+    ...(f.images ?? []).map((url) => ({ type: "image_url", image_url: { url } })),
+    ...(f.videos ?? []).map((url) => ({ type: "video_url", video_url: { url } })),
+    ...(f.audios ?? []).map((url) => ({ type: "audio_url", audio_url: { url } })),
+  ]
+  if (refs.length > 0) body.input_references = refs
   return body
 }
 
-/** POST /api/v1/chat/completions with audio output modality on OpenRouter. */
-export function openrouterAudioBody(record: Pick<ModelRecord, "endpoint" | "params">, prompt: string, params: Params): Record<string, unknown> {
+/** POST /api/v1/chat/completions with audio output category on OpenRouter. */
+export function openrouterAudioBody(record: Pick<ModelRecord, "endpoint" | "params">, prompt: string, params: Params, sound?: { data: string; format: string }): Record<string, unknown> {
   const sent = sendableParams(record, params)
+  // A sound to work on goes with the words as an input_audio part (base64, without the data: prefix)
+  const content = sound ? [{ type: "text", text: prompt }, { type: "input_audio", input_audio: sound }] : prompt
   return {
     model: record.endpoint,
-    messages: [{ role: "user", content: prompt }],
+    messages: [{ role: "user", content }],
     modalities: ["text", "audio"],
     audio: {
       voice: text(sent.voice) ?? "alloy",

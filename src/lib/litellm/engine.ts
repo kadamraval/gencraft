@@ -1,8 +1,8 @@
-import type { ModelPrice, ModelRecord, PriceRule, RegistryModality } from "../registry/types"
-import type { Category } from "../sheet/types"
+import type { ModelPrice, ModelRecord, PriceRule, AppCategory } from "../registry/types"
+import type { ProviderTask } from "../sheet/types"
 
 /**
- * Core LiteLLM Engine: Single source of truth for multi-provider model discovery, modality/category resolution,
+ * Core LiteLLM Engine: Single source of truth for multi-provider model discovery, category/task resolution,
  * capability flags, canonical cross-provider linking, and tiered pricing from `model_prices_and_context_window.json`.
  */
 
@@ -101,10 +101,10 @@ export interface ParsedLiteLLMModel {
   endpoint: string
   /** Canonical provider-independent model slug (e.g. "bytedance/seedance-2.5", "google/veo-3.1", "openai/gpt-5") */
   canonicalId: string
-  /** Studio modality ("text" | "image" | "video" | "audio") */
-  modality: RegistryModality
-  /** Standardized input-to-output category */
-  category: Category
+  /** Studio category ("text" | "image" | "video" | "audio") */
+  category: AppCategory
+  /** Standardized input-to-output provider task */
+  task: ProviderTask
   /** Extracted LiteLLM capabilities and token limits */
   capabilities: LiteLLMCapabilities
   /** Extracted ModelPrice with resolution/audio tier rules */
@@ -147,56 +147,56 @@ export function resolveProviderAndEndpoint(key: string, litellmProvider: string)
   return { provider, endpoint }
 }
 
-/** Maps LiteLLM `mode` + key structure to our studio `RegistryModality` and `Category`. */
-export function resolveModalityAndCategory(key: string, entry: RawLiteLLMEntry): { modality: RegistryModality; category: Category } | null {
+/** Maps LiteLLM `mode` + key structure to our studio category and provider task. */
+export function resolveCategoryAndTask(key: string, entry: RawLiteLLMEntry): { category: AppCategory; task: ProviderTask } | null {
   const mode = (entry.mode ?? "").toLowerCase()
   const lowerKey = key.toLowerCase()
   const endpoints = Array.isArray(entry.supported_endpoints) ? entry.supported_endpoints.map((s) => String(s).toLowerCase()) : []
 
   if (mode === "video_generation" || endpoints.some((e) => e.includes("/videos"))) {
-    if (lowerKey.includes("reference-to-video")) return { modality: "video", category: "reference-to-video" }
-    if (lowerKey.includes("image-to-video") || lowerKey.includes("i2v")) return { modality: "video", category: "image-to-video" }
-    if (lowerKey.includes("video-to-video") || lowerKey.includes("v2v")) return { modality: "video", category: "video-to-video" }
-    return { modality: "video", category: "text-to-video" }
+    if (lowerKey.includes("reference-to-video")) return { category: "video", task: "reference-to-video" }
+    if (lowerKey.includes("image-to-video") || lowerKey.includes("i2v")) return { category: "video", task: "image-to-video" }
+    if (lowerKey.includes("video-to-video") || lowerKey.includes("v2v")) return { category: "video", task: "video-to-video" }
+    return { category: "video", task: "text-to-video" }
   }
 
   if (mode === "image_edit" || (mode === "image_generation" && /(?:\/|-|_)(?:edit|inpaint|outpaint|upscale|restore|relight|remove-bg|background)$/i.test(lowerKey))) {
-    return { modality: "image", category: "image-to-image" }
+    return { category: "image", task: "image-to-image" }
   }
 
   if (mode === "image_generation" || endpoints.some((e) => e.includes("/images/generations"))) {
-    return { modality: "image", category: "text-to-image" }
+    return { category: "image", task: "text-to-image" }
   }
 
   if (mode === "audio_speech" || endpoints.some((e) => e.includes("/audio/speech"))) {
-    return { modality: "audio", category: "text-to-speech" }
+    return { category: "audio", task: "text-to-speech" }
   }
 
   if (mode === "audio_transcription" || endpoints.some((e) => e.includes("/audio/transcriptions"))) {
-    return { modality: "audio", category: "speech-to-text" }
+    return { category: "audio", task: "speech-to-text" }
   }
 
   if (mode === "audio_generation" || (mode.startsWith("audio") && !mode.includes("speech") && !mode.includes("transcription"))) {
-    return { modality: "audio", category: "text-to-audio" }
+    return { category: "audio", task: "text-to-audio" }
   }
 
   if (mode === "chat" || mode === "completion" || mode === "responses") {
-    return { modality: "text", category: "chat" }
+    return { category: "text", task: "chat" }
   }
 
   // Fallback for LiteLLM entries (e.g. Replicate / OpenRouter) that omit `mode`
   if (!mode) {
     if (typeof entry.output_cost_per_video_per_second === "number" || /(?:text-to-video|image-to-video|video-generation|\bveo\b|\bkling\b|\bseedance\b|\bwan-\b|\bhailuo\b|\bsora\b)/i.test(lowerKey)) {
-      return { modality: "video", category: lowerKey.includes("image-to-video") ? "image-to-video" : "text-to-video" }
+      return { category: "video", task: lowerKey.includes("image-to-video") ? "image-to-video" : "text-to-video" }
     }
     if (typeof entry.output_cost_per_image === "number" || /(?:stable-diffusion|\bsdxl\b|\bflux\b|\bimagen\b|\bseedream\b|\bideogram\b|\brecraft\b|\bdall-e\b)/i.test(lowerKey)) {
-      return { modality: "image", category: "text-to-image" }
+      return { category: "image", task: "text-to-image" }
     }
     if (typeof entry.input_cost_per_character === "number" || typeof entry.input_cost_per_audio_per_second === "number" || /(?:\bwhisper\b|\btts\b|text-to-speech|\belevenlabs\b|\blyria\b)/i.test(lowerKey)) {
-      return { modality: "audio", category: lowerKey.includes("whisper") ? "speech-to-text" : "text-to-speech" }
+      return { category: "audio", task: lowerKey.includes("whisper") ? "speech-to-text" : "text-to-speech" }
     }
     if (typeof entry.input_cost_per_token === "number" || typeof entry.output_cost_per_token === "number" || typeof entry.max_tokens === "number" || typeof entry.max_input_tokens === "number") {
-      return { modality: "text", category: "chat" }
+      return { category: "text", task: "chat" }
     }
   }
 
@@ -350,7 +350,7 @@ export function parseLiteLLMDatabase(
     const { provider, endpoint } = resolveProviderAndEndpoint(key, entry.litellm_provider)
     if (onlySupported && !SUPPORTED_STUDIO_PROVIDERS.has(provider)) continue
 
-    const modCat = resolveModalityAndCategory(key, entry)
+    const modCat = resolveCategoryAndTask(key, entry)
     if (!modCat) continue
 
     const capabilities = extractCapabilities(entry)
@@ -361,8 +361,8 @@ export function parseLiteLLMDatabase(
       provider,
       endpoint,
       canonicalId: canonicalModelId(endpoint, provider),
-      modality: modCat.modality,
       category: modCat.category,
+      task: modCat.task,
       capabilities,
       price,
     })
@@ -403,7 +403,7 @@ export function enrichRecordWithLiteLLM(record: ModelRecord, parsed: ParsedLiteL
     price,
     tools: record.tools ?? caps.functionCalling,
     retiresAt: record.retiresAt ?? caps.deprecationDate,
-    task: record.task ?? (parsed.category !== "chat" ? parsed.category : undefined),
+    task: record.task ?? (parsed.task !== "chat" ? parsed.task : undefined),
     summary,
   }
 }

@@ -3,7 +3,7 @@ import { ImagePlus, Loader2, Sparkles, Tag, Type, X } from "lucide-react"
 import { Field, Rows } from "@/components/ui/form-rows"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ModelPickerButton } from "@/components/models/model-picker"
 import { Textarea } from "@/components/ui/textarea"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { describeExample, describerCandidates, fileToDataUrl, videoFrames } from "@/lib/elements/describe"
@@ -12,8 +12,6 @@ import { CATEGORY_LABEL, isReferenceCategory } from "@/lib/elements/types"
 import type { ElementCategory, ElementItem } from "@/lib/elements/types"
 import { isLiveProviderReady, getProviderApiKey } from "@/lib/providers/live-connectors"
 import { useListedModels } from "@/lib/registry/store"
-import { describePrice } from "@/lib/registry/types"
-import { useMoney } from "@/lib/currency/currency"
 import type { SettingsState } from "@/types"
 
 interface Props {
@@ -35,7 +33,6 @@ interface Props {
  */
 export function ElementBuilder({ category, settings, onSaved, onCancel, onOpenSettings, plain }: Props) {
   const listed = useListedModels()
-  const money = useMoney()
   const reference = isReferenceCategory(category)
   const [name, setName] = React.useState("")
   const [files, setFiles] = React.useState<File[]>([])
@@ -200,18 +197,7 @@ export function ElementBuilder({ category, settings, onSaved, onCancel, onOpenSe
                 {candidates.length > 0 ? (
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
-                      <Select value={chosen?.id} onValueChange={setDescriber}>
-                        <SelectTrigger aria-label="Vision model" className="h-8 min-w-0 flex-1 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {candidates.slice(0, 40).map((c) => (
-                            <SelectItem key={c.id} value={c.id} className="text-xs">
-                              {c.name} · {describePrice(c.price, money.format, c.modality)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <ModelPickerButton records={candidates} value={chosen?.id} onChange={setDescriber} label="Vision model" className="flex-1" />
                       <Button type="button" variant="secondary" size="sm" disabled={busy} onClick={() => exampleInput.current?.click()} className="h-8 shrink-0 gap-1.5 text-xs">
                         {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
                         From an example
@@ -325,18 +311,7 @@ export function ElementBuilder({ category, settings, onSaved, onCancel, onOpenSe
           <div className="flex items-center gap-2">
             {candidates.length > 0 ? (
               <>
-                <Select value={chosen?.id} onValueChange={setDescriber}>
-                  <SelectTrigger aria-label="Vision model" className="h-8 min-w-0 flex-1 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {candidates.slice(0, 40).map((c) => (
-                      <SelectItem key={c.id} value={c.id} className="text-xs">
-                        {c.name} · {describePrice(c.price, money.format, c.modality)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <ModelPickerButton records={candidates} value={chosen?.id} onChange={setDescriber} label="Vision model" className="flex-1" />
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button type="button" variant="secondary" size="sm" disabled={busy} onClick={() => exampleInput.current?.click()} className="h-8 gap-1.5 text-xs">

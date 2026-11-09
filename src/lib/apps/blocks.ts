@@ -82,7 +82,7 @@ export function blocksFor(brief: Brief, model: ModelRecord | undefined, pool: Mo
   const brands = inputs.filter((i) => i.type === "brand")
   const step: Suggested["step"] = {}
   const slots = model ? slotsOf(model, pool) : undefined
-  const makesVideo = model?.modality === "video"
+  const makesVideo = model?.category === "video"
 
   if (slots && makesVideo && slots.start && pictures.length > 0) {
     // A video with a start frame: the first picture is where it starts, the second where it ends

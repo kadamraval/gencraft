@@ -1,0 +1,168 @@
+{
+ "version": 1,
+ "tasks": [
+  {
+   "id": "text-to-image",
+   "name": "Text to image",
+   "category": "image",
+   "providerTask": "text-to-image",
+   "takesIn": "text",
+   "mayTake": "reference images",
+   "gives": "image",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library"
+   ]
+  },
+  {
+   "id": "image-to-image",
+   "name": "Image to image",
+   "category": "image",
+   "providerTask": "image-to-image",
+   "takesIn": "image + text",
+   "mayTake": "more images",
+   "gives": "image",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library"
+   ]
+  },
+  {
+   "id": "text-to-video",
+   "name": "Text to video",
+   "category": "video",
+   "providerTask": "text-to-video",
+   "takesIn": "text",
+   "mayTake": "reference",
+   "gives": "video",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library"
+   ]
+  },
+  {
+   "id": "image-to-video",
+   "name": "Image to video",
+   "category": "video",
+   "providerTask": "image-to-video",
+   "takesIn": "image + text",
+   "mayTake": "end frame",
+   "gives": "video",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library"
+   ]
+  },
+  {
+   "id": "reference-to-video",
+   "name": "Reference to video",
+   "category": "video",
+   "providerTask": "reference-to-video",
+   "takesIn": "images/videos + text",
+   "mayTake": null,
+   "gives": "video",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library"
+   ]
+  },
+  {
+   "id": "audio-text-to-speech",
+   "name": "Voiceover (text to speech)",
+   "category": "audio",
+   "providerTask": "text-to-speech",
+   "takesIn": "text",
+   "mayTake": "voice",
+   "gives": "audio",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library",
+    "story",
+    "edit",
+    "audio"
+   ]
+  },
+  {
+   "id": "audio-text-to-music",
+   "name": "Music",
+   "category": "audio",
+   "providerTask": "text-to-audio",
+   "takesIn": "text",
+   "mayTake": "length",
+   "gives": "audio",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library",
+    "story",
+    "edit",
+    "audio"
+   ]
+  },
+  {
+   "id": "audio-text-to-sfx",
+   "name": "Sound effects",
+   "category": "audio",
+   "providerTask": "text-to-audio",
+   "takesIn": "text",
+   "mayTake": "length",
+   "gives": "audio",
+   "alsoKnownAs": [],
+   "usedIn": [
+    "create",
+    "agent",
+    "library",
+    "story",
+    "edit",
+    "audio"
+   ]
+  },
+  {
+   "id": "chat",
+   "name": "Chat",
+   "category": "text",
+   "providerTask": "chat",
+   "takesIn": "text",
+   "mayTake": "images, files",
+   "gives": "text",
+   "alsoKnownAs": [
+    "Language model",
+    "LLM",
+    "Assistant"
+   ],
+   "usedIn": [
+    "create",
+    "agent"
+   ]
+  },
+  {
+   "id": "text-embedding",
+   "name": "Embedding",
+   "category": "embedding",
+   "providerTask": "text-to-embedding",
+   "takesIn": "text",
+   "mayTake": null,
+   "gives": "a list of numbers that stands for the meaning",
+   "alsoKnownAs": [
+    "Embeddings",
+    "Vector"
+   ],
+   "usedIn": [
+    "agent"
+   ]
+  }
+ ]
+}

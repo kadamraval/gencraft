@@ -1,3 +1,4 @@
+import { printScript } from "@/lib/media/export-helpers"
 import * as React from "react"
 import { Redo2, Undo2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -575,6 +576,7 @@ export const ScriptEditor = React.forwardRef<ScriptEditorHandle, Props>(function
         full={full}
         onToggleFull={onToggleFull}
         onDownload={exportScript}
+        onPdf={() => printScript(title, blocks)}
         onUpload={() => importInput.current?.click()}
         onBreak={() => onBreakIntoScenes(scenesOf(blocks))}
         breakNote=""

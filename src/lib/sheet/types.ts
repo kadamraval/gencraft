@@ -3,15 +3,15 @@
  * source that says so (and the record keeps which one), or it is unknown and the sheet says that.
  *
  * Two layers:
- *  - Model: what the maker made (type, category, latest version). The same for every host.
+ *  - Model: what the maker made (category, task, latest version). Words: docs/terms.md. The same for every host.
  *  - Listing: that model on one host (endpoint, price, status). Each host has its own.
  */
 
-/** What comes out */
-export type SheetType = "image" | "video" | "audio" | "text"
+/** Category: what comes out */
+export type SheetCategory = "image" | "video" | "audio" | "text"
 
-/** input to output, the standard task names */
-export type Category =
+/** Provider task: the input-to-output name providers file a model under */
+export type ProviderTask =
   | "text-to-image"
   | "image-to-image"
   | "text-to-video"
@@ -26,13 +26,13 @@ export type Category =
   | "audio-to-video"
   | "chat"
 
-/** What a model is for inside its category. Only the provider's own structure decides it (see jobs.ts). */
-export type Job = "generate" | "edit" | "extend" | "lip-sync" | "motion-transfer" | "upscale" | "remove-background" | "remove-object" | "fill" | "relight" | "restyle" | "reframe" | "colorize" | "restore" | "interpolate" | "isolate-voice" | "noise-reduction" | "separate-audio" | "voice-change" | "dub" | "transcribe" | "other"
+/** Action: what an endpoint does, read only from the provider's own structure (see actions.ts). It maps to a task or a tool. */
+export type Action = "generate" | "edit" | "extend" | "lip-sync" | "motion-transfer" | "upscale" | "remove-background" | "remove-object" | "fill" | "relight" | "restyle" | "reframe" | "colorize" | "restore" | "interpolate" | "isolate-voice" | "noise-reduction" | "separate-audio" | "voice-change" | "dub" | "transcribe" | "caption" | "other"
 
 /** How much a value can be trusted, best first */
 export type Confidence = "run" | "provider" | "maker" | "community" | "scraped"
 
-export type FieldName = "type" | "category" | "job" | "price" | "status" | "name" | "date"
+export type FieldName = "category" | "task" | "action" | "price" | "status" | "name" | "date"
 
 /** A single statement from one source about one listing */
 export interface Fact {
@@ -72,8 +72,8 @@ export interface Listing {
   name?: string
   /** Sources that know this endpoint at all. Empty means no source found it. */
   seenBy: string[]
-  category: Sourced<Category>
-  job: Sourced<Job>
+  task: Sourced<ProviderTask>
+  action: Sourced<Action>
   price: Sourced<PriceValue>
   status: Sourced<"active" | "deprecated">
 }
@@ -83,22 +83,22 @@ export interface SheetModel {
   id: string
   maker: string
   name: string
-  type: SheetType
-  category: Category
-  job: Job
+  category: SheetCategory
+  task: ProviderTask
+  action: Action
   listings: Listing[]
 }
 
 /**
- * The maker list: who, which latest models, and exactly where each lives on each source. Nothing is matched by name. The category and
- * the job are declared here by a person; the sources only confirm or contradict them.
+ * The maker list: who, which latest models, and exactly where each lives on each source. Nothing is matched by name. The category, task and
+ * action are declared here by a person; the sources only confirm or contradict them.
  */
 export interface MakerModel {
   id: string
   name: string
-  type: SheetType
-  category: Category
-  job: Job
+  category: SheetCategory
+  task: ProviderTask
+  action: Action
   /** Keys of the LiteLLM file for this model */
   litellm: string[]
   /** Exact endpoint ids on each host */
@@ -108,7 +108,22 @@ export interface MakerModel {
 export interface Maker {
   id: string
   name: string
+  /** Other names providers use for this maker or its model lines (an account, an endpoint folder), lower case: "kwaivgi", "kling-video" */
+  aliases?: string[]
+  /** Whether this maker's models publish their weights. "mixed": decided per model (leaderboard, the model's own page). */
+  weights?: "open" | "closed" | "mixed"
+  /** The maker's own organisations on Hugging Face, spelled exactly: a model published there has public weights */
+  hub?: string[]
+  /** The maker's model families (Kling, Seedance ...): the name people know, the words providers write it with, the category it makes */
+  families?: MakerFamily[]
   models: MakerModel[]
+}
+
+export interface MakerFamily {
+  name: string
+  /** Lower case, as in endpoints: "kling-video", "kling". A single letter ("h") stands for a version written with it ("h3" is H3). */
+  words: string[]
+  category: "image" | "video" | "audio" | "text" | "embedding"
 }
 
 export interface MakerList {

@@ -1,19 +1,19 @@
-import { jobOf } from "./jobs"
-import type { Category, Fact, FieldName, Listing, MakerList, Precedence, PriceValue, SheetModel, Sourced } from "./types"
+import { actionOf } from "./actions"
+import type { ProviderTask, Fact, FieldName, Listing, MakerList, Precedence, PriceValue, SheetModel, Sourced } from "./types"
 
 /**
  * Builds the sheet from the maker list and the facts of the sources. The maker list is declared by a person: it says what each model is
- * (category, job) and which endpoints are it. The sources do not decide that; they confirm it or contradict it, and a contradiction is kept
+ * (category, task, action) and which endpoints are it. The sources do not decide that; they confirm it or contradict it, and a contradiction is kept
  * on the record as a conflict. Price, status and dates come from the sources, in the order the config gives.
  */
 
-/** What a host may call a category when the maker list says another: fal files reference-to-video under image-to-video or video-to-video */
-const ACCEPTED: Partial<Record<Category, Category[]>> = {
+/** What a host may call a task when the maker list says another: fal files reference-to-video under image-to-video or video-to-video */
+const ACCEPTED: Partial<Record<ProviderTask, ProviderTask[]>> = {
   "reference-to-video": ["reference-to-video", "image-to-video", "video-to-video"],
   "audio-to-video": ["audio-to-video", "image-to-video", "video-to-video"],
 }
 
-const accepts = (declared: Category, said: Category): boolean => (ACCEPTED[declared] ?? [declared]).includes(said)
+const accepts = (declared: ProviderTask, said: ProviderTask): boolean => (ACCEPTED[declared] ?? [declared]).includes(said)
 
 const keyOf = (host: string, endpoint: string) => `${host}|${endpoint}`
 
@@ -73,18 +73,18 @@ export function buildSheet(list: MakerList, facts: Fact[], precedence: Precedenc
         const viaKeys = m.litellm.flatMap((k) => viaIndex.get(k) ?? []).filter((f) => f.host === host && f.endpoint === endpoint)
         const here = [...own, ...viaKeys.filter((f) => !own.includes(f))]
 
-        // Category: declared; what the sources said is a check
-        const said = here.filter((f) => f.field === "category")
-        const conflicts = said.filter((f) => !accepts(m.category, f.value as Category)).map((f) => ({ source: f.source, value: f.value as Category }))
-        const category: Sourced<Category> = { value: m.category, source: "maker-list", confidence: "maker", ...(conflicts.length ? { conflicts } : {}) }
+        // Task: declared; what the sources said is a check
+        const said = here.filter((f) => f.field === "task")
+        const conflicts = said.filter((f) => !accepts(m.task, f.value as ProviderTask)).map((f) => ({ source: f.source, value: f.value as ProviderTask }))
+        const task: Sourced<ProviderTask> = { value: m.task, source: "maker-list", confidence: "maker", ...(conflicts.length ? { conflicts } : {}) }
 
-        // Job: declared; the host's own endpoint name is the check
-        const derived = host === "fal" ? jobOf(endpoint, m.category) : undefined
-        const job: Sourced<typeof m.job> = {
-          value: m.job,
+        // Action: declared; the host's own endpoint name is the check
+        const derived = host === "fal" ? actionOf(endpoint, m.task) : undefined
+        const action: Sourced<typeof m.action> = {
+          value: m.action,
           source: "maker-list",
           confidence: "maker",
-          ...(derived && derived.job !== "other" && derived.job !== m.job ? { conflicts: [{ source: `endpoint name "${derived.by || endpoint}"`, value: derived.job }] } : {}),
+          ...(derived && derived.action !== "other" && derived.action !== m.action ? { conflicts: [{ source: `endpoint name "${derived.by || endpoint}"`, value: derived.action }] } : {}),
         }
 
         const nameFact = pick<string>(here, "name", precedence.name)
@@ -93,13 +93,13 @@ export function buildSheet(list: MakerList, facts: Fact[], precedence: Precedenc
           endpoint,
           name: nameFact.value,
           seenBy: [...new Set(here.map((f) => f.source))],
-          category,
-          job,
+          task,
+          action,
           price: pickPrice(here, precedence.price),
           status: pick(here, "status", precedence.status),
         })
       }
-      models.push({ id: m.id, maker: maker.name, name: m.name, type: m.type, category: m.category, job: m.job, listings })
+      models.push({ id: m.id, maker: maker.name, name: m.name, category: m.category, task: m.task, action: m.action, listings })
     }
   }
   return models

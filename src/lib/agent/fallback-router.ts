@@ -1,9 +1,9 @@
+import { capabilityOfExact } from "@/lib/capability"
 import { SettingsState } from "@/types"
-import { usageLedger, ModalityCategory, ProviderId } from "@/lib/ledger/usage-store"
+import { usageLedger, Category, ProviderId } from "@/lib/ledger/usage-store"
 import type { ActualCost } from "@/lib/ledger/actual-cost"
-import catalogData from "@/lib/providers/model-pricing-catalog.json"
-import { MODEL_CATALOG } from "@/lib/providers/catalog"
 import { getListedModels, getRecord } from "@/lib/registry/store"
+import { readCustomModels } from "@/lib/registry/custom-models"
 import { computeDefaultEnabled, defaultModelFor } from "@/lib/registry/enabled"
 import { sameModelElsewhere, pickCheapestHostForModel } from "@/lib/registry/cross-host"
 import { estimateRun } from "@/lib/registry/price"
@@ -14,7 +14,7 @@ export interface ResolvedModelInfo {
   id: string
   name: string
   provider: ProviderId
-  modality: ModalityCategory
+  category: Category
   costNumeric: number
   costDisplay: string
   specs: string
@@ -25,7 +25,7 @@ export interface ResolvedModelInfo {
 }
 
 export interface FallbackExecutionOptions<T> {
-  modality: ModalityCategory
+  category: Category
   settings: SettingsState
   actionName: string
   /**
@@ -69,198 +69,60 @@ export interface FallbackExecutionResult<T> {
   credits: number
 }
 
-// Default fallback recommendations when none configured in settings
-const DEFAULT_MODALITY_DEFAULTS: Record<
-  ModalityCategory,
-  { primaryId: string; fallbackIds: string[] }
-> = {
-  video: {
-    primaryId: "fal/cinema-studio-4.0",
-    fallbackIds: ["fal/kling-1.5-pro", "replicate/wan-2.1-t2v-14b"],
-  },
-  image: {
-    primaryId: "fal/flux-1-schnell",
-    fallbackIds: ["openai/dall-e-3", "replicate/flux-1-schnell"],
-  },
-  text: {
-    primaryId: "gemini/gemini-2.5-pro",
-    fallbackIds: ["openrouter/claude-3.7-sonnet", "openai/gpt-4o"],
-  },
-  audio: {
-    primaryId: "fal/stable-audio",
-    fallbackIds: ["openai/tts-1-hd"],
-  },
-  embedded: {
-    primaryId: "gemini/gemini-embedding-004",
-    fallbackIds: ["openai/text-embedding-3-large"],
-  },
+const PROVIDERS: ProviderId[] = ["fal", "openai", "gemini", "replicate", "openrouter"]
+
+function infoOf(rec: ModelRecord, isCustom?: boolean): ResolvedModelInfo {
+  const est = estimateRun(rec, {})
+  return {
+    id: rec.id,
+    name: rec.name,
+    provider: PROVIDERS.includes(rec.provider as ProviderId) ? (rec.provider as ProviderId) : "fal",
+    category: rec.category,
+    // No price known means none is made up: the ledger records the run's own estimate or what the provider reports
+    costNumeric: est.usd ?? 0,
+    costDisplay: est.usd === null && est.display === "—" ? "price unknown" : est.display,
+    specs: rec.endpoint,
+    latency: "—",
+    description: rec.description,
+    isCustom,
+  }
 }
 
 /**
- * Resolves any model identifier against the 42-model pricing catalog,
- * local custom models, and system catalogs with clean normalization.
+ * The model behind an id, as the registry knows it: the standard database, the providers' live lists, and the models the person added.
+ * An id none of them knows keeps its name and provider and carries no price.
  */
 export function resolveModelInfo(
   modelId: string,
-  targetModality: ModalityCategory = "video"
+  targetCategory: Category = "video"
 ): ResolvedModelInfo {
-  const cleanId = (modelId || "").toLowerCase().trim()
+  const record = getRecord(modelId)
+  const custom = readCustomModels().find((m) => m.id === modelId)
+  if (record) return infoOf(record, Boolean(custom))
+  if (custom) return infoOf(custom, true)
 
-  // 0. Live registry record (fal / OpenRouter models fetched from the provider)
-  const liveRecord = getRecord(modelId)
-  if (liveRecord && liveRecord.endpoint !== liveRecord.id) {
-    const prov: ProviderId = ["fal", "openai", "gemini", "replicate", "openrouter"].includes(liveRecord.provider)
-      ? (liveRecord.provider as ProviderId)
-      : "fal"
-    const mod: ModalityCategory = liveRecord.modality
-    return {
-      id: liveRecord.id,
-      name: liveRecord.name,
-      provider: prov,
-      modality: mod,
-      costNumeric: estimateRun(liveRecord, {}).usd ?? 0.1,
-      costDisplay: estimateRun(liveRecord, {}).display,
-      specs: liveRecord.endpoint,
-      latency: "—",
-      description: liveRecord.description,
-    }
-  }
-
-  // 1. Check custom models saved in localStorage if available
-  let customModels: ResolvedModelInfo[] = []
-  if (typeof window !== "undefined") {
-    try {
-      const saved = localStorage.getItem("gencraft_custom_models")
-      if (saved) customModels = JSON.parse(saved)
-    } catch {}
-  }
-
-  const customMatch = customModels.find(
-    (m) =>
-      m.id.toLowerCase() === cleanId ||
-      m.name.toLowerCase() === cleanId
-  )
-  if (customMatch) {
-    return {
-      ...customMatch,
-      isCustom: true,
-    }
-  }
-
-  // 2. Check 42-model pricing catalog
-  const catalogList = catalogData.models as unknown as Array<{
-    id: string
-    name: string
-    provider: string
-    modality: string
-    costNumeric: number
-    costDisplay: string
-    specs: string
-    latency: string
-    badge?: string
-    description?: string
-  }>
-
-  const catalogMatch = catalogList.find((m) => {
-    const cid = m.id.toLowerCase()
-    const cname = m.name.toLowerCase()
-    return (
-      cid === cleanId ||
-      cid.endsWith("/" + cleanId) ||
-      cleanId.endsWith("/" + cid) ||
-      cid.replace(/[/_-]/g, "") === cleanId.replace(/[/_-]/g, "") ||
-      cname === cleanId
-    )
-  })
-
-  if (catalogMatch) {
-    let prov: ProviderId = "fal"
-    if (["fal", "openai", "gemini", "replicate", "openrouter"].includes(catalogMatch.provider)) {
-      prov = catalogMatch.provider as ProviderId
-    }
-
-    let mod: ModalityCategory = targetModality
-    if (["text", "image", "video", "audio", "embedded"].includes(catalogMatch.modality)) {
-      mod = catalogMatch.modality as ModalityCategory
-    }
-
-    return {
-      id: catalogMatch.id,
-      name: catalogMatch.name,
-      provider: prov,
-      modality: mod,
-      costNumeric: catalogMatch.costNumeric || 0.1,
-      costDisplay: catalogMatch.costDisplay || "$0.10",
-      specs: catalogMatch.specs || "1080p · Production GPU",
-      latency: catalogMatch.latency || "15s",
-      badge: catalogMatch.badge,
-      description: catalogMatch.description,
-    }
-  }
-
-  // 3. Check legacy MODEL_CATALOG
-  const legacyMatch = MODEL_CATALOG.find((m) => {
-    const lid = m.id.toLowerCase()
-    return (
-      lid === cleanId ||
-      lid.endsWith("/" + cleanId) ||
-      cleanId.endsWith("/" + lid) ||
-      m.name.toLowerCase() === cleanId
-    )
-  })
-
-  if (legacyMatch) {
-    let prov: ProviderId = "fal"
-    if (["fal", "openai", "gemini", "replicate", "openrouter"].includes(legacyMatch.provider)) {
-      prov = legacyMatch.provider as ProviderId
-    }
-
-    return {
-      id: legacyMatch.id,
-      name: legacyMatch.name,
-      provider: prov,
-      modality: targetModality,
-      costNumeric: legacyMatch.costNumeric || 0.1,
-      costDisplay: legacyMatch.costPerRun || "$0.10",
-      specs: `${legacyMatch.resolution} · ${legacyMatch.latency}`,
-      latency: legacyMatch.latency || "18s",
-      badge: legacyMatch.badge,
-      description: legacyMatch.description,
-    }
-  }
-
-  // 4. Fallback safe synthesizer for custom / unspecified model string
-  const parts = cleanId.split("/")
-  const derivedProvider = (parts[0] as ProviderId) || "fal"
-  const rawName = parts.pop() || cleanId
-  const formattedName = rawName
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ")
-
+  const parts = (modelId || "").trim().split("/")
+  const provider = parts[0] as ProviderId
   return {
-    id: modelId || `custom-${Date.now()}`,
-    name: formattedName || "Custom Model",
-    provider: ["fal", "openai", "gemini", "replicate", "openrouter"].includes(derivedProvider)
-      ? derivedProvider
-      : "fal",
-    modality: targetModality,
-    costNumeric: 0.1,
-    costDisplay: "$0.10",
-    specs: "BYOK Custom Direct",
-    latency: "15s",
-    badge: "Direct",
-    description: "User-defined direct model endpoint.",
+    id: modelId,
+    name: parts[parts.length - 1] || modelId,
+    provider: PROVIDERS.includes(provider) ? provider : "fal",
+    category: targetCategory,
+    costNumeric: 0,
+    costDisplay: "price unknown",
+    specs: modelId,
+    latency: "—",
+    description: "Not in the model database or any provider's list.",
   }
 }
 
 /**
  * LiteLLM-Style Multi-Provider & Single-Provider Router Chain Builder:
- * - Single Key Mode (1 provider connected): builds intra-provider fallback chain across same-modality models.
+ * - Single Key Mode (1 provider connected): builds intra-provider fallback chain across same-category models.
  * - Multi-Key Mode (2–5 providers connected):
  *   1. If `strategy === "cost-based-routing"`, promotes the cheapest cross-host equivalent of the same model to primary.
  *   2. Places same-model cross-provider equivalents (`sameModelElsewhere`) sorted by lowest `estimateRun` cost first.
- *   3. Appends best cross-provider modality fallbacks, then intra-provider fallbacks.
+ *   3. Appends best cross-provider category fallbacks, then intra-provider fallbacks.
  */
 export function buildLiteLLMRouterChain(
   primaryRecord: ModelRecord,
@@ -283,18 +145,18 @@ export function buildLiteLLMRouterChain(
     .slice()
     .sort((a, b) => (estimateRun(a, params).usd ?? 1e9) - (estimateRun(b, params).usd ?? 1e9))
 
-  // 2. Best default-enabled models on other connected providers for the same modality
+  // 2. Best default-enabled models on other connected providers for the same category
   const byId = new Map(usablePool.map((r) => [r.id, r]))
   const seenProviders = new Set<string>([
     effectivePrimary.provider,
     ...crossHostEquivalents.map((r) => r.provider),
   ])
-  const crossProviderModality: ModelRecord[] = []
+  const crossProviderCategory: ModelRecord[] = []
   for (const id of computeDefaultEnabled(usablePool)) {
     const rec = byId.get(id)
-    if (!rec || rec.modality !== effectivePrimary.modality || seenProviders.has(rec.provider)) continue
+    if (!rec || rec.category !== effectivePrimary.category || seenProviders.has(rec.provider)) continue
     seenProviders.add(rec.provider)
-    crossProviderModality.push(rec)
+    crossProviderCategory.push(rec)
   }
 
   // 3. Intra-provider fallbacks (essential when user only connects 1 provider key)
@@ -303,7 +165,7 @@ export function buildLiteLLMRouterChain(
     .filter(
       (rec): rec is ModelRecord =>
         Boolean(rec) &&
-        rec!.modality === effectivePrimary.modality &&
+        rec!.category === effectivePrimary.category &&
         rec!.provider === effectivePrimary.provider &&
         rec!.id !== effectivePrimary.id
     )
@@ -314,7 +176,7 @@ export function buildLiteLLMRouterChain(
   for (const candidate of [
     effectivePrimary,
     ...crossHostEquivalents,
-    ...crossProviderModality,
+    ...crossProviderCategory,
     ...intraProviderFallbacks,
   ]) {
     if (seenIds.has(candidate.id)) continue
@@ -325,11 +187,11 @@ export function buildLiteLLMRouterChain(
 }
 
 /**
- * Resolves the ordered fallback chain for a given modality using user studio settings.
+ * Resolves the ordered fallback chain for a given category using user studio settings.
  * Returns { primary, chain, autoLock }
  */
-export function resolveModalityChain(
-  modality: ModalityCategory,
+export function resolveCategoryChain(
+  category: Category,
   settings: SettingsState,
   primaryOverride?: string
 ): {
@@ -337,11 +199,10 @@ export function resolveModalityChain(
   chain: ResolvedModelInfo[]
   autoLock: boolean
 } {
-  const defaults = DEFAULT_MODALITY_DEFAULTS[modality]
 
   // Retrieve primary ID from settings
   let configuredPrimaryId: string | undefined
-  switch (modality) {
+  switch (category) {
     case "video":
       configuredPrimaryId = settings.aiEngine.activeVideoModelId
       break
@@ -354,7 +215,7 @@ export function resolveModalityChain(
     case "audio":
       configuredPrimaryId = settings.aiEngine.activeAudioModelId
       break
-    case "embedded":
+    case "embedding":
       configuredPrimaryId = settings.aiEngine.activeEmbeddingModelId
       break
   }
@@ -364,41 +225,42 @@ export function resolveModalityChain(
   // Only models a provider key can run: a fallback on a provider without a key could never succeed
   const listedNow = getListedModels()
   const usable = (id: string | undefined): id is string => Boolean(id) && listedNow.some((r) => r.id === id)
-  const registryModality = modality === "embedded" ? undefined : modality
-  const registryDefault = registryModality ? defaultModelFor(registryModality, getListedModels())?.id : undefined
+  const registryCategory = category === "embedding" ? undefined : category
+  // No fixed model ids: the default is the best model the person has whose capability fits (an embedding model for embeddings)
+  const registryDefault = registryCategory ? defaultModelFor(registryCategory, listedNow)?.id : listedNow.find((r) => capabilityOfExact(r).does.includes("embed"))?.id
   // No usable model at all: say so plainly instead of trying a stand-in that has no key
-  if (registryModality && !usable(primaryOverride) && !usable(configuredPrimaryId) && !registryDefault) {
-    const what = registryModality === "text" ? "chat" : registryModality
+  if (registryCategory && !usable(primaryOverride) && !usable(configuredPrimaryId) && !registryDefault) {
+    const what = registryCategory === "text" ? "chat" : registryCategory
     throw new Error(`No ${what} model is available. Add a provider key and switch on a ${what} model in Settings.`)
   }
-  const primaryModelId = (usable(primaryOverride) && primaryOverride) || (usable(configuredPrimaryId) && configuredPrimaryId) || registryDefault || primaryOverride || configuredPrimaryId || defaults.primaryId
-  const primary = resolveModelInfo(primaryModelId, modality)
+  const primaryModelId = (usable(primaryOverride) && primaryOverride) || (usable(configuredPrimaryId) && configuredPrimaryId) || registryDefault || primaryOverride || configuredPrimaryId || ""
+  if (!primaryModelId) throw new Error(`No ${category} model is available. Add a provider key in Settings.`)
+  const primary = resolveModelInfo(primaryModelId, category)
 
-  // Retrieve configured fallbacks for this modality
-  const configuredFallbacks = settings.aiEngine.fallbackModels?.[modality] || []
+  // Retrieve configured fallbacks for this category
+  const configuredFallbacks = settings.aiEngine.fallbackModels?.[category] || []
   const usableFallbacks = configuredFallbacks.filter(usable)
   // Nothing set by the person: use LiteLLM router chain (same-model cross-host equivalents sorted by lowest price first,
-  // then cross-provider modality fallbacks, then intra-provider fallbacks when only 1 key is connected)
+  // then cross-provider category fallbacks, then intra-provider fallbacks when only 1 key is connected)
   const primaryRecord = getRecord(primaryModelId)
-  const autoFallbacks = registryModality
+  const autoFallbacks = registryCategory
     ? (() => {
-        if (primaryRecord && primaryRecord.endpoint !== primaryRecord.id) {
+        if (primaryRecord) {
           return buildLiteLLMRouterChain(primaryRecord, listedNow)
             .slice(1, 5)
             .map((r) => r.id)
         }
-        const primaryProvider = primaryRecord?.provider
         const byId = new Map(listedNow.map((r) => [r.id, r]))
         const seen = new Set<string>()
         return computeDefaultEnabled(listedNow)
           .map((id) => byId.get(id))
-          .filter((r): r is NonNullable<typeof r> => Boolean(r) && r!.modality === registryModality && r!.provider !== primaryProvider)
+          .filter((r): r is NonNullable<typeof r> => Boolean(r) && r!.category === registryCategory)
           .filter((r) => (seen.has(r.provider) ? false : (seen.add(r.provider), true)))
           .slice(0, 3)
           .map((r) => r.id)
       })()
     : []
-  const fallbackList = usableFallbacks.length > 0 ? usableFallbacks : configuredFallbacks.length > 0 ? [] : [...autoFallbacks, ...defaults.fallbackIds.filter(usable)]
+  const fallbackList = usableFallbacks.length > 0 ? usableFallbacks : configuredFallbacks.length > 0 ? [] : autoFallbacks
 
   // De-duplicate: Ensure primary model does not duplicate in the fallback sequence
   const uniqueFallbackIds = fallbackList.filter(
@@ -410,7 +272,7 @@ export function resolveModalityChain(
 
   const chain: ResolvedModelInfo[] = [
     primary,
-    ...uniqueFallbackIds.map((fid) => resolveModelInfo(fid, modality)),
+    ...uniqueFallbackIds.map((fid) => resolveModelInfo(fid, category)),
   ]
 
   const autoLock = settings.aiEngine.autoLockModels ?? true
@@ -428,7 +290,7 @@ export async function executeWithFallback<T>(
   options: FallbackExecutionOptions<T>
 ): Promise<FallbackExecutionResult<T>> {
   const {
-    modality,
+    category,
     settings,
     actionName,
     execute,
@@ -445,7 +307,7 @@ export async function executeWithFallback<T>(
     onDiagnosticLog?.(msg)
   }
 
-  const { primary, chain, autoLock } = resolveModalityChain(modality, settings, primaryModelId)
+  const { primary, chain, autoLock } = resolveCategoryChain(category, settings, primaryModelId)
 
   const fallbackSummary =
     chain.length > 1
@@ -456,7 +318,7 @@ export async function executeWithFallback<T>(
       : "None configured"
 
   pushLog(
-    `[Router] Modality: ${modality.toUpperCase()} | Primary: ${primary.name} (${primary.provider})`
+    `[Router] Category: ${category.toUpperCase()} | Primary: ${primary.name} (${primary.provider})`
   )
   pushLog(`[Router] Failover Sequence: Primary (${primary.name}) → ${fallbackSummary}`)
 
@@ -500,7 +362,7 @@ export async function executeWithFallback<T>(
       // Deduct from Wholesale Usage Ledger
       // The price of this run with its own settings, for the model that actually ran; the default price only when they are unknown
       const ran = cost ? getRecord(currentModel.id) : undefined
-      const estimate = ran && ran.endpoint !== ran.id ? estimateRun(ran, cost!.values, cost!.context ?? {}) : undefined
+      const estimate = ran ? estimateRun(ran, cost!.values, cost!.context ?? {}) : undefined
       const priced = estimate ? estimate.usd : null
       const guessed = priced !== null ? Math.round(priced * 10000) / 10000 : Math.round(currentModel.costNumeric * Math.max(0.001, costMultiplier) * 10000) / 10000
       // What the provider reported, when it does, is the cost; otherwise the estimate
@@ -509,10 +371,10 @@ export async function executeWithFallback<T>(
       const credits = Math.round(costUsd * 25 * 100) / 100
 
       // Text is counted where its tokens are known (lib/ledger/text-usage.ts), never here, so it is not counted twice or at a flat price
-      if (modality !== "text") usageLedger.addRecord({
+      if (category !== "text") usageLedger.addRecord({
         modelName: currentModel.name,
         modelId: currentModel.id,
-        category: modality,
+        category: category,
         provider: currentModel.provider,
         action: "Deducted",
         costUsd,
@@ -568,11 +430,11 @@ export async function executeWithFallback<T>(
 
   // All models in chain failed
   pushLog(
-    `❌ [Router Exhaustion] All ${chain.length} models in the fallback chain for ${modality} failed.`
+    `❌ [Router Exhaustion] All ${chain.length} models in the fallback chain for ${category} failed.`
   )
 
   throw new Error(
-    `Fallback sequence exhausted for ${modality}. Attempted ${chain.length} models (${chain
+    `Fallback sequence exhausted for ${category}. Attempted ${chain.length} models (${chain
       .map((m) => m.name)
       .join(", ")}): ${lastError?.message || "Execution failed"}`
   )

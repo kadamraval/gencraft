@@ -30,7 +30,7 @@ const needsFile: Record<string, number> = {}
 const examples: string[] = []
 
 for (const r of models) {
-  const key = `${r.provider}/${r.modality}`
+  const key = `${r.provider}/${r.category}`
   const s = stats.get(key) ?? { total: 0, ok: 0, noSpec: 0, blocked: 0 }
   s.total++
   stats.set(key, s)

@@ -76,7 +76,7 @@ const TIER_WORD = { official: "The maker's own page", host: "The provider's list
 /** What the maker says about the model that a provider's list cannot: price for a standard run, rules, how to prompt it, where each fact came from. */
 function MakerNotes({ model }: { model: ModelRecord }) {
   const profile = profileFor(model)
-  const run = model.modality === "text" ? undefined : standardRun(model)
+  const run = model.category === "text" ? undefined : standardRun(model)
   const rules = profile?.rules.map((r) => r.reason).filter((r, i, all) => all.indexOf(r) === i) ?? []
   const limits = profile?.inputs
     ? [
@@ -145,64 +145,77 @@ function limit(word: string, l?: { max: number; maxSeconds?: number; note?: stri
   return `${l.max} ${word}${l.note ? ` (${l.note})` : l.maxSeconds ? ` (${l.maxSeconds} s each)` : ""}`
 }
 
-export function ModelParamsDialog({ model, onClose }: { model: ModelRecord | null; onClose: () => void }) {
-  if (!model) return null
+/** The line under a model's name: settings, file inputs, and how many are untested. */
+export function paramsSummary(model: ModelRecord): string {
   const entries = Object.entries(model.params.properties)
-  const files = entries.filter(([, p]) => p.format)
+  const files = entries.filter(([, p]) => p.format).length
   const settings = entries.filter(([, p]) => !p.format)
   const provider = PROVIDERS.find((p) => p.id === model.provider)?.label ?? model.provider
   const untested = settings.filter(([, p]) => p.untested).length
+  return `${settings.length} settings and ${files} file inputs on ${provider}${untested > 0 ? `, ${untested} untested` : ""}.`
+}
 
+/** Maker notes, file inputs and every setting, grouped as the composer offers them. */
+export function ModelParamsBody({ model }: { model: ModelRecord }) {
+  const entries = Object.entries(model.params.properties)
+  const files = entries.filter(([, p]) => p.format)
+  const settings = entries.filter(([, p]) => !p.format)
+  return (
+    <>
+      <MakerNotes model={model} />
+      {files.length > 0 && (
+        <section>
+          <h4 className="text-xs font-semibold text-foreground">Files it takes</h4>
+          <div className="divide-y divide-border/40">
+            {files.map(([key, p]) => (
+              <div key={key} className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)] items-baseline gap-3 py-1.5">
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-medium text-foreground">{ROLE[p.slot?.role ?? ""] ?? label(key, p)}</p>
+                  <p className="truncate font-mono text-xs text-muted-foreground">{key}</p>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {p.format}
+                  {p.slot ? (p.slot.list ? `, up to ${p.slot.max ?? "an unstated number"}` : ", one") : ""}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+      {GROUPS.map((g) => {
+        const rows = settings.filter(([, p]) => g.tier.includes(p.tier ?? "none"))
+        if (rows.length === 0) return null
+        return (
+          <section key={g.title}>
+            <h4 className="flex items-baseline gap-2 text-xs font-semibold text-foreground">
+              {g.title}
+              <span className="font-normal text-muted-foreground">{g.hint}</span>
+            </h4>
+            <div className="divide-y divide-border/40">
+              {rows.map(([key, p]) => (
+                <Row key={key} name={key} p={p} />
+              ))}
+            </div>
+          </section>
+        )
+      })}
+      {settings.length === 0 && <p className="text-xs text-muted-foreground">This provider lists no settings for the model. It runs with a prompt.</p>}
+    </>
+  )
+}
+
+export function ModelParamsDialog({ model, onClose }: { model: ModelRecord | null; onClose: () => void }) {
+  if (!model) return null
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-xl gap-3">
         <DialogHeader>
           <DialogTitle className="text-base">{model.name} settings</DialogTitle>
-          <DialogDescription>
-            {settings.length} settings and {files.length} file inputs on {provider}
-            {untested > 0 ? `, ${untested} untested` : ""}.
-          </DialogDescription>
+          <DialogDescription>{paramsSummary(model)}</DialogDescription>
         </DialogHeader>
 
         <div className="max-h-96 space-y-4 overflow-y-auto pr-1">
-          <MakerNotes model={model} />
-          {files.length > 0 && (
-            <section>
-              <h4 className="text-xs font-semibold text-foreground">Files it takes</h4>
-              <div className="divide-y divide-border/40">
-                {files.map(([key, p]) => (
-                  <div key={key} className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)] items-baseline gap-3 py-1.5">
-                    <div className="min-w-0">
-                      <p className="truncate text-xs font-medium text-foreground">{ROLE[p.slot?.role ?? ""] ?? label(key, p)}</p>
-                      <p className="truncate font-mono text-xs text-muted-foreground">{key}</p>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {p.format}
-                      {p.slot ? (p.slot.list ? `, up to ${p.slot.max ?? "an unstated number"}` : ", one") : ""}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-          {GROUPS.map((g) => {
-            const rows = settings.filter(([, p]) => g.tier.includes(p.tier ?? "none"))
-            if (rows.length === 0) return null
-            return (
-              <section key={g.title}>
-                <h4 className="flex items-baseline gap-2 text-xs font-semibold text-foreground">
-                  {g.title}
-                  <span className="font-normal text-muted-foreground">{g.hint}</span>
-                </h4>
-                <div className="divide-y divide-border/40">
-                  {rows.map(([key, p]) => (
-                    <Row key={key} name={key} p={p} />
-                  ))}
-                </div>
-              </section>
-            )
-          })}
-          {settings.length === 0 && <p className="text-xs text-muted-foreground">This provider lists no settings for the model. It runs with a prompt.</p>}
+          <ModelParamsBody model={model} />
         </div>
       </DialogContent>
     </Dialog>

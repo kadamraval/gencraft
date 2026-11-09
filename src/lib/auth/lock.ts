@@ -20,6 +20,8 @@ interface Stored {
   salt: string
   hash: string
   iterations: number
+  /** The secret is a 6-digit PIN: the lock screen shows six boxes instead of a text field */
+  pin?: boolean
 }
 
 const toHex = (bytes: Uint8Array) => Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("")
@@ -81,10 +83,10 @@ export function hasPassword(): boolean {
   return readStored() !== null || legacyPassword() !== null
 }
 
-async function store(password: string): Promise<void> {
+async function store(password: string, pin = false): Promise<void> {
   const salt = crypto.getRandomValues(new Uint8Array(new ArrayBuffer(16)))
   const hash = await derive(password, salt, ITERATIONS)
-  localStorage.setItem(KEY, JSON.stringify({ salt: toHex(salt), hash, iterations: ITERATIONS } satisfies Stored))
+  localStorage.setItem(KEY, JSON.stringify({ salt: toHex(salt), hash, iterations: ITERATIONS, ...(pin ? { pin: true } : {}) } satisfies Stored))
   forgetLegacy()
 }
 
@@ -106,6 +108,19 @@ export async function checkPassword(password: string): Promise<boolean> {
 export async function setPassword(next: string, current?: string): Promise<"ok" | "wrong-current"> {
   if (hasPassword() && !(await checkPassword(current ?? ""))) return "wrong-current"
   await store(next)
+  return "ok"
+}
+
+/** True when the lock is a 6-digit PIN (the lock screen then shows six boxes) */
+export function isPinLock(): boolean {
+  return readStored()?.pin === true
+}
+
+/** Sets or changes the PIN: exactly six digits. When a lock is already set, the current one has to be right. */
+export async function setPin(next: string, current?: string): Promise<"ok" | "wrong-current" | "not-a-pin"> {
+  if (!/^\d{6}$/.test(next)) return "not-a-pin"
+  if (hasPassword() && !(await checkPassword(current ?? ""))) return "wrong-current"
+  await store(next, true)
   return "ok"
 }
 

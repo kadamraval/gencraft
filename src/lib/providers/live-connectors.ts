@@ -8,7 +8,7 @@ import { buildInput } from "@/lib/registry/request"
 import { filesFrom, shapeRun } from "@/lib/models/apply"
 import { fieldsNamedIn, recordParamChecks, untestedSent } from "@/lib/registry/param-checks"
 import { dropRejectedParamsOnError, translateParamsToModelSchema } from "@/lib/litellm/params"
-import { ProviderId, ModalityCategory } from "@/lib/ledger/usage-store"
+import { ProviderId, Category } from "@/lib/ledger/usage-store"
 import { ResolvedModelInfo } from "@/lib/agent/fallback-router"
 import { actualCostOf } from "@/lib/ledger/actual-cost"
 import type { ActualCost } from "@/lib/ledger/actual-cost"
@@ -31,7 +31,7 @@ export interface LiveProviderRequestOptions {
   /** Called when the provider says what the run really cost */
   onActualCost?: (cost: ActualCost) => void
   model: ResolvedModelInfo
-  modality: ModalityCategory
+  category: Category
   prompt: string
   settings: SettingsState
   onLog?: (log: string) => void
@@ -57,7 +57,7 @@ export interface LiveProviderRequestOptions {
   /** Model-schema parameters chosen in the composer (aspect_ratio, duration, ...) */
   params?: Record<string, unknown>
   /** Reference files chosen in the composer: images in order, the same images grouped, a video or audio the model works on */
-  references?: { images: string[]; groups?: string[][]; sourceVideoUrl?: string; sourceAudioUrl?: string }
+  references?: { images: string[]; groups?: string[][]; sourceVideoUrl?: string; sourceAudioUrl?: string; maskUrl?: string }
 }
 
 export interface LiveExecutionResult {
@@ -363,7 +363,7 @@ export async function dispatchLiveProviderRequest(
 ): Promise<LiveExecutionResult> {
   const {
     model,
-    modality,
+    category,
     prompt,
     settings,
     onLog,
@@ -385,7 +385,7 @@ export async function dispatchLiveProviderRequest(
 
     try {
       const controller = new AbortController()
-      const timeoutSec = modality === "video" ? 60 : 25
+      const timeoutSec = category === "video" ? 60 : 25
       const timer = setTimeout(() => controller.abort(), timeoutSec * 1000)
 
       // 0. Registry models on OpenAI, OpenRouter and Gemini run through their own connectors,
@@ -427,7 +427,7 @@ export async function dispatchLiveProviderRequest(
 
       // 1. Google Gemini Live (Text / Multimodal Reasoning)
       if (provider === "gemini") {
-        if (modality === "video") {
+        if (category === "video") {
           clearTimeout(timer)
           throw new LiveProviderAPIError("gemini", "Gemini video generation is not available in this build. Use a video model from fal or Replicate.")
         } else {
@@ -532,7 +532,7 @@ export async function dispatchLiveProviderRequest(
 
       // 3. OpenAI Live (GPT-4o, DALL-E 3, TTS-1)
       if (provider === "openai") {
-        if (modality === "image") {
+        if (category === "image") {
           const res = await fetch("https://api.openai.com/v1/images/generations", {
             method: "POST",
             headers: {
@@ -640,6 +640,7 @@ export async function dispatchLiveProviderRequest(
             groups,
             sourceVideo: await inline(options.references?.sourceVideoUrl ?? videoParams?.referenceVideoUrl),
             sourceAudio: await inline(options.references?.sourceAudioUrl),
+            mask: await inline(options.references?.maskUrl),
             videos: options.references?.sourceVideoUrl ? [(await inline(options.references.sourceVideoUrl))!] : undefined,
             audios: options.references?.sourceAudioUrl ? [(await inline(options.references.sourceAudioUrl))!] : undefined,
           })
@@ -679,8 +680,8 @@ export async function dispatchLiveProviderRequest(
           }
         }
         let endpoint = "https://queue.fal.run/fal-ai/flux/schnell"
-        if (modality === "video") endpoint = "https://queue.fal.run/fal-ai/kling-video/v1.5/pro/text-to-video"
-        if (modality === "audio") endpoint = "https://queue.fal.run/fal-ai/stable-audio"
+        if (category === "video") endpoint = "https://queue.fal.run/fal-ai/kling-video/v1.5/pro/text-to-video"
+        if (category === "audio") endpoint = "https://queue.fal.run/fal-ai/stable-audio"
 
         const body: Record<string, unknown> = { prompt }
         // Default OFF for Safety Checker: bypassSafetyChecker defaults to true (uncensored)
@@ -700,14 +701,14 @@ export async function dispatchLiveProviderRequest(
           body.video_url = videoParams.referenceVideoUrl
         }
 
-        if (modality === "image") {
+        if (category === "image") {
           body.image_size = "landscape_16_9"
           body.num_images = imageParams?.batchCount || 1
           if (imageParams?.referenceImageUrl) {
             body.image_url = imageParams.referenceImageUrl
           }
         }
-        if (modality === "video") {
+        if (category === "video") {
           body.duration = "10"
           body.aspect_ratio = videoParams?.aspectRatio || "16:9"
         }
@@ -769,7 +770,7 @@ export async function dispatchLiveProviderRequest(
           inputBody.video = videoParams.referenceVideoUrl
         }
 
-        if (modality === "video") {
+        if (category === "video") {
           endpoint = "https://api.replicate.com/v1/models/wan-video/wan-2.1-1.3b/predictions"
           if (typeof window !== "undefined") {
             endpoint = "/api/proxy/replicate/v1/models/wan-video/wan-2.1-1.3b/predictions"
@@ -777,7 +778,7 @@ export async function dispatchLiveProviderRequest(
           inputBody.num_frames = 81
           inputBody.aspect_ratio = videoParams?.aspectRatio || "16:9"
           onLog?.(`[Connector] Dispatching Replicate Wan 2.1 Video prediction... [Safety Filter: ${bypassSafety ? "Bypassed" : "Active"}]`)
-        } else if (modality === "image") {
+        } else if (category === "image") {
           endpoint = "https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions"
           if (typeof window !== "undefined") {
             endpoint = "/api/proxy/replicate/v1/models/black-forest-labs/flux-schnell/predictions"
@@ -847,18 +848,18 @@ export async function dispatchLiveProviderRequest(
         }
 
         const latencyMs = Math.round(performance.now() - startTime)
-        onLog?.(`✓ [Connector] Live Replicate ${modality} completed (${latencyMs}ms)`)
+        onLog?.(`✓ [Connector] Live Replicate ${category} completed (${latencyMs}ms)`)
 
         let videoUrl: string | undefined
         let imageUrls: string[] | undefined
 
-        if (modality === "video") {
+        if (category === "video") {
           videoUrl = Array.isArray(data.output)
             ? data.output[0]
             : typeof data.output === "string"
             ? data.output
             : undefined
-        } else if (modality === "image") {
+        } else if (category === "image") {
           imageUrls = Array.isArray(data.output)
             ? data.output
             : typeof data.output === "string"

@@ -1,3 +1,5 @@
+import { useMeaningSearch } from "@/lib/library/meaning-search"
+import type { SettingsState } from "@/types"
 import { applyFilters } from "@/lib/library/filters"
 import { useDownloaded, useLikes } from "@/lib/library/library-store"
 import * as React from "react"
@@ -37,6 +39,8 @@ interface MediaVaultViewProps {
   /** What a switched-on model can do with an opened video, and starting one */
   editActions?: EditAction[]
   onEdit?: (item: DetailMediaItem, action: EditAction) => void
+  /** For search by meaning (an embedding model on a provider with a key) */
+  settings?: SettingsState
 }
 
 export function MediaVaultView({
@@ -56,6 +60,7 @@ export function MediaVaultView({
   onReuse,
   editActions,
   onEdit,
+  settings,
 }: MediaVaultViewProps) {
   // Inspiration has no source yet, so it starts empty. The Library shows everything that was made or uploaded.
   const items = React.useMemo<DetailMediaItem[]>(() => (type === "library" ? studioAssets.map(toDetailItem) : []), [type, studioAssets])
@@ -81,10 +86,17 @@ export function MediaVaultView({
 
   const liked = useLikes()
   const downloaded = useDownloaded()
-  const displayedItems = React.useMemo(
-    () => applyFilters(rawItems, { search: searchQuery, type: typeFilter, model: modelFilter, status: statusFilter, hideFailed, activity: activityFilter, date: dateRangeFilter }, { liked, downloaded }),
-    [rawItems, searchQuery, typeFilter, modelFilter, statusFilter, hideFailed, activityFilter, dateRangeFilter, liked, downloaded],
-  )
+  // Search by meaning when an embedding model is available: files whose words match come first, then the ones that mean the same
+  const meaning = useMeaningSearch(rawItems, searchQuery, settings)
+  const displayedItems = React.useMemo(() => {
+    const filters = { search: searchQuery, type: typeFilter, model: modelFilter, status: statusFilter, hideFailed, activity: activityFilter, date: dateRangeFilter }
+    const byWords = applyFilters(rawItems, filters, { liked, downloaded })
+    if (!meaning || !searchQuery.trim()) return byWords
+    const rest = applyFilters(rawItems, { ...filters, search: "" }, { liked, downloaded })
+    const have = new Set(byWords.map((i) => i.id))
+    const order = new Map(meaning.map((id, i) => [id, i]))
+    return [...byWords, ...rest.filter((i) => !have.has(i.id) && order.has(i.id)).sort((a, b) => order.get(a.id)! - order.get(b.id)!)]
+  }, [rawItems, searchQuery, typeFilter, modelFilter, statusFilter, hideFailed, activityFilter, dateRangeFilter, liked, downloaded, meaning])
 
   const squareGridClass = gridClass(cardSizeStep)
   const masonryColumnsClass = masonryClass(cardSizeStep)
@@ -115,6 +127,10 @@ export function MediaVaultView({
         onUseAsReference={(it) => onNavigateToChat(it.prompt)}
         editActions={editActions}
         onEdit={onEdit}
+        onDelete={(it) => {
+          setSelectedItem(null)
+          setDoomed(it)
+        }}
       />
 
       <RunLogDialog item={logItem} onClose={() => setLogItem(null)} onRetry={onReuse ? (it) => { setLogItem(null); onReuse(it) } : undefined} />
